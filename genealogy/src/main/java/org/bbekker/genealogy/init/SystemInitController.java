@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.repository.BaseName;
 import org.bbekker.genealogy.repository.BaseNamePrefix;
 import org.bbekker.genealogy.repository.BaseNamePrefixRepository;
@@ -47,7 +48,7 @@ public class SystemInitController {
 		if (numOfBaseNameEntries == 0) {
 
 			try {
-				final Resource resource = new ClassPathResource("data/BaseName.csv");
+				final Resource resource = new ClassPathResource(AppConstants.BASE_NAME_CSV_PATH);
 				final InputStream inputStream = resource.getInputStream();
 
 				final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -85,7 +86,7 @@ public class SystemInitController {
 		if (numOfBaseNamePrefixEntries == 0) {
 			try {
 
-				final Resource resource = new ClassPathResource("data/BaseNamePrefix.csv");
+				final Resource resource = new ClassPathResource(AppConstants.BASE_NAME_PREFIX_CSV_PATH);
 				final InputStream inputStream = resource.getInputStream();
 
 				final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
