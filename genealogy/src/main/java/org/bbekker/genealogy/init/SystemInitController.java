@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bbekker.genealogy.common.AppConstants;
+import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.BaseName;
 import org.bbekker.genealogy.repository.BaseNamePrefix;
 import org.bbekker.genealogy.repository.BaseNamePrefixRepository;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class SystemInitController {
+
+
 
 	@Autowired
 	private BaseNameRepository baseNameRepository;
@@ -56,9 +59,13 @@ public class SystemInitController {
 
 				while ((line = bufferedReader.readLine()) != null) {
 
-					final List<String> lineList = Arrays.asList(line.split(","));
-					BaseName bn = new BaseName(lineList.get(1), lineList.get(0));
-					bn = baseNameRepository.save(bn);
+					final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
+					if ( (lineList.get(1) != null && !lineList.get(1).isEmpty())
+							&& (lineList.get(0) != null && !lineList.get(0).isEmpty())
+							) {
+						BaseName bn = new BaseName(lineList.get(1), lineList.get(0));
+						bn = baseNameRepository.save(bn);
+					}
 				}
 
 				bufferedReader.close();
@@ -94,9 +101,13 @@ public class SystemInitController {
 
 				while ((line = bufferedReader.readLine()) != null) {
 
-					List<String> lineList = Arrays.asList(line.split(","));
-					BaseNamePrefix bnp = new BaseNamePrefix(lineList.get(1), lineList.get(0));
-					bnp = baseNamePrefixRepository.save(bnp);
+					final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
+					if ( (lineList.get(1) != null && !lineList.get(1).isEmpty())
+							&& (lineList.get(0) != null && !lineList.get(0).isEmpty())
+							) {
+						BaseNamePrefix bnp = new BaseNamePrefix(lineList.get(1), lineList.get(0));
+						bnp = baseNamePrefixRepository.save(bnp);
+					}
 				}
 
 				bufferedReader.close();
