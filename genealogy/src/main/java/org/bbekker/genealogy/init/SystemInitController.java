@@ -1,0 +1,117 @@
+package org.bbekker.genealogy.init;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
+
+import org.bbekker.genealogy.repository.BaseName;
+import org.bbekker.genealogy.repository.BaseNamePrefix;
+import org.bbekker.genealogy.repository.BaseNamePrefixRepository;
+import org.bbekker.genealogy.repository.BaseNameRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class SystemInitController {
+
+	@Autowired
+	private BaseNameRepository baseNameRepository;
+	@Autowired
+	private BaseNamePrefixRepository baseNamePrefixRepository;
+
+	@RequestMapping(path = "/systeminit", method = RequestMethod.GET)
+	public Boolean systemInitializer() {
+
+		Boolean result = Boolean.FALSE;
+
+		if (loadBaseNames() & loadBaseNamePrefixes()) {
+			result = Boolean.TRUE;
+		}
+
+		return result;
+	}
+
+	private Boolean loadBaseNames() {
+
+		Boolean result = Boolean.FALSE;
+
+		// load names from csv file, but only if the table is still emtpy
+		long numOfBaseNameEntries = baseNameRepository.count();
+		if (numOfBaseNameEntries == 0) {
+
+			try {
+				final Resource resource = new ClassPathResource("data/BaseName.csv");
+				final InputStream inputStream = resource.getInputStream();
+
+				final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+				String line = null;
+
+				while ((line = bufferedReader.readLine()) != null) {
+
+					final List<String> lineList = Arrays.asList(line.split(","));
+					BaseName bn = new BaseName(lineList.get(1), lineList.get(0));
+					bn = baseNameRepository.save(bn);
+				}
+
+				bufferedReader.close();
+				inputStream.close();
+
+				result = Boolean.TRUE;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			// Table has rows, assume it's loaded already, do nothing.
+			// TODO: do a table content refresh, maybe there is changed content.
+			result = Boolean.TRUE;
+		}
+
+		return result;
+	}
+
+	private Boolean loadBaseNamePrefixes() {
+
+		Boolean result = Boolean.FALSE;
+
+		// load name prefixes from csv file, but only if the table is still emtpy
+		long numOfBaseNamePrefixEntries = baseNamePrefixRepository.count();
+		if (numOfBaseNamePrefixEntries == 0) {
+			try {
+
+				final Resource resource = new ClassPathResource("data/BaseNamePrefix.csv");
+				final InputStream inputStream = resource.getInputStream();
+
+				final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+				String line = null;
+
+				while ((line = bufferedReader.readLine()) != null) {
+
+					List<String> lineList = Arrays.asList(line.split(","));
+					BaseNamePrefix bnp = new BaseNamePrefix(lineList.get(1), lineList.get(0));
+					bnp = baseNamePrefixRepository.save(bnp);
+				}
+
+				bufferedReader.close();
+				inputStream.close();
+
+				result = Boolean.TRUE;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			// Table has rows, assume it's loaded already, do nothing.
+			// TODO: do a table content refresh, maybe there is changed content.
+			result = Boolean.TRUE;
+		}
+
+		return result;
+	}
+
+}
