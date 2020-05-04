@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.common.SystemConstants;
@@ -14,6 +15,7 @@ import org.bbekker.genealogy.repository.BaseNamePrefix;
 import org.bbekker.genealogy.repository.BaseNamePrefixRepository;
 import org.bbekker.genealogy.repository.BaseNameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SystemInitController {
 
-
+	@Autowired
+	MessageSource messageSource;
 
 	@Autowired
 	private BaseNameRepository baseNameRepository;
@@ -31,7 +34,7 @@ public class SystemInitController {
 	private BaseNamePrefixRepository baseNamePrefixRepository;
 
 	@RequestMapping(path = "/systeminit", method = RequestMethod.GET)
-	public Boolean systemInitializer() {
+	public String systemInitializer(Locale locale) {
 
 		Boolean result = Boolean.FALSE;
 
@@ -39,7 +42,8 @@ public class SystemInitController {
 			result = Boolean.TRUE;
 		}
 
-		return result;
+		return messageSource.getMessage("init.finished", null, locale);
+		//return result;
 	}
 
 	private Boolean loadBaseNames() {
@@ -59,6 +63,7 @@ public class SystemInitController {
 
 				while ((line = bufferedReader.readLine()) != null) {
 
+					// Skip empty entries
 					final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 					if ( (lineList.get(1) != null && !lineList.get(1).isEmpty())
 							&& (lineList.get(0) != null && !lineList.get(0).isEmpty())
@@ -101,6 +106,7 @@ public class SystemInitController {
 
 				while ((line = bufferedReader.readLine()) != null) {
 
+					// Skip empty entries
 					final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 					if ( (lineList.get(1) != null && !lineList.get(1).isEmpty())
 							&& (lineList.get(0) != null && !lineList.get(0).isEmpty())
