@@ -14,6 +14,8 @@ import org.bbekker.genealogy.repository.BaseName;
 import org.bbekker.genealogy.repository.BaseNamePrefix;
 import org.bbekker.genealogy.repository.BaseNamePrefixRepository;
 import org.bbekker.genealogy.repository.BaseNameRepository;
+import org.bbekker.genealogy.repository.Gender;
+import org.bbekker.genealogy.repository.GenderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
@@ -30,15 +32,19 @@ public class SystemInitController {
 
 	@Autowired
 	private BaseNameRepository baseNameRepository;
+
 	@Autowired
 	private BaseNamePrefixRepository baseNamePrefixRepository;
+
+	@Autowired
+	private GenderRepository genderRepository;
 
 	@RequestMapping(path = "/systeminit", method = RequestMethod.GET)
 	public String systemInitializer(Locale locale) {
 
 		Boolean result = Boolean.FALSE;
 
-		if (loadBaseNames() & loadBaseNamePrefixes()) {
+		if (loadBaseNames() & loadBaseNamePrefixes() & loadGenders()) {
 			result = Boolean.TRUE;
 		}
 
@@ -113,6 +119,49 @@ public class SystemInitController {
 							) {
 						BaseNamePrefix bnp = new BaseNamePrefix(lineList.get(1), lineList.get(0));
 						bnp = baseNamePrefixRepository.save(bnp);
+					}
+				}
+
+				bufferedReader.close();
+				inputStream.close();
+
+				result = Boolean.TRUE;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			// Table has rows, assume it's loaded already, do nothing.
+			// TODO: do a table content refresh, maybe there is changed content.
+			result = Boolean.TRUE;
+		}
+
+		return result;
+	}
+
+	private Boolean loadGenders() {
+
+		Boolean result = Boolean.FALSE;
+
+		// load name prefixes from csv file, but only if the table is still emtpy
+		long numOfBaseNamePrefixEntries = genderRepository.count();
+		if (numOfBaseNamePrefixEntries == 0) {
+			try {
+
+				final Resource resource = new ClassPathResource(AppConstants.GENDER_CSV_PATH);
+				final InputStream inputStream = resource.getInputStream();
+
+				final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+				String line = null;
+
+				while ((line = bufferedReader.readLine()) != null) {
+
+					// Skip empty entries
+					final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
+					if ( (lineList.get(1) != null && !lineList.get(1).isEmpty())
+							&& (lineList.get(0) != null && !lineList.get(0).isEmpty())
+							) {
+						Gender gnd = new Gender(lineList.get(0), lineList.get(1), lineList.get(2));
+						gnd = genderRepository.save(gnd);
 					}
 				}
 
