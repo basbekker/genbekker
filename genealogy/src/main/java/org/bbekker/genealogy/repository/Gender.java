@@ -7,6 +7,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.bbekker.genealogy.common.AppConstants;
+import org.bbekker.genealogy.common.AppConstants.Gender_Type;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -34,7 +36,12 @@ public class Gender {
 	}
 
 	public Gender(String gender, String name, String languageCode) {
-		this.gender = gender;
+		if (AppConstants.isInEnum(gender, Gender_Type.class)) {
+			this.gender = gender;
+		} else {
+			throw new RuntimeException("invalid gender " + gender);
+		}
+
 		this.name = name;
 		this.languageCode = languageCode;
 	}

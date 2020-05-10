@@ -42,10 +42,18 @@ public class SystemInitController {
 	@RequestMapping(path = "/systeminit", method = RequestMethod.GET)
 	public String systemInitializer(Locale locale) {
 
-		Boolean result = Boolean.FALSE;
+		Boolean result = Boolean.TRUE;
 
-		if (loadBaseNames() & loadBaseNamePrefixes() & loadGenders()) {
-			result = Boolean.TRUE;
+		if (!loadBaseNames())  {
+			result = Boolean.FALSE;
+		}
+
+		if (!loadBaseNamePrefixes()) {
+			result = Boolean.FALSE;
+		}
+
+		if (!loadGenders()) {
+			result = Boolean.FALSE;
 		}
 
 		return messageSource.getMessage("init.finished", null, locale);
@@ -143,8 +151,8 @@ public class SystemInitController {
 		Boolean result = Boolean.FALSE;
 
 		// load name prefixes from csv file, but only if the table is still emtpy
-		long numOfBaseNamePrefixEntries = genderRepository.count();
-		if (numOfBaseNamePrefixEntries == 0) {
+		long numOfGenderEntries = genderRepository.count();
+		if (numOfGenderEntries == 0) {
 			try {
 
 				final Resource resource = new ClassPathResource(AppConstants.GENDER_CSV_PATH);

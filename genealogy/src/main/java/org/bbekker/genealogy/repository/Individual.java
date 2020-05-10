@@ -44,8 +44,7 @@ public class Individual {
 	private String familiarName;
 
 	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	@Column(name = "GENDER_ID", nullable = false, unique = false)
-	@JoinColumn(name = "id", nullable = false)
+	@JoinColumn(name = "GENDER_ID", nullable = false, unique = false)
 	private Gender gender;
 
 	@Basic(optional = true, fetch = FetchType.LAZY)
