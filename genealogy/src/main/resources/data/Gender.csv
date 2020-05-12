@@ -1,6 +1,9 @@
 MALE,Male,en
-FEMALE,Female,en 
+FEMALE,Female,en
+UNDEFINED,Undefined,en 
 MALE,Man,nl
 FEMALE,Vrouw,nl
+UNDEFINED,Onbekend,nl
 MALE,Masculino,es
-FEMALE,Feminino,es 
+FEMALE,Feminino,es
+UNDEFINED,Desconocido,es

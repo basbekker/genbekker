@@ -48,11 +48,16 @@ public class Gender {
 
 	@Override
 	public String toString() {
-		return String.format("Gender[id=%s name='%s' languageCode='%s']", id, name, languageCode);
+		return String.format("Gender[id=%s gender='%s' name='%s' languageCode='%s']", id, gender, name, languageCode);
 	}
 
 	public String getId() {
 		return id;
+	}
+
+	public String getGender()
+	{
+		return gender;
 	}
 
 	public String getName() {

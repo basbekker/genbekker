@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.bbekker.genealogy.common.AppConstants;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,9 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class UploadController {
-
-	// Save the uploaded file to this folder
-	private static String UPLOADED_FOLDER = "C://temp//";
 
 	@RequestMapping(path = "/upload", method = RequestMethod.GET)
 	public String index() {
@@ -35,7 +33,7 @@ public class UploadController {
 
 			// Get the file and save it somewhere
 			byte[] bytes = file.getBytes();
-			Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
+			Path path = Paths.get(AppConstants.UPLOAD_FOLDER + file.getOriginalFilename());
 			Files.write(path, bytes);
 
 			redirectAttributes.addFlashAttribute("message",
