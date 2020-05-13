@@ -1,7 +1,10 @@
 package org.bbekker.genealogy.common;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class AppConstants {
 
+	@Value("${upload.folder}")
 	public static final String UPLOAD_FOLDER = "C://temp//";
 
 	public static final String BASE_NAME_CSV_PATH = "data/BaseName.csv";
