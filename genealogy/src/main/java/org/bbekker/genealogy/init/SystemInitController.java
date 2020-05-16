@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,7 +42,7 @@ public class SystemInitController {
 	private GenderRepository genderRepository;
 
 	@RequestMapping(path = "/systeminit", method = RequestMethod.GET)
-	public String systemInitializer(Locale locale) {
+	public ResponseEntity<?> systemInitializer(Locale locale) {
 
 		Boolean result = Boolean.TRUE;
 
@@ -56,8 +58,13 @@ public class SystemInitController {
 			result = Boolean.FALSE;
 		}
 
-		return messageSource.getMessage("init.finished", null, locale);
-		//return result;
+		final String return_msg = messageSource.getMessage("init.finished", null, locale);
+
+		if(result) {
+			return new ResponseEntity<>(return_msg, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	private Boolean loadBaseNames() {
