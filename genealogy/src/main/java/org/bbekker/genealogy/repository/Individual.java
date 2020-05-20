@@ -112,28 +112,56 @@ public class Individual {
 		return familiarName;
 	}
 
+	public void setGender(Gender gender) {
+		this.gender = gender;
+	}
+
 	public Gender getGender() {
 		return gender;
+	}
+
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
 	public Date getBirthDate() {
 		return birthDate;
 	}
 
+	public void setDeathDate(Date deathDate) {
+		this.deathDate = deathDate;
+	}
+
 	public Date getDeathDate() {
 		return deathDate;
+	}
+
+	public void setBirthPlace(String birthPlace) {
+		this.birthPlace = birthPlace;
 	}
 
 	public String getBirthPlace() {
 		return birthPlace;
 	}
 
+	public void setDeathPlace(String deathPlace) {
+		this.deathPlace = deathPlace;
+	}
+
 	public String getDeathPlace() {
 		return deathPlace;
 	}
 
+	public void setDeathCause(String deathCause) {
+		this.deathCause = deathCause;
+	}
+
 	public String getDeathCause() {
 		return deathCause;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	public String getNotes() {
