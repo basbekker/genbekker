@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.bbekker.genealogy.common.AppConstants;
@@ -22,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ImportController {
 
-	Logger logger = LoggerFactory.getLogger(ImportController.class);
+	private static Logger logger = LoggerFactory.getLogger(ImportController.class);
 
 	@Autowired
 	MessageSource messageSource;
@@ -44,9 +47,10 @@ public class ImportController {
 	private String EigenCodeBlackList;
 
 	@RequestMapping(path = "/import", method = RequestMethod.GET)
-	public String doImports() {
+	public ResponseEntity<?> doImports(Locale locale) {
 
 		Boolean result = Boolean.FALSE;
+		String return_msg = SystemConstants.EMPTY_STRING;
 
 		try {
 			File uploadedFile = new File(AppConstants.UPLOAD_FOLDER + AppConstants.BEKKER_CSV_NAME);
@@ -79,11 +83,19 @@ public class ImportController {
 			bufferedReader.close();
 			inputStream.close();
 
+			return_msg = messageSource.getMessage("import.finished", null, locale);
+
 		} catch (Exception e) {
 			// do nothing yet
+			return_msg = e.getMessage();
+			e.printStackTrace();
 		}
 
-		return "doImport=" + result.toString();
+		if(result) {
+			return new ResponseEntity<>(return_msg, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(return_msg, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	private String stripQuotes(String field) {
@@ -116,9 +128,6 @@ public class ImportController {
 
 		final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 
-		int position = 0;
-		boolean parseOk = true;
-
 		String eigenCode = SystemConstants.EMPTY_STRING;
 
 		// Principal individual.
@@ -137,53 +146,97 @@ public class ImportController {
 		String partnerFamiliarName = SystemConstants.EMPTY_STRING;
 		Gender partnerGender = null;
 
+		int position = 0;
+		boolean parseOk = true;
+		boolean parsePartnerOk = true;
+		boolean blackListed = false;
+
 		for (String field : lineList) {
 
-			final String fieldName = headerMappings.get(position);
+			String fieldName = headerMappings.get(position);
+
+			if (fieldName == null) {
+				fieldName = SystemConstants.EMPTY_STRING;
+			}
 
 			if (fieldName.equals(AppConstants.EIGENCODE_NL)) {
 				eigenCode = stripQuotes(field);
 				// Some lines are to be skipped for being junk, irrelevant etc.
 				if (blackListedLines.contains(eigenCode)) {
+					blackListed = true;
 					parseOk = false;
+					logger.info("line skip - blacklisted");
 				}
 			}
 
-			// Principal individual parsing.
-			if (fieldName.equals(AppConstants.ANAAM_NL)) {
-				lastName = stripQuotes(field);
-				logger.info("lastName=" + lastName);
-			}
+			if (!blackListed && parseOk) {
 
-			if (fieldName.equals(AppConstants.VNAMEN_NL)) {
-				firstName = stripQuotes(field);
-			}
+				// Principal individual parsing.
+				if (fieldName.equals(AppConstants.RNAAM_NL)) {
+					familiarName = stripQuotes(field);
+					logger.info("familiarName=" + familiarName);
+				}
 
-			if (fieldName.equals(AppConstants.VVOEG_NL)) {
-				middleName = stripQuotes(field);
-			}
+				if (fieldName.equals(AppConstants.ANAAM_NL)) {
+					lastName = stripQuotes(field);
+					if (lastName.isEmpty()) {
+						parseOk = false;
+					}
+					logger.info("lastName=" + lastName);
+				}
 
-			if (fieldName.equals(AppConstants.GESLACHT_NL)) {
-				final String genderType = stripQuotes(field);
-				gender = setGender(genderType);
-			}
+				if (fieldName.equals(AppConstants.VNAMEN_NL)) {
+					firstName = stripQuotes(field);
+					logger.info("firstName=" + firstName);
+					if (firstName.isEmpty()) {
+						parseOk = false;
+					}
+					logger.info("lastName=" + lastName);
+				}
 
-			// Partner individual parsing.
-			if (fieldName.equals(AppConstants.PANAAM_NL)) {
-				partnerLastName = stripQuotes(field);
-			}
+				if (fieldName.equals(AppConstants.VVOEG_NL)) {
+					middleName = stripQuotes(field);
+					logger.info("middleName=" + middleName);
+				}
 
-			if (fieldName.equals(AppConstants.PVNAMEN_NL)) {
-				partnerFirstName = stripQuotes(field);
-			}
+				if (fieldName.equals(AppConstants.GESLACHT_NL)) {
+					final String genderType = stripQuotes(field);
+					gender = setGender(genderType);
+					logger.info("gender=" + gender);
+				}
 
-			if (fieldName.equals(AppConstants.PVVOEG_NL)) {
-				partnerMiddleName = stripQuotes(field);
-			}
+				// Partner individual parsing.
+				if (fieldName.equals(AppConstants.PRNAAM_NL)) {
+					partnerFamiliarName = stripQuotes(field);
+					logger.info("partnerFamiliarName=" + partnerFamiliarName);
+				}
 
-			if (fieldName.equals(AppConstants.PGESLACHT_NL)) {
-				final String genderType = stripQuotes(field);
-				partnerGender = setGender(genderType);
+				if (fieldName.equals(AppConstants.PANAAM_NL)) {
+					partnerLastName = stripQuotes(field);
+					logger.info("partnerLastName=" + partnerLastName);
+					if (partnerLastName.isEmpty()) {
+						parsePartnerOk = false;
+					}
+				}
+
+				if (fieldName.equals(AppConstants.PVNAMEN_NL)) {
+					partnerFirstName = stripQuotes(field);
+					logger.info("partnerFirstName=" + partnerFirstName);
+					if (partnerFirstName.isEmpty()) {
+						parsePartnerOk = false;
+					}
+				}
+
+				if (fieldName.equals(AppConstants.PVVOEG_NL)) {
+					partnerMiddleName = stripQuotes(field);
+					logger.info("partnerMiddleName=" + partnerMiddleName);
+				}
+
+				if (fieldName.equals(AppConstants.PGESLACHT_NL)) {
+					final String genderType = stripQuotes(field);
+					partnerGender = setGender(genderType);
+					logger.info("partnerGender=" + partnerGender);
+				}
 			}
 
 			position++;
@@ -193,9 +246,11 @@ public class ImportController {
 			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, gender);
 			individual = individualRepository.save(individual);
 
-			Individual partnerIndividual = new Individual(partnerLastName, partnerFirstName, partnerMiddleName,
-					partnerMaidenName, partnerFamiliarName, partnerGender);
-			partnerIndividual = individualRepository.save(partnerIndividual);
+			if (parsePartnerOk) {
+				Individual partnerIndividual = new Individual(partnerLastName, partnerFirstName, partnerMiddleName,
+						partnerMaidenName, partnerFamiliarName, partnerGender);
+				partnerIndividual = individualRepository.save(partnerIndividual);
+			}
 		}
 
 		return Boolean.TRUE;
@@ -204,11 +259,17 @@ public class ImportController {
 	private Gender setGender(String field) {
 		Gender gender = null;
 
-		List<Gender> foundGenders = genderRepository.findByTypeAndLanguage(field.toUpperCase(), AppConstants.ISO639_1_NL);
-		if (foundGenders.size() > 0) {
-			Gender foundGender = foundGenders.get(0);
-			String debug = foundGender.toString();
-		}
+		/*
+		 * List<Gender> foundGenders =
+		 * genderRepository.findByTypeAndLanguage(field.toUpperCase(),
+		 * AppConstants.ISO639_1_NL); if (foundGenders.size() > 0) { Gender foundGender
+		 * = foundGenders.get(0); logger.info("foundGender=" + foundGender.toString());
+		 * gender = foundGender; } else { List<Gender> undefinedGenders =
+		 * genderRepository.findByTypeAndLanguage(Gender_Type.UNDEFINED.name(),
+		 * AppConstants.ISO639_1_NL); if (undefinedGenders.size() > 0) { Gender
+		 * foundGender = foundGenders.get(0); logger.info("undefinedGender=" +
+		 * foundGender.toString()); gender = foundGender; } }
+		 */
 
 		Iterable<Gender> allGenders = genderRepository.findAll();
 		for (Gender oneGender : allGenders) {
@@ -217,13 +278,12 @@ public class ImportController {
 				gender = oneGender;
 				break;
 			} else {
-				if (field.equals(AppConstants.FEMALE_NL)
-						&& oneGender.getGender().equals(Gender_Type.FEMALE.name())
+				if (field.equals(AppConstants.FEMALE_NL) && oneGender.getGender().equals(Gender_Type.FEMALE.name())
 						&& oneGender.getlanguageCode().equals(AppConstants.ISO639_1_NL)) {
 					gender = oneGender;
 					break;
 				} else {
-					if (field.isEmpty() && oneGender.getGender().equals(Gender_Type.UNDEFINED.name())
+					if (oneGender.getGender().equals(Gender_Type.UNDEFINED.name())
 							&& oneGender.getlanguageCode().equals(AppConstants.ISO639_1_NL)) {
 						gender = oneGender;
 						break;
@@ -232,6 +292,9 @@ public class ImportController {
 			}
 		}
 
+		if (gender != null) {
+			logger.info("gender=" + gender.toString());
+		}
 		return gender;
 	}
 

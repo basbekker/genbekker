@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class AppConstants {
 
 	@Value("${upload.folder}")
-	public static final String UPLOAD_FOLDER = "C://temp//";
+	public static final String UPLOAD_FOLDER = "C://Temp//Upload//";
 
 	public static final String BASE_NAME_CSV_PATH = "data/BaseName.csv";
 	public static final String BASE_NAME_PREFIX_CSV_PATH = "data/BaseNamePrefix.csv";
@@ -27,9 +27,9 @@ public class AppConstants {
 		return false;
 	}
 
-	public static final String ISO639_1_NL = "NL";
-	public static final String ISO639_1_ES = "ES";
-	public static final String ISO639_1_EN = "EN";
+	public static final String ISO639_1_NL = "nl";
+	public static final String ISO639_1_ES = "es";
+	public static final String ISO639_1_EN = "en";
 
 	public static final String MALE_NL = "M";
 	public static final String FEMALE_NL = "V";
