@@ -85,7 +85,7 @@ public class Individual {
 
 	@Override
 	public String toString() {
-		return String.format("Individual[id=%s lastName='%s' firstName='%s' gender='%s']", id, lastName, firstName, gender.getId());
+		return String.format("Individual[id=%s lastName='%s' firstName='%s' gender='%s' birthDate='%s' deathDate='%s']", id, lastName, firstName, gender.getName(), birthDate, deathDate);
 	}
 
 	public String getId() {

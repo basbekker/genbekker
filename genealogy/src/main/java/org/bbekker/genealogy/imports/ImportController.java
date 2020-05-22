@@ -5,11 +5,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.common.AppConstants.Gender_Type;
@@ -32,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ImportController {
 
-	private static Logger logger = LoggerFactory.getLogger(ImportController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ImportController.class);
 
 	@Autowired
 	MessageSource messageSource;
@@ -46,6 +50,9 @@ public class ImportController {
 	@Value("${bekker.csv.blacklist}")
 	private String EigenCodeBlackList;
 
+	@Value("${upload.folder}")
+	String UPLOAD_FOLDER;
+
 	@RequestMapping(path = "/import", method = RequestMethod.GET)
 	public ResponseEntity<?> doImports(Locale locale) {
 
@@ -53,7 +60,7 @@ public class ImportController {
 		String return_msg = SystemConstants.EMPTY_STRING;
 
 		try {
-			File uploadedFile = new File(AppConstants.UPLOAD_FOLDER + AppConstants.BEKKER_CSV_NAME);
+			File uploadedFile = new File(UPLOAD_FOLDER + AppConstants.BEKKER_CSV_NAME);
 			InputStream inputStream = new FileInputStream(uploadedFile);
 
 			final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -64,6 +71,8 @@ public class ImportController {
 
 			final List<String> blackList = loadBlacklistedLines(EigenCodeBlackList);
 
+			final Map<String, Gender> genderMappings = getGenderMappings();
+
 			while ((line = bufferedReader.readLine()) != null) {
 
 				logger.info("line=" + line);
@@ -73,7 +82,7 @@ public class ImportController {
 					headerMappings = importCSVHeaderLine(line);
 				} else {
 					// Other lines are data lines.
-					result = importCSVDataLine(line, headerMappings, blackList);
+					result = importCSVDataLine(line, headerMappings, blackList, genderMappings);
 				}
 
 				lineNum++;
@@ -83,6 +92,9 @@ public class ImportController {
 			bufferedReader.close();
 			inputStream.close();
 
+			Long numberOfIndividualEntries = individualRepository.count();
+			logger.info("Individual entries=" + numberOfIndividualEntries.toString());
+
 			return_msg = messageSource.getMessage("import.finished", null, locale);
 
 		} catch (Exception e) {
@@ -91,7 +103,7 @@ public class ImportController {
 			e.printStackTrace();
 		}
 
-		if(result) {
+		if (result) {
 			return new ResponseEntity<>(return_msg, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(return_msg, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -124,7 +136,8 @@ public class ImportController {
 		return headerMappings;
 	}
 
-	private Boolean importCSVDataLine(String line, Map<Integer, String> headerMappings, List<String> blackListedLines) {
+	private Boolean importCSVDataLine(String line, Map<Integer, String> headerMappings, List<String> blackListedLines,
+			Map<String, Gender> genderMappings) {
 
 		final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 
@@ -137,6 +150,8 @@ public class ImportController {
 		String maidenName = SystemConstants.EMPTY_STRING;
 		String familiarName = SystemConstants.EMPTY_STRING;
 		Gender gender = null;
+		Date birthDate = null;
+		Date deathDate = null;
 
 		// Partner individual.
 		String partnerLastName = SystemConstants.EMPTY_STRING;
@@ -145,6 +160,8 @@ public class ImportController {
 		String partnerMaidenName = SystemConstants.EMPTY_STRING;
 		String partnerFamiliarName = SystemConstants.EMPTY_STRING;
 		Gender partnerGender = null;
+		Date partnerBirthDate = null;
+		Date partnerDeathDate = null;
 
 		int position = 0;
 		boolean parseOk = true;
@@ -165,7 +182,7 @@ public class ImportController {
 				if (blackListedLines.contains(eigenCode)) {
 					blackListed = true;
 					parseOk = false;
-					logger.info("line skip - blacklisted");
+					logger.debug("line skip - blacklisted");
 				}
 			}
 
@@ -174,7 +191,10 @@ public class ImportController {
 				// Principal individual parsing.
 				if (fieldName.equals(AppConstants.RNAAM_NL)) {
 					familiarName = stripQuotes(field);
-					logger.info("familiarName=" + familiarName);
+					if (familiarName.isEmpty()) {
+						familiarName = null;
+					}
+					logger.debug("familiarName=" + familiarName);
 				}
 
 				if (fieldName.equals(AppConstants.ANAAM_NL)) {
@@ -182,7 +202,7 @@ public class ImportController {
 					if (lastName.isEmpty()) {
 						parseOk = false;
 					}
-					logger.info("lastName=" + lastName);
+					logger.debug("lastName=" + lastName);
 				}
 
 				if (fieldName.equals(AppConstants.VNAMEN_NL)) {
@@ -191,52 +211,110 @@ public class ImportController {
 					if (firstName.isEmpty()) {
 						parseOk = false;
 					}
-					logger.info("lastName=" + lastName);
+					logger.debug("lastName=" + lastName);
 				}
 
 				if (fieldName.equals(AppConstants.VVOEG_NL)) {
 					middleName = stripQuotes(field);
-					logger.info("middleName=" + middleName);
+					if (middleName.isEmpty()) {
+						middleName = null;
+					}
+					logger.debug("middleName=" + middleName);
 				}
 
 				if (fieldName.equals(AppConstants.GESLACHT_NL)) {
 					final String genderType = stripQuotes(field);
-					gender = setGender(genderType);
-					logger.info("gender=" + gender);
+					gender = setGender(genderType, genderMappings);
+					if (gender != null) {
+						logger.debug("gender=" + gender.toString());
+					} else {
+						logger.debug("gender=null");
+					}
+				}
+
+				if (fieldName.equals(AppConstants.GEBDATUM_NL)) {
+					final String birthDateString = stripQuotes(field);
+					final Optional<Date> optionalBirthDate = setDate(birthDateString);
+					birthDate = null;
+					if (optionalBirthDate != null && optionalBirthDate.isPresent()) {
+						birthDate = optionalBirthDate.get();
+					}
+					logger.debug("birthDate=" + birthDate);
+				}
+
+				if (fieldName.equals(AppConstants.OVLDATUM_NL)) {
+					final String deathDateString = stripQuotes(field);
+					final Optional<Date> optionalDeathDate = setDate(deathDateString);
+					deathDate = null;
+					if (optionalDeathDate != null && optionalDeathDate.isPresent()) {
+						deathDate = optionalDeathDate.get();
+					}
+					logger.debug("deathDate=" + deathDate);
 				}
 
 				// Partner individual parsing.
 				if (fieldName.equals(AppConstants.PRNAAM_NL)) {
 					partnerFamiliarName = stripQuotes(field);
-					logger.info("partnerFamiliarName=" + partnerFamiliarName);
+					if (partnerFamiliarName.isEmpty()) {
+						partnerFamiliarName = null;
+					}
+					logger.debug("partnerFamiliarName=" + partnerFamiliarName);
 				}
 
 				if (fieldName.equals(AppConstants.PANAAM_NL)) {
 					partnerLastName = stripQuotes(field);
-					logger.info("partnerLastName=" + partnerLastName);
 					if (partnerLastName.isEmpty()) {
 						parsePartnerOk = false;
 					}
+					logger.debug("partnerLastName=" + partnerLastName);
 				}
 
 				if (fieldName.equals(AppConstants.PVNAMEN_NL)) {
 					partnerFirstName = stripQuotes(field);
-					logger.info("partnerFirstName=" + partnerFirstName);
 					if (partnerFirstName.isEmpty()) {
 						parsePartnerOk = false;
 					}
+					logger.debug("partnerFirstName=" + partnerFirstName);
 				}
 
 				if (fieldName.equals(AppConstants.PVVOEG_NL)) {
 					partnerMiddleName = stripQuotes(field);
-					logger.info("partnerMiddleName=" + partnerMiddleName);
+					if (partnerMiddleName.isEmpty()) {
+						partnerMiddleName = null;
+					}
+					logger.debug("partnerMiddleName=" + partnerMiddleName);
 				}
 
 				if (fieldName.equals(AppConstants.PGESLACHT_NL)) {
 					final String genderType = stripQuotes(field);
-					partnerGender = setGender(genderType);
-					logger.info("partnerGender=" + partnerGender);
+					partnerGender = setGender(genderType, genderMappings);
+					if (gender != null) {
+						logger.debug("partnerGender=" + partnerGender.toString());
+					} else {
+						logger.debug("partnerGender=null");
+					}
 				}
+
+				if (fieldName.equals(AppConstants.PGEBDATUM_NL)) {
+					final String partnerBirthDateString = stripQuotes(field);
+					final Optional<Date> optionalPartnerBirthDate = setDate(partnerBirthDateString);
+					partnerBirthDate = null;
+					if (optionalPartnerBirthDate != null && optionalPartnerBirthDate.isPresent()) {
+						partnerBirthDate = optionalPartnerBirthDate.get();
+					}
+					logger.debug("partnerBirthDate=" + partnerBirthDate);
+				}
+
+				if (fieldName.equals(AppConstants.POVLDATUM_NL)) {
+					final String partnerDeathDateString = stripQuotes(field);
+					final Optional<Date> optionalPartnerDeathDate = setDate(partnerDeathDateString);
+					partnerDeathDate = null;
+					if (optionalPartnerDeathDate != null && optionalPartnerDeathDate.isPresent()) {
+						partnerDeathDate = optionalPartnerDeathDate.get();
+					}
+					logger.debug("partnerDeathDate=" + partnerDeathDate);
+				}
+
 			}
 
 			position++;
@@ -244,58 +322,88 @@ public class ImportController {
 
 		if (parseOk) {
 			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, gender);
+			individual.setBirthDate(birthDate);
+			individual.setDeathDate(deathDate);
 			individual = individualRepository.save(individual);
+			logger.info("individual=" + individual.toString());
 
 			if (parsePartnerOk) {
 				Individual partnerIndividual = new Individual(partnerLastName, partnerFirstName, partnerMiddleName,
 						partnerMaidenName, partnerFamiliarName, partnerGender);
+				partnerIndividual.setBirthDate(partnerBirthDate);
+				partnerIndividual.setDeathDate(partnerDeathDate);
 				partnerIndividual = individualRepository.save(partnerIndividual);
+				logger.info("partnerIndividual=" + partnerIndividual.toString());
 			}
 		}
 
 		return Boolean.TRUE;
 	}
 
-	private Gender setGender(String field) {
-		Gender gender = null;
+	/**
+	 *
+	 * @param field imported string with Dutch gender indication, ie M, V
+	 * @param genderMappings
+	 * @return gender object
+	 */
+	private Gender setGender(String field, Map<String, Gender> genderMappings) {
 
-		/*
-		 * List<Gender> foundGenders =
-		 * genderRepository.findByTypeAndLanguage(field.toUpperCase(),
-		 * AppConstants.ISO639_1_NL); if (foundGenders.size() > 0) { Gender foundGender
-		 * = foundGenders.get(0); logger.info("foundGender=" + foundGender.toString());
-		 * gender = foundGender; } else { List<Gender> undefinedGenders =
-		 * genderRepository.findByTypeAndLanguage(Gender_Type.UNDEFINED.name(),
-		 * AppConstants.ISO639_1_NL); if (undefinedGenders.size() > 0) { Gender
-		 * foundGender = foundGenders.get(0); logger.info("undefinedGender=" +
-		 * foundGender.toString()); gender = foundGender; } }
-		 */
+		Gender gender = null;
+		String key = SystemConstants.EMPTY_STRING;
+
+		if (field.equals(AppConstants.MALE_NL)) {
+			key = Gender_Type.MALE.name() + SystemConstants.COMMA + AppConstants.ISO639_1_NL;
+		} else {
+			if (field.equals(AppConstants.FEMALE_NL)) {
+				key = Gender_Type.FEMALE.name() + SystemConstants.COMMA + AppConstants.ISO639_1_NL;
+			} else {
+				key = Gender_Type.UNDEFINED.name() + SystemConstants.COMMA + AppConstants.ISO639_1_NL;
+			}
+		}
+		gender = genderMappings.get(key);
+
+		return gender;
+	}
+
+	/**
+	 * Build a mapping of gender types per language with their gender object.
+	 *
+	 * @return a map with as key compound string "gender type,language code", ie
+	 *         "MALE,nl", "UNDEFINED,es"
+	 */
+	private Map<String, Gender> getGenderMappings() {
+		Map<String, Gender> genders = new HashMap<String, Gender>();
 
 		Iterable<Gender> allGenders = genderRepository.findAll();
 		for (Gender oneGender : allGenders) {
-			if (field.equals(AppConstants.MALE_NL) && oneGender.getGender().equals(Gender_Type.MALE.name())
-					&& oneGender.getlanguageCode().equals(AppConstants.ISO639_1_NL)) {
-				gender = oneGender;
-				break;
-			} else {
-				if (field.equals(AppConstants.FEMALE_NL) && oneGender.getGender().equals(Gender_Type.FEMALE.name())
-						&& oneGender.getlanguageCode().equals(AppConstants.ISO639_1_NL)) {
-					gender = oneGender;
-					break;
-				} else {
-					if (oneGender.getGender().equals(Gender_Type.UNDEFINED.name())
-							&& oneGender.getlanguageCode().equals(AppConstants.ISO639_1_NL)) {
-						gender = oneGender;
-						break;
-					}
-				}
-			}
+			genders.put(oneGender.getGender() + SystemConstants.COMMA + oneGender.getlanguageCode(), oneGender);
 		}
 
-		if (gender != null) {
-			logger.info("gender=" + gender.toString());
+		return genders;
+	}
+
+	/**
+	 * Convert a date string to a date object.
+	 *
+	 * @param dateString date in dd-mm-yyy format
+	 * @return a date if string was parsed successfully, empty if the string was
+	 *         null or empty, or null otherwise
+	 */
+	private Optional<Date> setDate(String dateString) {
+		Optional<Date> date = null;
+		try {
+			if (dateString != null && !dateString.isEmpty()) {
+				Date tempDate = new SimpleDateFormat("dd-mm-yyyy").parse(dateString);
+				date = Optional.of(tempDate);
+			} else {
+				date = Optional.empty();
+			}
+
+		} catch (ParseException e) {
+			date = null;
+			logger.error(e.getLocalizedMessage());
 		}
-		return gender;
+		return date;
 	}
 
 }

@@ -1,11 +1,6 @@
 package org.bbekker.genealogy.common;
 
-import org.springframework.beans.factory.annotation.Value;
-
 public class AppConstants {
-
-	@Value("${upload.folder}")
-	public static final String UPLOAD_FOLDER = "C://Temp//Upload//";
 
 	public static final String BASE_NAME_CSV_PATH = "data/BaseName.csv";
 	public static final String BASE_NAME_PREFIX_CSV_PATH = "data/BaseNamePrefix.csv";
@@ -67,5 +62,11 @@ public class AppConstants {
 	public static final String PANAAM_NL ="PANAAM";
 	public static final String PNAAMGRP_NL = "PNAAMGRP";
 	public static final String PGESLACHT_NL = "PGESLACHT";
+	public static final String PBEROEP_NL = "PBEROEP";
+	public static final String PGEBDP_NL = "PGEBDP";
+	public static final String PGEBDATUM_NL = "PGEBDATUM";
+	//...
+	public static final String POVLDATUM_NL = "POVLDATUM";
+	//...
 
 }
