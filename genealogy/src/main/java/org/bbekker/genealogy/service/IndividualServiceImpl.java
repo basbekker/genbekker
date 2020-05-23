@@ -1,9 +1,7 @@
 package org.bbekker.genealogy.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
@@ -24,8 +22,6 @@ public class IndividualServiceImpl  implements IndividualService {
 	@Autowired
 	private IndividualRepository individualRepository;
 
-	static Map<String, Individual> individualsDB = new HashMap<>();
-
 	@Override
 	public List<Individual> findAll() {
 
@@ -36,6 +32,7 @@ public class IndividualServiceImpl  implements IndividualService {
 			allIndividuals.add(individual);
 		}
 
+		logger.info("return allIndividuals");
 		return allIndividuals;
 	}
 
