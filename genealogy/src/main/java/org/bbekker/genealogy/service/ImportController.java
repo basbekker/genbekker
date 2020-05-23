@@ -1,4 +1,4 @@
-package org.bbekker.genealogy.imports;
+package org.bbekker.genealogy.service;
 
 import java.io.BufferedReader;
 import java.io.File;
