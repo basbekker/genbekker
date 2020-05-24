@@ -38,7 +38,9 @@ public class IndividualServiceImpl  implements IndividualService {
 
 	@Override
 	public void saveAll(List<Individual> individuals) {
-		// TODO Auto-generated method stub
+		for (Individual individual : individuals) {
+			individualRepository.save(individual);
+		}
 	}
 
 }
