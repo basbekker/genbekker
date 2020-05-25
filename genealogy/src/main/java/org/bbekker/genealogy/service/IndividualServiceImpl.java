@@ -9,12 +9,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class IndividualServiceImpl  implements IndividualService {
 
 	private static final Logger logger = LoggerFactory.getLogger(IndividualServiceImpl.class);
+	private static final int pageSize = 20;
 
 	@Autowired
 	MessageSource messageSource;
@@ -33,6 +37,27 @@ public class IndividualServiceImpl  implements IndividualService {
 		}
 
 		logger.info("return allIndividuals");
+		return allIndividuals;
+	}
+
+	@Override
+	public Long getNumberOfPages() {
+		Long numberOfpages = individualRepository.count() / pageSize;
+		return numberOfpages;
+	}
+
+	@Override
+	public List<Individual> findAllPaged(int currentPage) {
+
+		List<Individual> allIndividuals = new ArrayList<Individual>();
+		Pageable newPage = PageRequest.of(currentPage, pageSize);
+
+		Page<Individual> foundIndividuals = individualRepository.findAll(newPage);
+		for (Individual individual : foundIndividuals) {
+			allIndividuals.add(individual);
+		}
+
+		logger.info("return pagedIndividuals");
 		return allIndividuals;
 	}
 

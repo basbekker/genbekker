@@ -11,4 +11,8 @@ public interface IndividualService {
 	List<Individual> findAll();
 
 	void saveAll(List<Individual> individuals);
+
+	List<Individual> findAllPaged(int currentPage);
+
+	Long getNumberOfPages();
 }

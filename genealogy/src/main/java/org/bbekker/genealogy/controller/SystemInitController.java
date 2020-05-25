@@ -1,4 +1,4 @@
-package org.bbekker.genealogy.init;
+package org.bbekker.genealogy.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;

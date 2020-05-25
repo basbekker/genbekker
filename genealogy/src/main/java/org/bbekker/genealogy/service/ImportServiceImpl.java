@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,16 +26,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-public class ImportController {
+@Service
+public class ImportServiceImpl implements ImportService {
 
-	private static final Logger logger = LoggerFactory.getLogger(ImportController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ImportServiceImpl.class);
 
 	@Autowired
 	MessageSource messageSource;
@@ -50,17 +45,13 @@ public class ImportController {
 	@Value("${bekker.csv.blacklist}")
 	private String EigenCodeBlackList;
 
-	@Value("${upload.folder}")
-	String UPLOAD_FOLDER;
+	@Override
+	public Boolean parseBekkerCsvFile(String fileName) {
 
-	@RequestMapping(path = "/import", method = RequestMethod.GET)
-	public ResponseEntity<?> doImports(Locale locale) {
-
-		Boolean result = Boolean.FALSE;
-		String return_msg = SystemConstants.EMPTY_STRING;
+		Boolean parseResult = Boolean.FALSE;
 
 		try {
-			File uploadedFile = new File(UPLOAD_FOLDER + AppConstants.BEKKER_CSV_NAME);
+			File uploadedFile = new File(fileName);
 			InputStream inputStream = new FileInputStream(uploadedFile);
 
 			final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -82,7 +73,7 @@ public class ImportController {
 					headerMappings = importCSVHeaderLine(line);
 				} else {
 					// Other lines are data lines.
-					result = importCSVDataLine(line, headerMappings, blackList, genderMappings);
+					parseResult = importCSVDataLine(line, headerMappings, blackList, genderMappings);
 				}
 
 				lineNum++;
@@ -95,19 +86,14 @@ public class ImportController {
 			Long numberOfIndividualEntries = individualRepository.count();
 			logger.info("Individual entries=" + numberOfIndividualEntries.toString());
 
-			return_msg = messageSource.getMessage("import.finished", null, locale);
 
 		} catch (Exception e) {
-			// do nothing yet
-			return_msg = e.getMessage();
+			parseResult = Boolean.FALSE;
+			logger.error("Parse " + fileName + " failed: ", e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 
-		if (result) {
-			return new ResponseEntity<>(return_msg, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(return_msg, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return parseResult;
 	}
 
 	private String stripQuotes(String field) {
@@ -197,6 +183,14 @@ public class ImportController {
 					logger.debug("familiarName=" + familiarName);
 				}
 
+				if (fieldName.equals(AppConstants.VVOEG_NL)) {
+					middleName = stripQuotes(field);
+					if (middleName.isEmpty()) {
+						middleName = null;
+					}
+					logger.debug("middleName=" + middleName);
+				}
+
 				if (fieldName.equals(AppConstants.ANAAM_NL)) {
 					lastName = stripQuotes(field);
 					if (lastName.isEmpty()) {
@@ -212,14 +206,6 @@ public class ImportController {
 						parseOk = false;
 					}
 					logger.debug("lastName=" + lastName);
-				}
-
-				if (fieldName.equals(AppConstants.VVOEG_NL)) {
-					middleName = stripQuotes(field);
-					if (middleName.isEmpty()) {
-						middleName = null;
-					}
-					logger.debug("middleName=" + middleName);
 				}
 
 				if (fieldName.equals(AppConstants.GESLACHT_NL)) {
@@ -405,5 +391,12 @@ public class ImportController {
 		}
 		return date;
 	}
+
+	@Override
+	public Boolean verifyUploadedFile(String fileName) {
+		// TODO Auto-generated method stub
+		return Boolean.TRUE;
+	}
+
 
 }

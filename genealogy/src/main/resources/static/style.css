@@ -1,15 +1,32 @@
 body {
-	background-color: #cccccc;
+	background-color: transparent;
 	font-family: arial,helvetica,sans-serif;
 }
 
-.bookHeadline {
+th {
+	color: black;
 	font-size: 12pt;
 	font-weight: bold;
+	text-align: left;
 }
 
-.bookDescription {
+.individualHead {
+	color: black;
+	font-size: 12pt;
+	font-weight: bold;
+	text-align: left;
+}
+
+tr {
+	color: black;
+	font-size: 12pt;
+	text-align: left;
+}
+
+.individualRow {
+	color: black;
 	font-size: 10pt;
+	text-align: left;
 }
 
 label {

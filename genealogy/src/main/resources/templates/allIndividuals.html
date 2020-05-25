@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta charset="ISO-8859-1">
+	<meta charset="UTF-8" />
+	<link rel="stylesheet" type="text/css" th:href="@{/style.css}">
 	<title>All Books</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
 </head>
 <body>
 <div class="container">
@@ -17,17 +17,19 @@
 			<table class="table">
 				<thead>
 					<tr>
+						<th> ID </th>
 						<th> Last Name </th>
 						<th> First Name </th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr th:if="${individuals.empty}">
-						<td colspan="2"> No Individuals Available </td>
+						<td colspan="3"> No Individuals Available </td>
 					</tr>
 					<tr th:each="individual : ${individuals}">
-						<td><span th:text="${individual.lastname}"> Last Name </span></td>
-						<td><span th:text="${individual.firstname}"> First Name </span></td>
+						<td><span th:text="${individual.id}"> ID </span></td>
+						<td><span th:text="${individual.lastName}"> Last Name </span></td>
+						<td><span th:text="${individual.firstName}"> First Name </span></td>
 					</tr>
 				</tbody>
 			</table>

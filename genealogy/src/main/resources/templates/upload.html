@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta charset="ISO-8859-1">
-<title>Spring Boot file upload</title>
+	<meta charset="UTF-8" />
+	<link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+	<title>File upload</title>
 </head>
 <body>
 
-	<h1>Spring Boot file upload</h1>
+	<h1>File Upload</h1>
 
-	<form method="POST" action="/upload" enctype="multipart/form-data">
-		<input type="file" name="file" /> 
+	<form action="/upload/bekker" method="POST" enctype="multipart/form-data">
+		<input type="file" name="file" />
+		<br /> <br /> 
+		<input type="checkbox" name="processUpload" />Process upload
 		<br /> <br />
 		<input type="submit" value="Submit" />
 	</form>

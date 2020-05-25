@@ -96,7 +96,7 @@ public class Individual {
 		return lastName;
 	}
 
-	public String getfirstName() {
+	public String getFirstName() {
 		return firstName;
 	}
 

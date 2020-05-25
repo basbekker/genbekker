@@ -1,4 +1,4 @@
-package org.bbekker.genealogy.service;
+package org.bbekker.genealogy.controller;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 
+import org.bbekker.genealogy.service.ImportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
+@RequestMapping(path = "/upload")
 public class UploadController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
@@ -26,16 +28,21 @@ public class UploadController {
 	@Autowired
 	MessageSource messageSource;
 
+	@Autowired
+	ImportService importService;
+
 	@Value("${upload.folder}")
 	String UPLOAD_FOLDER;
 
-	@RequestMapping(path = "/upload", method = RequestMethod.GET)
+	@RequestMapping(path = "/index", method = RequestMethod.GET)
 	public String index() {
 		return "upload";
 	}
 
-	@RequestMapping(path = "/upload", method = RequestMethod.POST)
-	public String singleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes,
+	@RequestMapping(path = "/bekker", method = RequestMethod.POST)
+	public String singleFileUpload(@RequestParam("file") MultipartFile file,
+			@RequestParam("processUpload") boolean processUpload,
+			RedirectAttributes redirectAttributes,
 			Locale locale) {
 
 		if (file.isEmpty()) {
@@ -45,13 +52,19 @@ public class UploadController {
 
 		try {
 
-			// Get the file and save it somewhere
+			// Get the file and save it in a separate upload storage
 			byte[] bytes = file.getBytes();
 			Path path = Paths.get(UPLOAD_FOLDER + file.getOriginalFilename());
 			Files.write(path, bytes);
 
+			if (processUpload) {
+				importService.parseBekkerCsvFile(path.toString());
+			}
+
+			String[] vars =
+					new String[]{file.getOriginalFilename()};
 			final String message = messageSource.getMessage("upload.finished",
-					new Object[] { file.getOriginalFilename() }, locale);
+					vars, locale);
 
 			redirectAttributes.addFlashAttribute("message", message);
 
@@ -62,11 +75,11 @@ public class UploadController {
 			e.printStackTrace();
 		}
 
-		return "redirect:/uploadStatus";
+		return "redirect:/upload/uploadStatus";
 	}
 
 	@RequestMapping(path = "/uploadStatus", method = RequestMethod.GET)
-	public String uploadStatus() {
+	public String uploadStatus(Locale locale) {
 		return "uploadStatus";
 	}
 

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8" />
+	<link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+	<title>Paged Books</title>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<h1>Individuals</h1>
+			</div>
+		</div>
+		<div>
+			<div>
+				<table>
+					<tbody class="individualRow">
+						<tr>
+							<td><span><a th:href="@{/individual/paged(page=${prevPage})}"> &lt; </a></span></td>
+							<td><span th:text="${currentPage}"></span></td>
+							<td><span><a th:href="@{/individual/paged(page=${nextPage})}"> &gt; </a></span></td>
+							<td><span th:text="${numberOfPages}"></span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div>
+				<table>
+					<thead class="individualHead">
+						<tr class="individualHead">
+							<th>ID</th>
+							<th>First Name</th>
+							<th>Middle Name</th>
+							<th>Last Name</th>
+						</tr>
+					</thead>
+					<tbody class="individualRow">
+						<tr th:if="${individuals.empty}">
+							<td colspan="3">No Individuals found</td>
+						</tr>
+						<tr class="individualRow" th:each="individual : ${individuals}">
+							<td><span th:text="${individual.id}"> ID </span></td>
+							<td><span th:text="${individual.firstName}"> First Name </span></td>
+							<td><span th:text="${individual.middleName}"> Middle Name </span></td>
+							<td><span th:text="${individual.lastName}"> Last Name </span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

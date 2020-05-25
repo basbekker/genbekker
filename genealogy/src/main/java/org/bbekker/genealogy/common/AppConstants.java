@@ -8,6 +8,7 @@ public class AppConstants {
 	public static final String GENDER_CSV_PATH = "data/Gender.csv";
 
 	public static final String BEKKER_CSV_NAME = "BEKKER.csv";
+	public static final String BEKKER_TEST_CSV_NAME = "BEKKER.csv";
 
 	public enum Gender_Type {
 		MALE, FEMALE, UNDEFINED
