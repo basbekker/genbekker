@@ -14,5 +14,7 @@ public interface IndividualService {
 
 	List<Individual> findAllPaged(int currentPage);
 
-	Long getNumberOfPages();
+	Integer getNumberOfPages();
+
+	Integer getNumberOfRecords();
 }

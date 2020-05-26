@@ -201,11 +201,10 @@ public class ImportServiceImpl implements ImportService {
 
 				if (fieldName.equals(AppConstants.VNAMEN_NL)) {
 					firstName = stripQuotes(field);
-					logger.info("firstName=" + firstName);
 					if (firstName.isEmpty()) {
 						parseOk = false;
 					}
-					logger.debug("lastName=" + lastName);
+					logger.debug("firstName=" + firstName);
 				}
 
 				if (fieldName.equals(AppConstants.GESLACHT_NL)) {

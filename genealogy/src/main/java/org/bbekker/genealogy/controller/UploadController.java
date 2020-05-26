@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.Locale;
 
 import org.bbekker.genealogy.service.ImportService;
+import org.bbekker.genealogy.service.IndividualService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class UploadController {
 	@Autowired
 	ImportService importService;
 
+	@Autowired
+	IndividualService individualService;
+
 	@Value("${upload.folder}")
 	String UPLOAD_FOLDER;
 
@@ -41,8 +45,7 @@ public class UploadController {
 
 	@RequestMapping(path = "/bekker", method = RequestMethod.POST)
 	public String singleFileUpload(@RequestParam("file") MultipartFile file,
-			@RequestParam("processUpload") boolean processUpload,
-			RedirectAttributes redirectAttributes,
+			@RequestParam("processUpload") boolean processUpload, RedirectAttributes redirectAttributes,
 			Locale locale) {
 
 		if (file.isEmpty()) {
@@ -61,10 +64,9 @@ public class UploadController {
 				importService.parseBekkerCsvFile(path.toString());
 			}
 
-			String[] vars =
-					new String[]{file.getOriginalFilename()};
-			final String message = messageSource.getMessage("upload.finished",
-					vars, locale);
+			String[] vars = new String[] { file.getOriginalFilename(),
+					individualService.getNumberOfRecords().toString() };
+			final String message = messageSource.getMessage("upload.finished", vars, locale);
 
 			redirectAttributes.addFlashAttribute("message", message);
 

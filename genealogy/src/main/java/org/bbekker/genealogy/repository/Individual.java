@@ -43,7 +43,7 @@ public class Individual {
 	@Column(name = "FAMILIAR_NAME", nullable = true, unique = false)
 	private String familiarName;
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "GENDER_ID", nullable = false, unique = false)
 	private Gender gender;
 
@@ -88,24 +88,48 @@ public class Individual {
 		return String.format("Individual[id=%s lastName='%s' firstName='%s' gender='%s' birthDate='%s' deathDate='%s']", id, lastName, firstName, gender.getName(), birthDate, deathDate);
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getId() {
 		return id;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getLastName() {
 		return lastName;
 	}
 
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
 	public String getFirstName() {
 		return firstName;
+	}
+
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
 	}
 
 	public String getMiddleName() {
 		return middleName;
 	}
 
+	public void setMaidenName(String maidenName) {
+		this.maidenName = maidenName;
+	}
+
 	public String getMaidenName() {
 		return maidenName;
+	}
+
+	public void setFamiliarName(String familiarName) {
+		this.familiarName = familiarName;
 	}
 
 	public String getFamiliarName() {

@@ -3,11 +3,22 @@ body {
 	font-family: arial,helvetica,sans-serif;
 }
 
+table {
+	border: 0px solid black;
+	padding: 10px;
+}
+
 th {
 	color: black;
 	font-size: 12pt;
 	font-weight: bold;
 	text-align: left;
+	border: 1px solid black;
+	padding-top: 10px;
+	padding-right: 30px;
+	padding-bottom: 10px;
+	padding-left: 30px;
+	
 }
 
 .individualHead {
@@ -21,6 +32,21 @@ tr {
 	color: black;
 	font-size: 12pt;
 	text-align: left;
+	border: 1px solid black;
+	padding-top: 10px;
+	padding-right: 30px;
+	padding-bottom: 10px;
+	padding-left: 30px;
+}
+
+td {
+	color: black;
+	font-size: 12pt;
+	text-align: left;
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
 }
 
 .individualRow {

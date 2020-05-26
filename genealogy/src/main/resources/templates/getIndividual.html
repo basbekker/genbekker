@@ -8,7 +8,7 @@
 <body>
 <div class="container">
 	<div class="row">
-		<div">
+		<div>
 			<h1> Individuals </h1>
 		</div>
 	</div>
@@ -20,21 +20,25 @@
 						<th> ID </th>
 						<th> Last Name </th>
 						<th> First Name </th>
+						<th> Middle Name </th>
+						<th> Maiden Name </th>
+						<th> Familiar Name </th>						
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:if="${individuals.empty}">
-						<td colspan="3"> No Individuals Available </td>
-					</tr>
-					<tr th:each="individual : ${individuals}">
-						<td><span th:text="${individual.id}"> ID </span></td>
-						<td><span th:text="${individual.lastName}"> Last Name </span></td>
-						<td><span th:text="${individual.firstName}"> First Name </span></td>
+					<tr th:if="${individual}">
+						<td><span th:text="${individual.id}"></span></td>
+						<td><span th:text="${individual.lastName}"></span></td>
+						<td><span th:text="${individual.firstName}"></span></td>
+						<td><span th:text="${individual.middleName}"></span></td>
+						<td><span th:text="${individual.maidenName}"></span></td>
+						<td><span th:text="${individual.familiarName}"></span></td>						
 					</tr>
 				</tbody>
 			</table>
 		</div>
 	</div>
+	<p><a href="/individual/paged">Return to individuals list</a></p>
 </div>
 </body>
 </html>

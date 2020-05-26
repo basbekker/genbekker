@@ -10,8 +10,12 @@
 	<h1>Upload Status</h1>
 
 	<div th:if="${message}">
-		<h2 th:text="${message}" />
+		<h3 th:text="${message}" />
 	</div>
+	
+	<form action="/upload/index" method="GET">
+		<input type="submit" value="Upload another" />
+	</form>
 
 </body>
 </html>

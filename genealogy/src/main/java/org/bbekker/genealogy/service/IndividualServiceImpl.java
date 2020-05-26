@@ -41,9 +41,9 @@ public class IndividualServiceImpl  implements IndividualService {
 	}
 
 	@Override
-	public Long getNumberOfPages() {
-		Long numberOfpages = individualRepository.count() / pageSize;
-		return numberOfpages;
+	public Integer getNumberOfPages() {
+		Long numberOfpages = (individualRepository.count() / pageSize);
+		return numberOfpages.intValue();
 	}
 
 	@Override
@@ -66,6 +66,12 @@ public class IndividualServiceImpl  implements IndividualService {
 		for (Individual individual : individuals) {
 			individualRepository.save(individual);
 		}
+	}
+
+	@Override
+	public Integer getNumberOfRecords() {
+		Long numberOfRecords = individualRepository.count();
+		return numberOfRecords.intValue();
 	}
 
 }
