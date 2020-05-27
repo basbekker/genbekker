@@ -86,7 +86,6 @@ public class ImportServiceImpl implements ImportService {
 			Long numberOfIndividualEntries = individualRepository.count();
 			logger.info("Individual entries=" + numberOfIndividualEntries.toString());
 
-
 		} catch (Exception e) {
 			parseResult = Boolean.FALSE;
 			logger.error("Parse " + fileName + " failed: ", e.getLocalizedMessage());
@@ -137,7 +136,11 @@ public class ImportServiceImpl implements ImportService {
 		String familiarName = SystemConstants.EMPTY_STRING;
 		Gender gender = null;
 		Date birthDate = null;
+		String birthPlace = SystemConstants.EMPTY_STRING;
 		Date deathDate = null;
+		String deathPlace = SystemConstants.EMPTY_STRING;
+		String deathCause = SystemConstants.EMPTY_STRING;
+		String notes = SystemConstants.EMPTY_STRING;
 
 		// Partner individual.
 		String partnerLastName = SystemConstants.EMPTY_STRING;
@@ -147,7 +150,11 @@ public class ImportServiceImpl implements ImportService {
 		String partnerFamiliarName = SystemConstants.EMPTY_STRING;
 		Gender partnerGender = null;
 		Date partnerBirthDate = null;
+		String partnerBirthPlace = SystemConstants.EMPTY_STRING;
 		Date partnerDeathDate = null;
+		String partnerDeathPlace = SystemConstants.EMPTY_STRING;
+		String partnerDeathCause = SystemConstants.EMPTY_STRING;
+		String partnerNotes = SystemConstants.EMPTY_STRING;
 
 		int position = 0;
 		boolean parseOk = true;
@@ -223,6 +230,15 @@ public class ImportServiceImpl implements ImportService {
 					birthDate = null;
 					if (optionalBirthDate != null && optionalBirthDate.isPresent()) {
 						birthDate = optionalBirthDate.get();
+					} else {
+						if (birthDateString != null && !birthDateString.isEmpty()) {
+							// The birth date field has data, only not in proper format, maybe it has just the year
+							// or something alike, so do not loose that info and save it to the notes field.
+							if (notes.length() > 0) {
+								notes = notes + SystemConstants.SPACE;
+							}
+							notes = notes + AppConstants.GEBDATUM_NL + SystemConstants.EQUALS + birthDateString + SystemConstants.SEMICOLON;
+						}
 					}
 					logger.debug("birthDate=" + birthDate);
 				}
@@ -286,6 +302,15 @@ public class ImportServiceImpl implements ImportService {
 					partnerBirthDate = null;
 					if (optionalPartnerBirthDate != null && optionalPartnerBirthDate.isPresent()) {
 						partnerBirthDate = optionalPartnerBirthDate.get();
+					} else {
+						if (partnerBirthDateString != null && !partnerBirthDateString.isEmpty()) {
+							// The partner birth date field has data, only not in proper format, maybe it has just the year
+							// or something alike, so do not loose that info and save it to the notes field.
+							if (partnerNotes.length() > 0) {
+								partnerNotes = partnerNotes + SystemConstants.SPACE;
+							}
+							partnerNotes = partnerNotes + AppConstants.PGEBDATUM_NL + SystemConstants.EQUALS + partnerBirthDateString + SystemConstants.SEMICOLON;
+						}
 					}
 					logger.debug("partnerBirthDate=" + partnerBirthDate);
 				}
@@ -308,7 +333,11 @@ public class ImportServiceImpl implements ImportService {
 		if (parseOk) {
 			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, gender);
 			individual.setBirthDate(birthDate);
+			individual.setBirthPlace(birthPlace);
 			individual.setDeathDate(deathDate);
+			individual.setBirthPlace(deathPlace);
+			individual.setDeathCause(deathCause);
+			individual.setNotes(notes);
 			individual = individualRepository.save(individual);
 			logger.info("individual=" + individual.toString());
 
@@ -316,7 +345,11 @@ public class ImportServiceImpl implements ImportService {
 				Individual partnerIndividual = new Individual(partnerLastName, partnerFirstName, partnerMiddleName,
 						partnerMaidenName, partnerFamiliarName, partnerGender);
 				partnerIndividual.setBirthDate(partnerBirthDate);
+				partnerIndividual.setBirthPlace(partnerBirthPlace);
 				partnerIndividual.setDeathDate(partnerDeathDate);
+				partnerIndividual.setBirthPlace(partnerDeathPlace);
+				partnerIndividual.setDeathCause(partnerDeathCause);
+				partnerIndividual.setNotes(partnerNotes);
 				partnerIndividual = individualRepository.save(partnerIndividual);
 				logger.info("partnerIndividual=" + partnerIndividual.toString());
 			}
@@ -327,7 +360,7 @@ public class ImportServiceImpl implements ImportService {
 
 	/**
 	 *
-	 * @param field imported string with Dutch gender indication, ie M, V
+	 * @param field          imported string with Dutch gender indication, ie M, V
 	 * @param genderMappings
 	 * @return gender object
 	 */
@@ -396,6 +429,5 @@ public class ImportServiceImpl implements ImportService {
 		// TODO Auto-generated method stub
 		return Boolean.TRUE;
 	}
-
 
 }

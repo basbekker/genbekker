@@ -80,12 +80,15 @@ public class Individual {
 	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName, Gender gender) {
 		this.lastName = lastName;
 		this.firstName = firstName;
+		this.middleName = middleName;
+		this.maidenName = maidenName;
+		this.familiarName = familiarName;
 		this.gender = gender;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Individual[id=%s lastName='%s' firstName='%s' gender='%s' birthDate='%s' deathDate='%s']", id, lastName, firstName, gender.getName(), birthDate, deathDate);
+		return String.format("Individual[id=%s lastName='%s' firstName='%s' middleName='%s' maidenName='%s' familiarName='%s' gender='%s' birthDate='%s' deathDate='%s']", id, lastName, firstName, middleName, maidenName, familiarName, gender.getName(), birthDate, deathDate);
 	}
 
 	public void setId(String id) {

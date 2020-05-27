@@ -37,5 +37,10 @@
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </root>
+    
+    <logger name="org.bbekker.genealogy.service.ImportServiceImpl" additivity="false"  level="debug">
+    	<appender-ref ref="RollingFile" />
+        <appender-ref ref="Console" />
+    </logger>
  
 </configuration>

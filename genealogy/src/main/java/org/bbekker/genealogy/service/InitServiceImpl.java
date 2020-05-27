@@ -1,4 +1,4 @@
-package org.bbekker.genealogy.controller;
+package org.bbekker.genealogy.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,18 +16,18 @@ import org.bbekker.genealogy.repository.BaseNamePrefixRepository;
 import org.bbekker.genealogy.repository.BaseNameRepository;
 import org.bbekker.genealogy.repository.Gender;
 import org.bbekker.genealogy.repository.GenderRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-@RestController
-public class SystemInitController {
+@Service
+public class InitServiceImpl implements InitService {
+
+	private static final Logger logger = LoggerFactory.getLogger(InitServiceImpl.class);
 
 	@Autowired
 	MessageSource messageSource;
@@ -41,8 +41,8 @@ public class SystemInitController {
 	@Autowired
 	private GenderRepository genderRepository;
 
-	@RequestMapping(path = "/systeminit", method = RequestMethod.GET)
-	public ResponseEntity<?> systemInitializer(Locale locale) {
+	@Override
+	public Boolean loadInitialData(Locale locale) {
 
 		Boolean result = Boolean.TRUE;
 
@@ -59,12 +59,9 @@ public class SystemInitController {
 		}
 
 		final String return_msg = messageSource.getMessage("init.finished", null, locale);
+		logger.info(return_msg);
 
-		if(result) {
-			return new ResponseEntity<>(return_msg, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return result;
 	}
 
 	private Boolean loadBaseNames() {

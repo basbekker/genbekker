@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<link rel="stylesheet" type="text/css" th:href="@{/style.css}">
-	<title>Paged individuals</title>
+	<title>Browse individuals</title>
 </head>
 <body>
 	<div class="container">
@@ -13,24 +13,40 @@
 			</div>
 		</div>
 		<div>
+		
 			<div>
 				<table>
-					<tbody class="individualRow">
-						<tr>
-							<td><span><a th:href="@{/individual/paged(page=${firstPage})}" title="First page"><img th:src="@{/first_page_black_24x24.png}" alt="First page"></a></span></td>
-							<td><span><a th:href="@{/individual/paged(page=${prevPage})}" title="Previous page"><img th:src="@{/navigate_before_black_24x24.png}" alt="Previous page"></a></span></td>
-							<td><span th:text="${currentPage}" title="Current page"></span></td>
-							<td><span><a th:href="@{/individual/paged(page=${nextPage})}" title="Next page"><img th:src="@{/navigate_next_black_24x24.png}" alt="Next page"></a></span></td>
-							<td><span><a th:href="@{/individual/paged(page=${lastPage})}" title="Last page"><img th:src="@{/last_page_black_24x24.png}" alt="Last page"></a></span></td>
+					<tbody>
+						<tr>					
+							<td>
+								<form action="/app/individual/paged">
+  									<input type="text" id="nameSearch" name="nameSearch">&nbsp;
+  									<input type="submit" value="Search">
+								</form> 
+							</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
+		
+			<div>
+				<table>
+					<tbody>
+						<tr>
+							<td><span><a th:href="@{/app/individual/paged(page=${firstPage})}" title="First page"><img th:src="@{/first_page_black_24x24.png}" alt="First page"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${prevPage})}" title="Previous page"><img th:src="@{/navigate_before_black_24x24.png}" alt="Previous page"></a></span></td>
+							<td><span th:text="${currentPage}" title="Current page"></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${nextPage})}" title="Next page"><img th:src="@{/navigate_next_black_24x24.png}" alt="Next page"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${lastPage})}" title="Last page"><img th:src="@{/last_page_black_24x24.png}" alt="Last page"></a></span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		
 			<div>
 				<table>
 					<thead>
 						<tr>
-							<th>ID</th>
 							<th>First Name</th>
 							<th>Middle Name</th>
 							<th>Last Name</th>
@@ -38,11 +54,14 @@
 					</thead>
 					<tbody>
 						<tr th:if="${individuals.empty}">
-							<td colspan="3">No Individuals found</td>
+							<td colspan="3">No individuals found</td>
 						</tr>
 						<tr th:each="individual : ${individuals}">	
-							<td><a th:href="@{/individual/display/{id}(id=${individual.id})}"><span th:text="${individual.id}"></span></a></td>
-							<td><span th:text="${individual.firstName}"></span></td>
+							<td>
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id})}">
+								<span th:text="${individual.firstName}"></span>
+								</a>
+							</td>
 							<td><span th:text="${individual.middleName}"></span></td>
 							<td><span th:text="${individual.lastName}"></span></td>
 						</tr>
@@ -50,7 +69,11 @@
 				</table>
 			</div>
 		</div>
-		<p><a href="/individual/create">Add a new individual</a></p>
+		
+		<div>
+			<p><a href="/app/individual/create">Add a new individual</a></p>
+		</div>
+		
 	</div>
 </body>
 

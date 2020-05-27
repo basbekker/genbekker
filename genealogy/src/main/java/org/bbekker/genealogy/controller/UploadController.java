@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping(path = "/upload")
+@RequestMapping(path = "/app/upload")
 public class UploadController {
 
 	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
@@ -44,8 +44,10 @@ public class UploadController {
 	}
 
 	@RequestMapping(path = "/bekker", method = RequestMethod.POST)
-	public String singleFileUpload(@RequestParam("file") MultipartFile file,
-			@RequestParam("processUpload") boolean processUpload, RedirectAttributes redirectAttributes,
+	public String singleFileUpload(
+			@RequestParam("file") MultipartFile file,
+			@RequestParam("processUpload") boolean processUpload,
+			RedirectAttributes redirectAttributes,
 			Locale locale) {
 
 		if (file.isEmpty()) {
@@ -77,7 +79,7 @@ public class UploadController {
 			e.printStackTrace();
 		}
 
-		return "redirect:/upload/uploadStatus";
+		return "redirect:/app/upload/uploadStatus";
 	}
 
 	@RequestMapping(path = "/uploadStatus", method = RequestMethod.GET)

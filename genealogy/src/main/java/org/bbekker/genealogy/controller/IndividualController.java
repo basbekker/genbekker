@@ -1,6 +1,5 @@
 package org.bbekker.genealogy.controller;
 
-import java.net.URI;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -12,19 +11,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Controller
-@RequestMapping("/individual")
+@RequestMapping("/app/individual")
 public class IndividualController {
 
 	private static final Logger logger = LoggerFactory.getLogger(IndividualController.class);
@@ -41,18 +37,7 @@ public class IndividualController {
 
 	@RequestMapping(path = "/add", method = RequestMethod.POST)
 	public String createIndividual(@Valid Individual individual, BindingResult result, Model model) {
-
-		return "";
-	}
-
-	@RequestMapping(path = "/create", method = RequestMethod.POST)
-	public ResponseEntity<Object> createIndividual(@RequestBody Individual individual) {
-		Individual createdIndividual = individualRepository.save(individual);
-
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-				.buildAndExpand(createdIndividual.getId()).toUri();
-
-		return ResponseEntity.created(location).build();
+		return "addIndividual";
 	}
 
 	@RequestMapping(path = "/display/{id}", method = RequestMethod.GET)
@@ -67,42 +52,6 @@ public class IndividualController {
 		return "getIndividual";
 	}
 
-	@RequestMapping(path = "/get/{id}", method = RequestMethod.GET)
-	public ResponseEntity<Individual> getIndividual(@PathVariable("id") String id) {
-		Optional<Individual> optionalIndividual = individualRepository.findById(id);
-
-		return ResponseEntity.of(optionalIndividual);
-	}
-
-	@RequestMapping(path = "/update/{id}", method = RequestMethod.PUT)
-	public ResponseEntity<Individual> updateIndividual(@PathVariable("id") String id, @Valid Individual individual, BindingResult result, Model model) {
-		Optional<Individual> optionalIndividual = individualRepository.findById(id);
-
-		if (optionalIndividual.isPresent()) {
-			individual.setId(id);
-			individualRepository.save(individual);
-
-			optionalIndividual = Optional.of(individual);
-		}
-
-		return ResponseEntity.of(optionalIndividual);
-	}
-
-	@RequestMapping(path = "/delete/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<Object> deleteIndividual(@PathVariable("id") String id) {
-		Optional<Individual> optionalIndividual = individualRepository.findById(id);
-
-		if (!optionalIndividual.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		individualRepository.deleteById(id);
-
-		return ResponseEntity.ok().build();
-	}
-
-
-
 	@RequestMapping(path = "/all", method = RequestMethod.GET)
 	public String showAll(Model model) {
 		model.addAttribute("individuals", individualService.findAll());
@@ -111,7 +60,10 @@ public class IndividualController {
 	}
 
 	@RequestMapping(path = "/paged", method = RequestMethod.GET)
-	public String showPaged(@RequestParam(value = "page", required = false) String currentPageNumber, Model model) {
+	public String showPaged(
+			@RequestParam(value = "page", required = false) String currentPageNumber,
+			@RequestParam(value = "nameSearch", required = false) String nameSearch,
+			Model model) {
 
 		int currentPage = 0;
 		if (currentPageNumber != null && !currentPageNumber.isEmpty()) {
@@ -134,7 +86,13 @@ public class IndividualController {
 		model.addAttribute("prevPage", prevPage);
 		model.addAttribute("nextPage", nextPage);
 		model.addAttribute("lastPage", lastPage);
-		model.addAttribute("individuals", individualService.findAllPaged(currentPage));
+
+		if (nameSearch != null && !nameSearch.isEmpty()) {
+			// TODO change to a findAll with wildcard search; for now still findAll
+			model.addAttribute("individuals", individualService.findAllPaged(currentPage));
+		} else {
+			model.addAttribute("individuals", individualService.findAllPaged(currentPage));
+		}
 
 		return "pagedIndividuals";
 	}
