@@ -26,7 +26,7 @@ public class AppConstants {
 	public enum GenderType {
 		MALE ("M", "♂", "male"), // For male sexuality.
 		FEMALE ("F", "♀", "female"), // For female sexuality.
-		OTHER ("O", "⚥", "intersexual"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
+		INTERSEXUAL ("O", "⚥", "intersexual"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
 		UNDEFINED ("U", "✗", "undefined"); // For use when sexuality is (still) unknown, or somehow doesn't fit in the previous 3.
 
 		private final String identifier;
@@ -39,7 +39,7 @@ public class AppConstants {
 			this.name = name;
 		}
 
-		public String getGenderIdentifier() {
+		public String getGenderId() {
 			return identifier;
 		}
 

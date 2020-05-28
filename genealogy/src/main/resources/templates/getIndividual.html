@@ -17,62 +17,62 @@
 			<table class="table">
 				<tbody th:if="${individual}">
 					<tr>
-						<td>ID</td>
+						<td><span th:text="#{individual.id}"></span></td>
 						<td><span th:text="${individual.id}"></span></td>			
 					</tr>
 					<tr>
-						<td>First Name</td>
+						<td><span th:text="#{individual.firstName}"></span></td>
 						<td><span th:text="${individual.firstName}"></span></td>						
 					</tr>
 					<tr>
-						<td>Middle Name</td>
+						<td><span th:text="#{individual.middleName}"></span></td>
 						<td><span th:text="${individual.middleName}"></span></td>						
 					</tr>
 					<tr>
-						<td>Last Name</td>
+						<td><span th:text="#{individual.lastName}"></span></td>
 						<td><span th:text="${individual.lastName}"></span></td>
 					</tr>
 					<tr>
-						<td>Maiden Name</td>
+						<td><span th:text="#{individual.maidenName}"></span></td>
 						<td><span th:text="${individual.maidenName}"></span></td>				
 					</tr>
 					<tr>
-						<td>Familiar Name</td>
+						<td><span th:text="#{individual.familiarName}"></span></td>
 						<td><span th:text="${individual.familiarName}"></span></td>						
 					</tr>
 					<tr>
-						<td>Gender</td>
-						<td><span th:text="${individual.genderType}"></span></td>						
+						<td><span th:text="#{individual.genderType}"></span></td>
+						<td><span th:text="${genderName}"></span></td>						
 					</tr>										
 					<tr>
-						<td>Birth Date</td>
+						<td><span th:text="#{individual.birthDate}"></span></td>
 						<td><span th:text="${individual.birthDate}"></span></td>						
 					</tr>					
 					<tr>
-						<td>Birth Place</td>
+						<td><span th:text="#{individual.birthPlace}"></span></td>
 						<td><span th:text="${individual.birthPlace}"></span></td>						
 					</tr>					
 					<tr>
-						<td>Death Date</td>
+						<td><span th:text="#{individual.deathDate}"></span></td>
 						<td><span th:text="${individual.deathDate}"></span></td>						
 					</tr>					
 					<tr>
-						<td>Death Place</td>
+						<td><span th:text="#{individual.deathPlace}"></span></td>
 						<td><span th:text="${individual.deathPlace}"></span></td>						
 					</tr>
 					<tr>
-						<td>Death Cause</td>
+						<td><span th:text="#{individual.deathCause}"></span></td>
 						<td><span th:text="${individual.deathCause}"></span></td>						
 					</tr>								
 					<tr>
-						<td>Notes</td>
+						<td><span th:text="#{individual.notes}"></span></td>
 						<td><span th:text="${individual.notes}"></span></td>						
 					</tr>															
 				</tbody>
 			</table>
 		</div>
 	</div>
-	<p><a href="/app/individual/paged">Return to list</a></p>
+	<p><a href="/app/individual/paged"><span th:text="#{return.to.list}"></span></a></p>
 </div>
 </body>
 </html>

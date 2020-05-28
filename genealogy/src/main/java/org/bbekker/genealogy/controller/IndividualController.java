@@ -1,9 +1,11 @@
 package org.bbekker.genealogy.controller;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.bbekker.genealogy.common.AppConstants.GenderType;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.service.IndividualService;
@@ -41,12 +43,13 @@ public class IndividualController {
 	}
 
 	@RequestMapping(path = "/display/{id}", method = RequestMethod.GET)
-	public String displayIndividual(@PathVariable("id") String id, Model model) {
+	public String displayIndividual(@PathVariable("id") String id, Model model, Locale locale) {
 		Optional<Individual> optionalIndividual = individualRepository.findById(id);
 
 		if (optionalIndividual.isPresent()) {
 			Individual individual = optionalIndividual.get();
 			model.addAttribute("individual", individual);
+			model.addAttribute("genderName", setGenderText(individual.getGenderType(), locale));
 		}
 
 		return "getIndividual";
@@ -95,6 +98,26 @@ public class IndividualController {
 		}
 
 		return "pagedIndividuals";
+	}
+
+	private String setGenderText(String genderType, Locale locale) {
+		String genderString = messageSource.getMessage("individual.genderType.undefined", null, locale);
+		if (genderType.equals(GenderType.MALE.getGenderId())) {
+			genderString = messageSource.getMessage("individual.genderType.male", null, locale);
+		} else {
+			if (genderType.equals(GenderType.FEMALE.getGenderId())) {
+				genderString = messageSource.getMessage("individual.genderType.female", null, locale);
+			} else {
+				if (genderType.equals(GenderType.INTERSEXUAL.getGenderId())) {
+					genderString = messageSource.getMessage("individual.genderType.intersexual", null, locale);
+				} else {
+					if (genderType.equals(GenderType.UNDEFINED.getGenderId())) {
+						genderString = messageSource.getMessage("individual.genderType.undefined", null, locale);
+					}
+				}
+			}
+		}
+		return genderString;
 	}
 
 }

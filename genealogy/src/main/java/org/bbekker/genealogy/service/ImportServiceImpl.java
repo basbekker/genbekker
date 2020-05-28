@@ -427,12 +427,12 @@ public class ImportServiceImpl implements ImportService {
 		String genderIdentifier = null;
 
 		if (field.equals(AppConstants.MALE_NL)) {
-			genderIdentifier = GenderType.MALE.getGenderIdentifier();
+			genderIdentifier = GenderType.MALE.getGenderId();
 		} else {
 			if (field.equals(AppConstants.FEMALE_NL)) {
-				genderIdentifier = GenderType.FEMALE.getGenderIdentifier();
+				genderIdentifier = GenderType.FEMALE.getGenderId();
 			} else {
-				genderIdentifier = GenderType.UNDEFINED.getGenderIdentifier();
+				genderIdentifier = GenderType.UNDEFINED.getGenderId();
 			}
 		}
 
