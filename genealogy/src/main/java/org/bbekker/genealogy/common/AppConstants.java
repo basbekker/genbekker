@@ -10,8 +10,46 @@ public class AppConstants {
 	public static final String BEKKER_CSV_NAME = "BEKKER.csv";
 	public static final String BEKKER_TEST_CSV_NAME = "BEKKER.csv";
 
+	/*
 	public enum Gender_Type {
-		MALE, FEMALE, UNDEFINED
+		MALE, FEMALE, OTHER, UNDEFINED
+	}
+	 */
+
+	/**
+	 * The gender type defines the biological sexuality of an individual.
+	 * Used fields:
+	 * - the one character gender identifier used by the application,
+	 * - the Unicode symbol for the gender,
+	 * - the textual presentation of the gender in English.
+	 */
+	public enum GenderType {
+		MALE ("M", "♂", "male"), // For male sexuality.
+		FEMALE ("F", "♀", "female"), // For female sexuality.
+		OTHER ("O", "⚥", "intersexual"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
+		UNDEFINED ("U", "✗", "undefined"); // For use when sexuality is (still) unknown, or somehow doesn't fit in the previous 3.
+
+		private final String identifier;
+		private final String symbol;
+		private final String name;
+
+		GenderType(String identifier, String symbol, String name) {
+			this.identifier = identifier;
+			this.symbol = symbol;
+			this.name = name;
+		}
+
+		public String getGenderIdentifier() {
+			return identifier;
+		}
+
+		public String getGenderSymbol() {
+			return symbol;
+		}
+
+		public String getGenderName() {
+			return name;
+		}
 	}
 
 	public static <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {
@@ -53,8 +91,14 @@ public class AppConstants {
 	public static final String BEROEP_NL = "BEROEP";
 	public static final String GEBDP_NL = "GEBDP";
 	public static final String GEBDATUM_NL = "GEBDATUM";
+	public static final String GEBPLTS_NL = "GEBPLTS";
+	public static final String GEBPROV_NL = "GEBPROV";
+	public static final String GEBLAND_NL = "GEBLAND";
 	//...
 	public static final String OVLDATUM_NL = "OVLDATUM";
+	public static final String OVLPLTS_NL = "OVLPLTS";
+	public static final String OVLPROV_NL = "OVLPROV";
+	public static final String OVLLAND_NL = "OVLLAND";
 	//...
 	public static final String PRNAAM_NL = "PRNAAM";
 	public static final String PTITEL_NL = "PTITEL";
@@ -66,8 +110,14 @@ public class AppConstants {
 	public static final String PBEROEP_NL = "PBEROEP";
 	public static final String PGEBDP_NL = "PGEBDP";
 	public static final String PGEBDATUM_NL = "PGEBDATUM";
+	public static final String PGEBPLTS_NL = "PGEBPLTS";
+	public static final String PGEBPROV_NL = "PGEBPROV";
+	public static final String PGEBLAND_NL = "PGEBLAND";
 	//...
 	public static final String POVLDATUM_NL = "POVLDATUM";
+	public static final String POVLPLTS_NL = "POVLPLTS";
+	public static final String POVLPROV_NL = "POVLPROV";
+	public static final String POVLLAND_NL = "POVLLAND";
 	//...
 
 }

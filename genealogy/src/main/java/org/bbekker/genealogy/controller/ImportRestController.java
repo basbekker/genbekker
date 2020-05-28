@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/import")
-public class ImportController {
+public class ImportRestController {
 
-	private static final Logger logger = LoggerFactory.getLogger(ImportController.class);
+	private static final Logger logger = LoggerFactory.getLogger(ImportRestController.class);
 
 	@Autowired
 	MessageSource messageSource;

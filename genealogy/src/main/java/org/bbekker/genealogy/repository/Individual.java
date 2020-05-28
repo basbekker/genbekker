@@ -8,8 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -31,45 +29,45 @@ public class Individual {
 	@Column(name = "FIRST_NAME", nullable = false, unique = false)
 	private String firstName;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "MIDDLE_NAME", nullable = true, unique = false)
 	private String middleName;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "MAIDEN_NAME", nullable = true, unique = false)
 	private String maidenName;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "FAMILIAR_NAME", nullable = true, unique = false)
 	private String familiarName;
 
-	@ManyToOne(optional = false, fetch = FetchType.EAGER)
-	@JoinColumn(name = "GENDER_ID", nullable = false, unique = false)
-	private Gender gender;
+	@Basic(optional = false, fetch = FetchType.EAGER)
+	@Column(name = "GENDER_TYPE", nullable = false, unique = false)
+	private String genderType;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Temporal(TemporalType.DATE)
 	@Column(name = "BIRTH_DATE", nullable = true, unique = false)
 	private Date birthDate;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Temporal(TemporalType.DATE)
 	@Column(name = "DEATH_DATE", nullable = true, unique = false)
 	private Date deathDate;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "BIRTH_PLACE", nullable = true, unique = false)
 	private String birthPlace;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "DEATH_PLACE", nullable = true, unique = false)
 	private String deathPlace;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "DEATH_CAUSE", nullable = true, unique = false)
 	private String deathCause;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "NOTES", nullable = true, unique = false)
 	private String notes;
 
@@ -77,18 +75,18 @@ public class Individual {
 	protected Individual() {
 	}
 
-	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName, Gender gender) {
+	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName, String genderType) {
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.maidenName = maidenName;
 		this.familiarName = familiarName;
-		this.gender = gender;
+		this.genderType = genderType;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Individual[id=%s lastName='%s' firstName='%s' middleName='%s' maidenName='%s' familiarName='%s' gender='%s' birthDate='%s' deathDate='%s']", id, lastName, firstName, middleName, maidenName, familiarName, gender.getName(), birthDate, deathDate);
+		return String.format("Individual[id=%s lastName='%s' firstName='%s' middleName='%s' maidenName='%s' familiarName='%s' gender='%s' birthDate='%s' birthPlace='%s' deathDate='%s' deathPlace='%s' deathCause='%s' notes='%s']", id, lastName, firstName, middleName, maidenName, familiarName, genderType, birthDate, birthPlace, deathDate, deathPlace, deathCause, notes);
 	}
 
 	public void setId(String id) {
@@ -139,12 +137,12 @@ public class Individual {
 		return familiarName;
 	}
 
-	public void setGender(Gender gender) {
-		this.gender = gender;
+	public void setGender(String genderType) {
+		this.genderType = genderType;
 	}
 
-	public Gender getGender() {
-		return gender;
+	public String getGenderType() {
+		return genderType;
 	}
 
 	public void setBirthDate(Date birthDate) {

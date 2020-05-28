@@ -15,10 +15,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.bbekker.genealogy.common.AppConstants;
-import org.bbekker.genealogy.common.AppConstants.Gender_Type;
+import org.bbekker.genealogy.common.AppConstants.GenderType;
 import org.bbekker.genealogy.common.SystemConstants;
-import org.bbekker.genealogy.repository.Gender;
-import org.bbekker.genealogy.repository.GenderRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.slf4j.Logger;
@@ -38,9 +36,6 @@ public class ImportServiceImpl implements ImportService {
 
 	@Autowired
 	private IndividualRepository individualRepository;
-
-	@Autowired
-	private GenderRepository genderRepository;
 
 	@Value("${bekker.csv.blacklist}")
 	private String EigenCodeBlackList;
@@ -62,8 +57,6 @@ public class ImportServiceImpl implements ImportService {
 
 			final List<String> blackList = loadBlacklistedLines(EigenCodeBlackList);
 
-			final Map<String, Gender> genderMappings = getGenderMappings();
-
 			while ((line = bufferedReader.readLine()) != null) {
 
 				logger.info("line=" + line);
@@ -73,7 +66,7 @@ public class ImportServiceImpl implements ImportService {
 					headerMappings = importCSVHeaderLine(line);
 				} else {
 					// Other lines are data lines.
-					parseResult = importCSVDataLine(line, headerMappings, blackList, genderMappings);
+					parseResult = importCSVDataLine(line, headerMappings, blackList);
 				}
 
 				lineNum++;
@@ -121,8 +114,7 @@ public class ImportServiceImpl implements ImportService {
 		return headerMappings;
 	}
 
-	private Boolean importCSVDataLine(String line, Map<Integer, String> headerMappings, List<String> blackListedLines,
-			Map<String, Gender> genderMappings) {
+	private Boolean importCSVDataLine(String line, Map<Integer, String> headerMappings, List<String> blackListedLines) {
 
 		final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 
@@ -134,7 +126,7 @@ public class ImportServiceImpl implements ImportService {
 		String middleName = SystemConstants.EMPTY_STRING;
 		String maidenName = SystemConstants.EMPTY_STRING;
 		String familiarName = SystemConstants.EMPTY_STRING;
-		Gender gender = null;
+		String genderType = null;
 		Date birthDate = null;
 		String birthPlace = SystemConstants.EMPTY_STRING;
 		Date deathDate = null;
@@ -148,7 +140,7 @@ public class ImportServiceImpl implements ImportService {
 		String partnerMiddleName = SystemConstants.EMPTY_STRING;
 		String partnerMaidenName = SystemConstants.EMPTY_STRING;
 		String partnerFamiliarName = SystemConstants.EMPTY_STRING;
-		Gender partnerGender = null;
+		String partnerGenderType = null;
 		Date partnerBirthDate = null;
 		String partnerBirthPlace = SystemConstants.EMPTY_STRING;
 		Date partnerDeathDate = null;
@@ -215,10 +207,10 @@ public class ImportServiceImpl implements ImportService {
 				}
 
 				if (fieldName.equals(AppConstants.GESLACHT_NL)) {
-					final String genderType = stripQuotes(field);
-					gender = setGender(genderType, genderMappings);
-					if (gender != null) {
-						logger.debug("gender=" + gender.toString());
+					final String importGenderType = stripQuotes(field);
+					genderType = setGender(importGenderType);
+					if (genderType != null) {
+						logger.debug("gender=" + genderType);
 					} else {
 						logger.debug("gender=null");
 					}
@@ -251,6 +243,39 @@ public class ImportServiceImpl implements ImportService {
 						deathDate = optionalDeathDate.get();
 					}
 					logger.debug("deathDate=" + deathDate);
+				}
+
+				if (fieldName.equals(AppConstants.GEBPLTS_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (birthPlace != null && !birthPlace.isEmpty()) {
+							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+						} else {
+							birthPlace = birthPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("birthPlace=" + birthPlace);
+				}
+
+				if (fieldName.equals(AppConstants.GEBPROV_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (birthPlace != null && !birthPlace.isEmpty()) {
+							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+						} else {
+							birthPlace = birthPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("birthPlace=" + birthPlace);
+				}
+
+				if (fieldName.equals(AppConstants.GEBLAND_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (birthPlace != null && !birthPlace.isEmpty()) {
+							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+						} else {
+							birthPlace = birthPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("birthPlace=" + birthPlace);
 				}
 
 				// Partner individual parsing.
@@ -287,12 +312,12 @@ public class ImportServiceImpl implements ImportService {
 				}
 
 				if (fieldName.equals(AppConstants.PGESLACHT_NL)) {
-					final String genderType = stripQuotes(field);
-					partnerGender = setGender(genderType, genderMappings);
-					if (gender != null) {
-						logger.debug("partnerGender=" + partnerGender.toString());
+					final String importGenderType = stripQuotes(field);
+					partnerGenderType = setGender(importGenderType);
+					if (partnerGenderType != null) {
+						logger.debug("gender=" + partnerGenderType);
 					} else {
-						logger.debug("partnerGender=null");
+						logger.debug("gender=null");
 					}
 				}
 
@@ -315,6 +340,39 @@ public class ImportServiceImpl implements ImportService {
 					logger.debug("partnerBirthDate=" + partnerBirthDate);
 				}
 
+				if (fieldName.equals(AppConstants.PGEBPLTS_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnerBirthPlace != null && !partnerBirthPlace.isEmpty()) {
+							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+						} else {
+							partnerBirthPlace = partnerBirthPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnerBirthPlace=" + partnerBirthPlace);
+				}
+
+				if (fieldName.equals(AppConstants.PGEBPROV_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnerBirthPlace != null && !partnerBirthPlace.isEmpty()) {
+							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+						} else {
+							partnerBirthPlace = partnerBirthPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnerBirthPlace=" + partnerBirthPlace);
+				}
+
+				if (fieldName.equals(AppConstants.PGEBLAND_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnerBirthPlace != null && !partnerBirthPlace.isEmpty()) {
+							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+						} else {
+							partnerBirthPlace = partnerBirthPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnerBirthPlace=" + partnerBirthPlace);
+				}
+
 				if (fieldName.equals(AppConstants.POVLDATUM_NL)) {
 					final String partnerDeathDateString = stripQuotes(field);
 					final Optional<Date> optionalPartnerDeathDate = setDate(partnerDeathDateString);
@@ -331,11 +389,11 @@ public class ImportServiceImpl implements ImportService {
 		}
 
 		if (parseOk) {
-			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, gender);
+			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, genderType);
 			individual.setBirthDate(birthDate);
 			individual.setBirthPlace(birthPlace);
 			individual.setDeathDate(deathDate);
-			individual.setBirthPlace(deathPlace);
+			individual.setDeathPlace(deathPlace);
 			individual.setDeathCause(deathCause);
 			individual.setNotes(notes);
 			individual = individualRepository.save(individual);
@@ -343,11 +401,11 @@ public class ImportServiceImpl implements ImportService {
 
 			if (parsePartnerOk) {
 				Individual partnerIndividual = new Individual(partnerLastName, partnerFirstName, partnerMiddleName,
-						partnerMaidenName, partnerFamiliarName, partnerGender);
+						partnerMaidenName, partnerFamiliarName, partnerGenderType);
 				partnerIndividual.setBirthDate(partnerBirthDate);
 				partnerIndividual.setBirthPlace(partnerBirthPlace);
 				partnerIndividual.setDeathDate(partnerDeathDate);
-				partnerIndividual.setBirthPlace(partnerDeathPlace);
+				partnerIndividual.setDeathPlace(partnerDeathPlace);
 				partnerIndividual.setDeathCause(partnerDeathCause);
 				partnerIndividual.setNotes(partnerNotes);
 				partnerIndividual = individualRepository.save(partnerIndividual);
@@ -359,51 +417,32 @@ public class ImportServiceImpl implements ImportService {
 	}
 
 	/**
+	 * Determine the gender type using for using with the GENPTT Dutch gender identifiers.
 	 *
-	 * @param field          imported string with Dutch gender indication, ie M, V
-	 * @param genderMappings
-	 * @return gender object
+	 * @param field imported string with Dutch gender indication, ie M, V
+	 * @return gender identifier
 	 */
-	private Gender setGender(String field, Map<String, Gender> genderMappings) {
+	private String setGender(String field) {
 
-		Gender gender = null;
-		String key = SystemConstants.EMPTY_STRING;
+		String genderIdentifier = null;
 
 		if (field.equals(AppConstants.MALE_NL)) {
-			key = Gender_Type.MALE.name() + SystemConstants.COMMA + AppConstants.ISO639_1_NL;
+			genderIdentifier = GenderType.MALE.getGenderIdentifier();
 		} else {
 			if (field.equals(AppConstants.FEMALE_NL)) {
-				key = Gender_Type.FEMALE.name() + SystemConstants.COMMA + AppConstants.ISO639_1_NL;
+				genderIdentifier = GenderType.FEMALE.getGenderIdentifier();
 			} else {
-				key = Gender_Type.UNDEFINED.name() + SystemConstants.COMMA + AppConstants.ISO639_1_NL;
+				genderIdentifier = GenderType.UNDEFINED.getGenderIdentifier();
 			}
 		}
-		gender = genderMappings.get(key);
 
-		return gender;
-	}
-
-	/**
-	 * Build a mapping of gender types per language with their gender object.
-	 *
-	 * @return a map with as key compound string "gender type,language code", ie
-	 *         "MALE,nl", "UNDEFINED,es"
-	 */
-	private Map<String, Gender> getGenderMappings() {
-		Map<String, Gender> genders = new HashMap<String, Gender>();
-
-		Iterable<Gender> allGenders = genderRepository.findAll();
-		for (Gender oneGender : allGenders) {
-			genders.put(oneGender.getGender() + SystemConstants.COMMA + oneGender.getlanguageCode(), oneGender);
-		}
-
-		return genders;
+		return genderIdentifier;
 	}
 
 	/**
 	 * Convert a date string to a date object.
 	 *
-	 * @param dateString date in dd-mm-yyy format
+	 * @param dateString date in dd-mm-yyyy format
 	 * @return a date if string was parsed successfully, empty if the string was
 	 *         null or empty, or null otherwise
 	 */
@@ -411,7 +450,7 @@ public class ImportServiceImpl implements ImportService {
 		Optional<Date> date = null;
 		try {
 			if (dateString != null && !dateString.isEmpty()) {
-				Date tempDate = new SimpleDateFormat("dd-mm-yyyy").parse(dateString);
+				Date tempDate = new SimpleDateFormat("dd-MM-yyyy").parse(dateString);
 				date = Optional.of(tempDate);
 			} else {
 				date = Optional.empty();
