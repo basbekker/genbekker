@@ -83,6 +83,8 @@ public class IndividualController {
 		int nextPage = Integer.min(currentPage + 1, numberOfPages);
 		int lastPage = numberOfPages;
 
+		logger.info(currentPage + " " + nameSearch);
+
 		model.addAttribute("numberOfPages", numberOfPages);
 		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("firstPage", firstPage);
@@ -91,8 +93,7 @@ public class IndividualController {
 		model.addAttribute("lastPage", lastPage);
 
 		if (nameSearch != null && !nameSearch.isEmpty()) {
-			// TODO change to a findAll with wildcard search; for now still findAll
-			model.addAttribute("individuals", individualService.findAllPaged(currentPage));
+			model.addAttribute("individuals", individualService.findLikePaged(nameSearch, currentPage));
 		} else {
 			model.addAttribute("individuals", individualService.findAllPaged(currentPage));
 		}

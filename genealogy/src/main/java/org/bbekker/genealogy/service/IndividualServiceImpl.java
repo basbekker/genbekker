@@ -62,6 +62,21 @@ public class IndividualServiceImpl  implements IndividualService {
 	}
 
 	@Override
+	public List<Individual> findLikePaged(String lastName, int currentPage) {
+
+		List<Individual> allIndividuals = new ArrayList<Individual>();
+		Pageable newPage = PageRequest.of(currentPage, pageSize);
+
+		Page<Individual> foundIndividuals = individualRepository.findByLastNameLike(lastName, newPage);
+		for (Individual individual : foundIndividuals) {
+			allIndividuals.add(individual);
+		}
+
+		logger.info("return pagedIndividuals");
+		return allIndividuals;
+	}
+
+	@Override
 	public void saveAll(List<Individual> individuals) {
 		for (Individual individual : individuals) {
 			individualRepository.save(individual);

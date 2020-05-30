@@ -14,7 +14,10 @@ public interface IndividualService {
 
 	List<Individual> findAllPaged(int currentPage);
 
+	List<Individual> findLikePaged(String lastName, int currentPage);
+
 	Integer getNumberOfPages();
 
 	Integer getNumberOfRecords();
+
 }

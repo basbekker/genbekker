@@ -8,8 +8,6 @@ import javax.validation.Valid;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.service.IndividualService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +23,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/api/individual")
 public class IndividualRestController {
-
-	private static final Logger logger = LoggerFactory.getLogger(IndividualRestController.class);
 
 	@Autowired
 	IndividualService individualService;
