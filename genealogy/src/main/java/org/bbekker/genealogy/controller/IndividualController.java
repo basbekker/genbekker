@@ -86,7 +86,7 @@ public class IndividualController {
 		logger.info(currentPage + " " + nameSearch);
 
 		model.addAttribute("numberOfPages", numberOfPages);
-		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("currentPage", currentPage + 1);
 		model.addAttribute("firstPage", firstPage);
 		model.addAttribute("prevPage", prevPage);
 		model.addAttribute("nextPage", nextPage);
