@@ -40,11 +40,6 @@ public class IndividualServiceImpl  implements IndividualService {
 		return allIndividuals;
 	}
 
-	@Override
-	public Integer getNumberOfPages() {
-		Long numberOfpages = (individualRepository.count() / pageSize);
-		return numberOfpages.intValue();
-	}
 
 	@Override
 	public List<Individual> findAllPaged(int currentPage) {
@@ -87,6 +82,28 @@ public class IndividualServiceImpl  implements IndividualService {
 	public Integer getNumberOfRecords() {
 		Long numberOfRecords = individualRepository.count();
 		return numberOfRecords.intValue();
+	}
+
+	@Override
+	public Integer getNumberOfPages() {
+		Long numberOfpages = (individualRepository.count() / pageSize);
+		return numberOfpages.intValue();
+	}
+
+	@Override
+	public Integer getNumberOfLikePages(String lastName) {
+		Long numberOfRecords = individualRepository.count(lastName);
+		if (numberOfRecords == 0L) {
+			return 0;
+		} else {
+			return roundUp(individualRepository.count(lastName), new Long(pageSize)).intValue();
+		}
+	}
+
+	private Long roundUp(Long recordCount, Long pageSize) {
+		// TODO still not rounding Ok
+		return (long) Math.ceil(recordCount / pageSize);
+
 	}
 
 }

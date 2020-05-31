@@ -15,29 +15,43 @@
 		<div>
 		
 			<div>
-				<table>
-					<tbody>
-						<tr>					
-							<td>
-								<form action="/app/individual/paged">
-  									<input type="text" id="nameSearch" name="nameSearch">&nbsp;
-  									<input type="submit" value="Search">
-								</form> 
-							</td>
-						</tr>
-					</tbody>
-				</table>
+				<form action="/app/individual/paged">
+					<table>
+						<tbody>
+							<tr>
+								<td>
+									<td><span">Current search: </span>
+									<span th:text="${searchArg}"></span>&nbsp;
+									<input type="hidden" name="searchArg" value="${searchArg}" />
+									<input type="hidden" name="page" value="${currentPage}" />
+								</td>
+								<td>
+									<input type="submit" name="action" value="clear">
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<td><span">New search: </span>
+									<input type="text" id="nameSearch" name="nameSearch">&nbsp;
+								</td>
+								<td>				
+  									<input type="submit" name="action" value="search">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
 			</div>
 		
 			<div>
 				<table>
 					<tbody>
 						<tr>
-							<td><span><a th:href="@{/app/individual/paged(page=${firstPage})}" title="First page"><img th:src="@{/first_page_black_24x24.png}" alt="First page"></a></span></td>
-							<td><span><a th:href="@{/app/individual/paged(page=${prevPage})}" title="Previous page"><img th:src="@{/navigate_before_black_24x24.png}" alt="Previous page"></a></span></td>
-							<td><span th:text="${currentPage}" title="Current page"></span></td>
-							<td><span><a th:href="@{/app/individual/paged(page=${nextPage})}" title="Next page"><img th:src="@{/navigate_next_black_24x24.png}" alt="Next page"></a></span></td>
-							<td><span><a th:href="@{/app/individual/paged(page=${lastPage})}" title="Last page"><img th:src="@{/last_page_black_24x24.png}" alt="Last page"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${firstPage}, searchArg=${searchArg})}" title="First page"><img th:src="@{/first_page_black_24x24.png}" alt="First page"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${prevPage}, searchArg=${searchArg})}" title="Previous page"><img th:src="@{/navigate_before_black_24x24.png}" alt="Previous page"></a></span></td>
+							<td><span th:text="${currentPage}" title="Current page"></span> of <span th:text="${numberOfPages}" title="Number of pages"></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${nextPage}, searchArg=${searchArg})}" title="Next page"><img th:src="@{/navigate_next_black_24x24.png}" alt="Next page"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${lastPage}, searchArg=${searchArg})}" title="Last page"><img th:src="@{/last_page_black_24x24.png}" alt="Last page"></a></span></td>
 						</tr>
 					</tbody>
 				</table>
@@ -58,7 +72,7 @@
 						</tr>
 						<tr th:each="individual : ${individuals}">	
 							<td>
-								<a th:href="@{/app/individual/display/{id}(id=${individual.id})}">
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg})}">
 								<span th:text="${individual.firstName}"></span>
 								</a>
 							</td>

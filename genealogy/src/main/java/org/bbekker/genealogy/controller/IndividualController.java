@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.bbekker.genealogy.common.AppConstants.GenderType;
+import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.service.IndividualService;
@@ -66,6 +67,8 @@ public class IndividualController {
 	public String showPaged(
 			@RequestParam(value = "page", required = false) String currentPageNumber,
 			@RequestParam(value = "nameSearch", required = false) String nameSearch,
+			@RequestParam(value = "searchArg", required = false) String searchArg,
+			@RequestParam(value = "action", required = false) String action,
 			Model model) {
 
 		int currentPage = 0;
@@ -77,26 +80,58 @@ public class IndividualController {
 			}
 		}
 
-		int numberOfPages = individualService.getNumberOfPages();
+		boolean noSearch = false;
+		String searchString = null;
+		if (searchArg != null && !searchArg.isEmpty()) {
+			searchString = searchArg;
+		} else {
+			searchString = SystemConstants.EMPTY_STRING;
+			noSearch = true;
+		}
+
+
+		if (action != null && !action.isEmpty()) {
+			if (action.equals("clear")) {
+				currentPage = 0;
+				searchString = SystemConstants.EMPTY_STRING;
+				noSearch = true;
+			} else {
+				if (action.equals("search")) {
+					currentPage = 0;
+					searchString = nameSearch;
+				} else {
+					// no-op
+				}
+			}
+		} else {
+			// no submit, just a link, stick with page and search
+		}
+
+		logger.info(currentPage + " " + searchString);
+
+		int numberOfPages = 0;
+		if (noSearch) {
+			numberOfPages = individualService.getNumberOfPages();
+			logger.info("no search # pages: " + numberOfPages);
+			model.addAttribute("individuals", individualService.findAllPaged(currentPage));
+		} else {
+			numberOfPages = individualService.getNumberOfLikePages(searchString);
+			logger.info("search # pages: " + numberOfPages);
+			model.addAttribute("individuals", individualService.findLikePaged(searchString, currentPage));
+		}
+
 		int firstPage = 0;
 		int prevPage = Integer.max(currentPage - 1, 0);
 		int nextPage = Integer.min(currentPage + 1, numberOfPages);
 		int lastPage = numberOfPages;
 
-		logger.info(currentPage + " " + nameSearch);
-
 		model.addAttribute("numberOfPages", numberOfPages);
-		model.addAttribute("currentPage", currentPage + 1);
+		model.addAttribute("currentPage", currentPage + 1); // internal first page is 0, but display is 1
 		model.addAttribute("firstPage", firstPage);
 		model.addAttribute("prevPage", prevPage);
 		model.addAttribute("nextPage", nextPage);
 		model.addAttribute("lastPage", lastPage);
-
-		if (nameSearch != null && !nameSearch.isEmpty()) {
-			model.addAttribute("individuals", individualService.findLikePaged(nameSearch, currentPage));
-		} else {
-			model.addAttribute("individuals", individualService.findAllPaged(currentPage));
-		}
+		model.addAttribute("searchArg",searchString);
 
 		return "pagedIndividuals";
 	}
