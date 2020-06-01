@@ -10,6 +10,7 @@ import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.service.IndividualService;
+import org.bbekker.genealogy.service.PageHandlerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,15 +111,15 @@ public class IndividualController {
 		logger.info(currentPage + " " + searchString);
 
 		int numberOfPages = 0;
+		PageHandlerUtil<Individual> pageHandler = null;
 		if (noSearch) {
-			numberOfPages = individualService.getNumberOfPages();
-			logger.info("no search # pages: " + numberOfPages);
-			model.addAttribute("individuals", individualService.findAllPaged(currentPage));
+			pageHandler = individualService.findAllPaged(currentPage);
 		} else {
-			numberOfPages = individualService.getNumberOfLikePages(searchString);
-			logger.info("search # pages: " + numberOfPages);
-			model.addAttribute("individuals", individualService.findLikePaged(searchString, currentPage));
+			pageHandler = individualService.findLikePaged(searchString, currentPage);
 		}
+		model.addAttribute("individuals", pageHandler.get());
+		numberOfPages = pageHandler.getTotalPages();
+		logger.info("no search # pages: " + numberOfPages);
 
 		int firstPage = 0;
 		int prevPage = Integer.max(currentPage - 1, 0);
@@ -126,7 +127,7 @@ public class IndividualController {
 		int lastPage = numberOfPages;
 
 		model.addAttribute("numberOfPages", numberOfPages);
-		model.addAttribute("currentPage", currentPage + 1); // internal first page is 0, but display is 1
+		model.addAttribute("currentPage", currentPage + 1); // internal first page is 0, but we display 1
 		model.addAttribute("firstPage", firstPage);
 		model.addAttribute("prevPage", prevPage);
 		model.addAttribute("nextPage", nextPage);

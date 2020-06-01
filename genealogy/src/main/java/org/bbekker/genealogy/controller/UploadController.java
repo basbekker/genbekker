@@ -67,7 +67,7 @@ public class UploadController {
 			}
 
 			String[] vars = new String[] { file.getOriginalFilename(),
-					individualService.getNumberOfRecords().toString() };
+					individualService.getNumberOfElements().toString() };
 			final String message = messageSource.getMessage("upload.finished", vars, locale);
 
 			redirectAttributes.addFlashAttribute("message", message);

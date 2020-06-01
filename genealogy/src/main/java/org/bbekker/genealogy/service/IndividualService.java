@@ -8,18 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IndividualService {
 
-	List<Individual> findAll();
-
 	void saveAll(List<Individual> individuals);
 
-	List<Individual> findAllPaged(int currentPage);
+	PageHandlerUtil<Individual> findAll();
 
-	List<Individual> findLikePaged(String lastName, int currentPage);
+	PageHandlerUtil<Individual> findAllPaged(int currentPage);
 
-	Integer getNumberOfRecords();
+	PageHandlerUtil<Individual> findLikePaged(String lastName, int currentPage);
 
-	Integer getNumberOfPages();
-
-	Integer getNumberOfLikePages(String lastName);
+	Integer getNumberOfElements();
 
 }
