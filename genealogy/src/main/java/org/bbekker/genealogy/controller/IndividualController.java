@@ -72,12 +72,12 @@ public class IndividualController {
 			@RequestParam(value = "action", required = false) String action,
 			Model model) {
 
-		int currentPage = 0;
+		int currentPage = 1;
 		if (currentPageNumber != null && !currentPageNumber.isEmpty()) {
 			try {
 				currentPage = Integer.valueOf(currentPageNumber);
 			} catch (Exception e) {
-				currentPage = 0;
+				currentPage = 1;
 			}
 		}
 
@@ -93,12 +93,12 @@ public class IndividualController {
 
 		if (action != null && !action.isEmpty()) {
 			if (action.equals("clear")) {
-				currentPage = 0;
+				currentPage = 1;
 				searchString = SystemConstants.EMPTY_STRING;
 				noSearch = true;
 			} else {
 				if (action.equals("search")) {
-					currentPage = 0;
+					currentPage = 1;
 					searchString = nameSearch;
 				} else {
 					// no-op
@@ -113,26 +113,27 @@ public class IndividualController {
 		int numberOfPages = 0;
 		PageHandlerUtil<Individual> pageHandler = null;
 		if (noSearch) {
-			pageHandler = individualService.findAllPaged(currentPage);
+			// Our first page is 1, but the paging service is zero based.
+			pageHandler = individualService.findAllPaged(currentPage - 1);
 		} else {
-			pageHandler = individualService.findLikePaged(searchString, currentPage);
+			pageHandler = individualService.findLikePaged(searchString, currentPage - 1);
 		}
 		model.addAttribute("individuals", pageHandler.get());
 		numberOfPages = pageHandler.getTotalPages();
 		logger.info("no search # pages: " + numberOfPages);
 
-		int firstPage = 0;
-		int prevPage = Integer.max(currentPage - 1, 0);
+		int firstPage = 1;
+		int prevPage = Integer.max(currentPage - 1, 1);
 		int nextPage = Integer.min(currentPage + 1, numberOfPages);
 		int lastPage = numberOfPages;
 
 		model.addAttribute("numberOfPages", numberOfPages);
-		model.addAttribute("currentPage", currentPage + 1); // internal first page is 0, but we display 1
+		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("firstPage", firstPage);
 		model.addAttribute("prevPage", prevPage);
 		model.addAttribute("nextPage", nextPage);
 		model.addAttribute("lastPage", lastPage);
-		model.addAttribute("searchArg",searchString);
+		model.addAttribute("searchArg", searchString);
 
 		return "pagedIndividuals";
 	}
