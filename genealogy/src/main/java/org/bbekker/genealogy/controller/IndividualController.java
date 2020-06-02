@@ -45,7 +45,12 @@ public class IndividualController {
 	}
 
 	@RequestMapping(path = "/display/{id}", method = RequestMethod.GET)
-	public String displayIndividual(@PathVariable("id") String id, Model model, Locale locale) {
+	public String displayIndividual(
+			@PathVariable("id") String id, Model model,
+			@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "searchArg", required = false) String searchArg,
+			Locale locale) {
+
 		Optional<Individual> optionalIndividual = individualRepository.findById(id);
 
 		if (optionalIndividual.isPresent()) {
@@ -53,6 +58,8 @@ public class IndividualController {
 			model.addAttribute("individual", individual);
 			model.addAttribute("genderName", setGenderText(individual.getGenderType(), locale));
 		}
+		model.addAttribute("page", page);
+		model.addAttribute("searchArg", searchArg);
 
 		return "getIndividual";
 	}

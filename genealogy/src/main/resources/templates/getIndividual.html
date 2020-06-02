@@ -12,6 +12,7 @@
 			<h1> Individual </h1>
 		</div>
 	</div>
+		
 	<div class="row">
 		<div >
 			<table class="table">
@@ -72,7 +73,11 @@
 			</table>
 		</div>
 	</div>
-	<p><a href="/app/individual/paged"><span th:text="#{return.to.list}"></span></a></p>
+		
+	<div>
+		<p><a th:href="@{/app/individual/paged(page=${page}, searchArg=${searchArg})}"><span th:text="#{return.to.list}"></span></a></p>
+	</div>
+	
 </div>
 </body>
 </html>

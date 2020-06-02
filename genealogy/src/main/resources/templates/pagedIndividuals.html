@@ -47,11 +47,11 @@
 				<table>
 					<tbody>
 						<tr>
-							<td><span><a th:href="@{/app/individual/paged(page=${firstPage}, searchArg=${searchArg})}" title="First page"><img th:src="@{/first_page_black_24x24.png}" alt="First page"></a></span></td>
-							<td><span><a th:href="@{/app/individual/paged(page=${prevPage}, searchArg=${searchArg})}" title="Previous page"><img th:src="@{/navigate_before_black_24x24.png}" alt="Previous page"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${firstPage}, searchArg=${searchArg})}" title="First page"><img th:src="@{/first_page_black_24x24.png}"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${prevPage}, searchArg=${searchArg})}" title="Previous page"><img th:src="@{/navigate_before_black_24x24.png}"></a></span></td>
 							<td><span th:text="${currentPage}" title="Current page"></span> of <span th:text="${numberOfPages}" title="Number of pages"></span></td>
-							<td><span><a th:href="@{/app/individual/paged(page=${nextPage}, searchArg=${searchArg})}" title="Next page"><img th:src="@{/navigate_next_black_24x24.png}" alt="Next page"></a></span></td>
-							<td><span><a th:href="@{/app/individual/paged(page=${lastPage}, searchArg=${searchArg})}" title="Last page"><img th:src="@{/last_page_black_24x24.png}" alt="Last page"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${nextPage}, searchArg=${searchArg})}" title="Next page"><img th:src="@{/navigate_next_black_24x24.png}"></a></span></td>
+							<td><span><a th:href="@{/app/individual/paged(page=${lastPage}, searchArg=${searchArg})}" title="Last page"><img th:src="@{/last_page_black_24x24.png}"></a></span></td>
 						</tr>
 					</tbody>
 				</table>
@@ -72,7 +72,7 @@
 						</tr>
 						<tr th:each="individual : ${individuals}">	
 							<td>
-								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg})}">
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, page=${currentPage}, searchArg=${searchArg})}">
 								<span th:text="${individual.firstName}"></span>
 								</a>
 							</td>
