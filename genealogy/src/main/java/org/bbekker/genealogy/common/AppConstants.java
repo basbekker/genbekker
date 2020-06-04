@@ -10,11 +10,8 @@ public class AppConstants {
 	public static final String BEKKER_CSV_NAME = "BEKKER.csv";
 	public static final String BEKKER_TEST_CSV_NAME = "BEKKER.csv";
 
-	/*
-	public enum Gender_Type {
-		MALE, FEMALE, OTHER, UNDEFINED
-	}
-	 */
+	private final static String RELATIONSHIPTYPE_ID = "RelationshipTypeId";
+	private final static String ROLE_ID = "RoleId";
 
 	/**
 	 * The gender type defines the biological sexuality of an individual.
@@ -52,6 +49,76 @@ public class AppConstants {
 		}
 	}
 
+	/**
+	 * The gender type defines the biological sexuality of an individual.
+	 * Used fields:
+	 * - the one character gender identifier used by the application,
+	 * - the textual presentation of the gender in English.
+	 */
+	public enum RelationshipType {
+		PARENT_CHILD ("PC", "parent child"),
+		MARRIED ("M", "married"),
+		PARTNERS ("P", "partners"),
+		COUSINS ("C", "cousins"),
+		FRIEND ("FR", "friends"),
+		OTHER ("O", "other");
+
+		private final String identifier;
+		private final String name;
+
+		RelationshipType(String identifier, String name) {
+			this.identifier = identifier;
+			this.name = name;
+		}
+
+		public String getRelationshipTypeId() {
+			return identifier;
+		}
+
+		public String getRelationshipTypeName() {
+			return name;
+		}
+	}
+
+	public enum Role {
+		FATHER ("F", "father"),
+		MOTHER ("M", "mother"),
+		SON ("S", "son"),
+		DAUGHTER ("D", "daughter"),
+		HUSBAND ("H", "husband"),
+		WIFE ("W", "wife"),
+		PARTNER ("P", "partner"),
+		COUSIN ("C", "cousin"),
+		NIECE ("N", "niece"),
+		UNCLE ("U", "uncle"),
+		AUNT ("A", "aunt"),
+		NEPHEW ("W", "nephew"),
+		NIECE_UA ("E", "niece (from uncle/aunt"),
+		PATERNAL_GRANDFATHER ("PG", "paternal grandfather"),
+		PATERNAL_GRANDMOTHER ("PM", "paternal grandmother"),
+		MATERNAL_GRANDFATHER ("MG", "maternal grandfather"),
+		MATERNAL_GRANDMOTHER ("MM", "maternal grandmother"),
+		FRIEND ("FR", "friend"),
+		OTHER ("O", "other");
+
+		private final String identifier;
+		private final String name;
+
+		Role(String identifier, String name) {
+			this.identifier = identifier;
+			this.name = name;
+		}
+
+		public String getRoleId() {
+			return identifier;
+		}
+
+		public String getRoleName() {
+			return name;
+		}
+	}
+
+
 	public static <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {
 		for (E e : enumClass.getEnumConstants()) {
 			if (e.name().equals(value)) {
@@ -59,6 +126,26 @@ public class AppConstants {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Get the key id for a certain relationship type description, for lookup in the locale internationalization property file
+	 *
+	 * @param relationshipTypeId a identification out of the RelationshipType enumeration
+	 * @return the key string for lookup
+	 */
+	public String getMessageKeyForRelationshipType(String relationshipTypeId) {
+		return RELATIONSHIPTYPE_ID + SystemConstants.DOT + relationshipTypeId;
+	}
+
+	/**
+	 * Get the key id for a certain role description, for lookup in the locale internationalization property file
+	 *
+	 * @param roleId a identification out of the Role enumeration
+	 * @return the key string for lookup
+	 */
+	public String getMessageKeyForRole(String roleId) {
+		return ROLE_ID + SystemConstants.DOT + roleId;
 	}
 
 	public static final String ISO639_1_NL = "nl";

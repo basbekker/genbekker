@@ -58,6 +58,14 @@ public class InitServiceImpl implements InitService {
 			result = Boolean.FALSE;
 		}
 
+		if (!loadRelationshipTypes()) {
+			result = Boolean.FALSE;
+		}
+
+		if (!loadRoles()) {
+			result = Boolean.FALSE;
+		}
+
 		final String return_msg = messageSource.getMessage("init.finished", null, locale);
 		logger.info(return_msg);
 
@@ -189,6 +197,20 @@ public class InitServiceImpl implements InitService {
 			// TODO: do a table content refresh, maybe there is changed content.
 			result = Boolean.TRUE;
 		}
+
+		return result;
+	}
+
+	private Boolean loadRoles() {
+
+		Boolean result = Boolean.FALSE;
+
+		return result;
+	}
+
+	private Boolean loadRelationshipTypes() {
+
+		Boolean result = Boolean.FALSE;
 
 		return result;
 	}
