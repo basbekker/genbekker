@@ -1,5 +1,7 @@
 package org.bbekker.genealogy.common;
 
+import java.util.stream.Stream;
+
 public class AppConstants {
 
 	public static final String BASE_NAME_CSV_PATH = "data/BaseName.csv";
@@ -10,8 +12,8 @@ public class AppConstants {
 	public static final String BEKKER_CSV_NAME = "BEKKER.csv";
 	public static final String BEKKER_TEST_CSV_NAME = "BEKKER.csv";
 
-	private final static String RELATIONSHIPTYPE_ID = "RelationshipTypeId";
-	private final static String ROLE_ID = "RoleId";
+	private final static String RELATIONSHIPTYPE_MESSAGE_PREFIX = "RelationshipTypeId";
+	private final static String ROLE_MESSAGE_PREFIX = "RoleId";
 
 	/**
 	 * The gender type defines the biological sexuality of an individual.
@@ -55,9 +57,9 @@ public class AppConstants {
 	 * - the one character gender identifier used by the application,
 	 * - the textual presentation of the gender in English.
 	 */
-	public enum RelationshipType {
+	public enum RelationshipTypes {
 		PARENT_CHILD ("PC", "parent child"),
-		MARRIED ("M", "married"),
+		MARRIED ("M", "marriage"),
 		PARTNERS ("P", "partners"),
 		COUSINS ("C", "cousins"),
 		FRIEND ("FR", "friends"),
@@ -66,7 +68,7 @@ public class AppConstants {
 		private final String identifier;
 		private final String name;
 
-		RelationshipType(String identifier, String name) {
+		RelationshipTypes(String identifier, String name) {
 			this.identifier = identifier;
 			this.name = name;
 		}
@@ -78,9 +80,17 @@ public class AppConstants {
 		public String getRelationshipTypeName() {
 			return name;
 		}
+
+		public String getMessageKey() {
+			return RELATIONSHIPTYPE_MESSAGE_PREFIX + SystemConstants.DOT + identifier;
+		}
+
+		public static Stream<RelationshipTypes> stream() {
+			return Stream.of(RelationshipTypes.values());
+		}
 	}
 
-	public enum Role {
+	public enum Roles {
 		FATHER ("F", "father"),
 		MOTHER ("M", "mother"),
 		SON ("S", "son"),
@@ -104,7 +114,7 @@ public class AppConstants {
 		private final String identifier;
 		private final String name;
 
-		Role(String identifier, String name) {
+		Roles(String identifier, String name) {
 			this.identifier = identifier;
 			this.name = name;
 		}
@@ -116,6 +126,14 @@ public class AppConstants {
 		public String getRoleName() {
 			return name;
 		}
+
+		public String getMessageKey() {
+			return ROLE_MESSAGE_PREFIX + SystemConstants.DOT + identifier;
+		}
+
+		public static Stream<Roles> stream() {
+			return Stream.of(Roles.values());
+		}
 	}
 
 
@@ -126,26 +144,6 @@ public class AppConstants {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * Get the key id for a certain relationship type description, for lookup in the locale internationalization property file
-	 *
-	 * @param relationshipTypeId a identification out of the RelationshipType enumeration
-	 * @return the key string for lookup
-	 */
-	public String getMessageKeyForRelationshipType(String relationshipTypeId) {
-		return RELATIONSHIPTYPE_ID + SystemConstants.DOT + relationshipTypeId;
-	}
-
-	/**
-	 * Get the key id for a certain role description, for lookup in the locale internationalization property file
-	 *
-	 * @param roleId a identification out of the Role enumeration
-	 * @return the key string for lookup
-	 */
-	public String getMessageKeyForRole(String roleId) {
-		return ROLE_ID + SystemConstants.DOT + roleId;
 	}
 
 	public static final String ISO639_1_NL = "nl";

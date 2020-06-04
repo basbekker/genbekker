@@ -18,19 +18,24 @@ public class Role {
 	private String id;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
+	@Column(name = "QUALIFIER", nullable = false, unique = false)
+	private String qualifier;
+
+	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Column(name = "DESCRIPTION", nullable = false, unique = false)
 	private String description;
 
 	protected Role() {
 	}
 
-	public Role(String description) {
+	public Role(String qualifier, String description) {
+		this.qualifier = qualifier;
 		this.description = description;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Role[id=%s description='%s']", id, description);
+		return String.format("Role[id=%s qualifier='%s' description='%s']", id, qualifier, description);
 	}
 
 	public void setId(String id) {
@@ -41,11 +46,19 @@ public class Role {
 		return id;
 	}
 
-	public void setdescription(String description) {
+	public void setQualifier(String qualifier) {
+		this.qualifier = qualifier;
+	}
+
+	public String getQualifier() {
+		return qualifier;
+	}
+
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	public String getdescription() {
+	public String getDescription() {
 		return description;
 	}
 

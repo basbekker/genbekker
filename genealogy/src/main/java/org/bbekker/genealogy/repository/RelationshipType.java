@@ -18,19 +18,24 @@ public class RelationshipType {
 	private String id;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
+	@Column(name = "QUALIFIER", nullable = false, unique = false)
+	private String qualifier;
+
+	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Column(name = "DESCRIPTION", nullable = false, unique = false)
 	private String description;
 
 	protected RelationshipType() {
 	}
 
-	public RelationshipType(String description) {
+	public RelationshipType(String qualifier, String description) {
+		this.qualifier = qualifier;
 		this.description = description;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("RelationshipType[id=%s description='%s']", id, description);
+		return String.format("RelationshipType[id=%s qualifier='%s' description='%s']", id, qualifier, description);
 	}
 
 	public void setId(String id) {
@@ -41,11 +46,19 @@ public class RelationshipType {
 		return id;
 	}
 
-	public void setdescription(String description) {
+	public void setQualifier(String qualifier) {
+		this.qualifier = qualifier;
+	}
+
+	public String getQualifier() {
+		return qualifier;
+	}
+
+	public void setdDscription(String description) {
 		this.description = description;
 	}
 
-	public String getdescription() {
+	public String getDescription() {
 		return description;
 	}
 

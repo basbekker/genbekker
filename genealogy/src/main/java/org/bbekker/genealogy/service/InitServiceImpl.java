@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.bbekker.genealogy.common.AppConstants;
+import org.bbekker.genealogy.common.AppConstants.RelationshipTypes;
+import org.bbekker.genealogy.common.AppConstants.Roles;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.BaseName;
 import org.bbekker.genealogy.repository.BaseNamePrefix;
@@ -16,6 +18,10 @@ import org.bbekker.genealogy.repository.BaseNamePrefixRepository;
 import org.bbekker.genealogy.repository.BaseNameRepository;
 import org.bbekker.genealogy.repository.Gender;
 import org.bbekker.genealogy.repository.GenderRepository;
+import org.bbekker.genealogy.repository.RelationshipType;
+import org.bbekker.genealogy.repository.RelationshipTypeRepository;
+import org.bbekker.genealogy.repository.Role;
+import org.bbekker.genealogy.repository.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +46,12 @@ public class InitServiceImpl implements InitService {
 
 	@Autowired
 	private GenderRepository genderRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
+
+	@Autowired
+	private RelationshipTypeRepository relationshipTypeRepository;
 
 	@Override
 	public Boolean loadInitialData(Locale locale) {
@@ -205,12 +217,32 @@ public class InitServiceImpl implements InitService {
 
 		Boolean result = Boolean.FALSE;
 
+		if (Roles.values().length > 0) {
+
+			// Load the roles from the enumeration.
+			for (Roles acRrole : Roles.values()) {
+				Role role = new Role(acRrole.getRoleId(), acRrole.getRoleName());
+				role = roleRepository.save(role);
+			}
+			result = Boolean.TRUE;
+		}
+
 		return result;
 	}
 
 	private Boolean loadRelationshipTypes() {
 
 		Boolean result = Boolean.FALSE;
+
+		if (RelationshipTypes.values().length > 0) {
+
+			// Load the relationship types from the enumeration.
+			for (RelationshipTypes acRelationshipType : RelationshipTypes.values()) {
+				RelationshipType relationshipType = new RelationshipType(acRelationshipType.getRelationshipTypeId(), acRelationshipType.getRelationshipTypeName());
+				relationshipType = relationshipTypeRepository.save(relationshipType);
+			}
+			result = Boolean.TRUE;
+		}
 
 		return result;
 	}
