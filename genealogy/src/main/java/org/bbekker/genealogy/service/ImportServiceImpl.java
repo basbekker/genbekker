@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.bbekker.genealogy.common.AppConstants;
-import org.bbekker.genealogy.common.AppConstants.GenderType;
+import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
@@ -427,12 +427,12 @@ public class ImportServiceImpl implements ImportService {
 		String genderIdentifier = null;
 
 		if (field.equals(AppConstants.MALE_NL)) {
-			genderIdentifier = GenderType.MALE.getGenderId();
+			genderIdentifier = GenderTypes.MALE.getGenderQualifier();
 		} else {
 			if (field.equals(AppConstants.FEMALE_NL)) {
-				genderIdentifier = GenderType.FEMALE.getGenderId();
+				genderIdentifier = GenderTypes.FEMALE.getGenderQualifier();
 			} else {
-				genderIdentifier = GenderType.UNDEFINED.getGenderId();
+				genderIdentifier = GenderTypes.UNDEFINED.getGenderQualifier();
 			}
 		}
 

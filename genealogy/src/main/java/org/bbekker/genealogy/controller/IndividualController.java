@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
-import org.bbekker.genealogy.common.AppConstants.GenderType;
+import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
@@ -147,16 +147,16 @@ public class IndividualController {
 
 	private String setGenderText(String genderType, Locale locale) {
 		String genderString = messageSource.getMessage("individual.genderType.undefined", null, locale);
-		if (genderType.equals(GenderType.MALE.getGenderId())) {
+		if (genderType.equals(GenderTypes.MALE.getGenderQualifier())) {
 			genderString = messageSource.getMessage("individual.genderType.male", null, locale);
 		} else {
-			if (genderType.equals(GenderType.FEMALE.getGenderId())) {
+			if (genderType.equals(GenderTypes.FEMALE.getGenderQualifier())) {
 				genderString = messageSource.getMessage("individual.genderType.female", null, locale);
 			} else {
-				if (genderType.equals(GenderType.INTERSEXUAL.getGenderId())) {
+				if (genderType.equals(GenderTypes.INTERSEXUAL.getGenderQualifier())) {
 					genderString = messageSource.getMessage("individual.genderType.intersexual", null, locale);
 				} else {
-					if (genderType.equals(GenderType.UNDEFINED.getGenderId())) {
+					if (genderType.equals(GenderTypes.UNDEFINED.getGenderQualifier())) {
 						genderString = messageSource.getMessage("individual.genderType.undefined", null, locale);
 					}
 				}

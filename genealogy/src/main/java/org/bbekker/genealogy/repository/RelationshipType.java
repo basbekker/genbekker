@@ -18,7 +18,7 @@ public class RelationshipType {
 	private String id;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
-	@Column(name = "QUALIFIER", nullable = false, unique = false)
+	@Column(name = "QUALIFIER", nullable = false, unique = true)
 	private String qualifier;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)

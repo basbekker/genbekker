@@ -6,83 +6,100 @@ public class AppConstants {
 
 	public static final String BASE_NAME_CSV_PATH = "data/BaseName.csv";
 	public static final String BASE_NAME_PREFIX_CSV_PATH = "data/BaseNamePrefix.csv";
-
 	public static final String GENDER_CSV_PATH = "data/Gender.csv";
+	public static final String ROLE_CSV_PATH = "data/Role.csv";
+	public static final String RELATIONSHIP_TYPE_CSV_PATH = "data/RelationshipType.csv";
 
 	public static final String BEKKER_CSV_NAME = "BEKKER.csv";
 	public static final String BEKKER_TEST_CSV_NAME = "BEKKER.csv";
 
+	private final static String GENDER_MESSAGE_PREFIX = "GenderId";
 	private final static String RELATIONSHIPTYPE_MESSAGE_PREFIX = "RelationshipTypeId";
 	private final static String ROLE_MESSAGE_PREFIX = "RoleId";
 
 	/**
 	 * The gender type defines the biological sexuality of an individual.
 	 * Used fields:
-	 * - the one character gender identifier used by the application,
+	 * - the character qualifier used by the application,
 	 * - the Unicode symbol for the gender,
-	 * - the textual presentation of the gender in English.
+	 * - the textual description the gender in English.
 	 */
-	public enum GenderType {
+	public enum GenderTypes {
 		MALE ("M", "♂", "male"), // For male sexuality.
 		FEMALE ("F", "♀", "female"), // For female sexuality.
-		INTERSEXUAL ("O", "⚥", "intersexual"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
+		INTERSEXUAL ("I", "⚥", "intersexual"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
 		UNDEFINED ("U", "✗", "undefined"); // For use when sexuality is (still) unknown, or somehow doesn't fit in the previous 3.
 
-		private final String identifier;
+		private final String qualifier;
 		private final String symbol;
-		private final String name;
+		private final String description;
 
-		GenderType(String identifier, String symbol, String name) {
-			this.identifier = identifier;
+		GenderTypes(String qualifier, String symbol, String description) {
+			this.qualifier = qualifier;
 			this.symbol = symbol;
-			this.name = name;
+			this.description = description;
 		}
 
-		public String getGenderId() {
-			return identifier;
+		public String getName() {
+			return this.getName();
+		}
+
+		public String getGenderQualifier() {
+			return qualifier;
 		}
 
 		public String getGenderSymbol() {
 			return symbol;
 		}
 
-		public String getGenderName() {
-			return name;
+		public String getGenderDescription() {
+			return description;
+		}
+
+		public String getMessageKey() {
+			return GENDER_MESSAGE_PREFIX + SystemConstants.DOT + qualifier;
+		}
+
+		public static Stream<RelationshipTypes> stream() {
+			return Stream.of(RelationshipTypes.values());
 		}
 	}
 
 	/**
-	 * The gender type defines the biological sexuality of an individual.
+	 * The relationship types define the relationships that exists between two individuals.
 	 * Used fields:
-	 * - the one character gender identifier used by the application,
-	 * - the textual presentation of the gender in English.
+	 * - the qualifier that uniquely identifies the relationship,
+	 * - the textual description of the relationship in English.
 	 */
 	public enum RelationshipTypes {
 		PARENT_CHILD ("PC", "parent child"),
 		MARRIED ("M", "marriage"),
 		PARTNERS ("P", "partners"),
 		COUSINS ("C", "cousins"),
-		FRIEND ("FR", "friends"),
-		OTHER ("O", "other");
+		FRIEND ("FR", "friends");
 
-		private final String identifier;
-		private final String name;
+		private final String qualifier;
+		private final String description;
 
-		RelationshipTypes(String identifier, String name) {
-			this.identifier = identifier;
-			this.name = name;
+		RelationshipTypes(String qualifier, String description) {
+			this.qualifier = qualifier;
+			this.description = description;
 		}
 
-		public String getRelationshipTypeId() {
-			return identifier;
+		public String getName() {
+			return this.getName();
 		}
 
-		public String getRelationshipTypeName() {
-			return name;
+		public String getRelationshipTypeQualifier() {
+			return qualifier;
+		}
+
+		public String getRelationshipTypeDescription() {
+			return description;
 		}
 
 		public String getMessageKey() {
-			return RELATIONSHIPTYPE_MESSAGE_PREFIX + SystemConstants.DOT + identifier;
+			return RELATIONSHIPTYPE_MESSAGE_PREFIX + SystemConstants.DOT + qualifier;
 		}
 
 		public static Stream<RelationshipTypes> stream() {
@@ -102,33 +119,36 @@ public class AppConstants {
 		NIECE ("N", "niece"),
 		UNCLE ("U", "uncle"),
 		AUNT ("A", "aunt"),
-		NEPHEW ("W", "nephew"),
-		NIECE_UA ("E", "niece (from uncle/aunt"),
+		NEPHEW ("NW", "nephew"),
+		NIECE_UA ("NE", "niece (from uncle/aunt"),
 		PATERNAL_GRANDFATHER ("PG", "paternal grandfather"),
 		PATERNAL_GRANDMOTHER ("PM", "paternal grandmother"),
 		MATERNAL_GRANDFATHER ("MG", "maternal grandfather"),
 		MATERNAL_GRANDMOTHER ("MM", "maternal grandmother"),
-		FRIEND ("FR", "friend"),
-		OTHER ("O", "other");
+		FRIEND ("FR", "friend");
 
-		private final String identifier;
-		private final String name;
+		private final String qualifier;
+		private final String description;
 
-		Roles(String identifier, String name) {
-			this.identifier = identifier;
-			this.name = name;
+		Roles(String qualifier, String description) {
+			this.qualifier = qualifier;
+			this.description = description;
 		}
 
-		public String getRoleId() {
-			return identifier;
+		public String getName() {
+			return this.getName();
 		}
 
-		public String getRoleName() {
-			return name;
+		public String getRoleQualifier() {
+			return qualifier;
+		}
+
+		public String getRoleDescription() {
+			return description;
 		}
 
 		public String getMessageKey() {
-			return ROLE_MESSAGE_PREFIX + SystemConstants.DOT + identifier;
+			return ROLE_MESSAGE_PREFIX + SystemConstants.DOT + qualifier;
 		}
 
 		public static Stream<Roles> stream() {
