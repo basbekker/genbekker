@@ -19,6 +19,12 @@ import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
+import org.bbekker.genealogy.repository.Relationship;
+import org.bbekker.genealogy.repository.RelationshipRepository;
+import org.bbekker.genealogy.repository.RelationshipType;
+import org.bbekker.genealogy.repository.RelationshipTypeRepository;
+import org.bbekker.genealogy.repository.Role;
+import org.bbekker.genealogy.repository.RoleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +42,16 @@ public class ImportServiceImpl implements ImportService {
 
 	@Autowired
 	private IndividualRepository individualRepository;
+
+	@Autowired
+	private RelationshipRepository relationshipRepository;
+
+	@Autowired
+	private RelationshipTypeRepository relationshipTypeRepository;
+
+	@Autowired
+	private RoleRepository roleRepository;
+
 
 	@Value("${bekker.csv.blacklist}")
 	private String EigenCodeBlackList;
@@ -410,6 +426,29 @@ public class ImportServiceImpl implements ImportService {
 				partnerIndividual.setNotes(partnerNotes);
 				partnerIndividual = individualRepository.save(partnerIndividual);
 				logger.info("partnerIndividual=" + partnerIndividual.toString());
+
+				Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository.findByQualifier("M");
+
+				Optional<Role> optionalRole1 = Optional.empty();
+				if (individual.getGenderType().equals(GenderTypes.MALE.getGenderQualifier())) {
+					optionalRole1 = roleRepository.findByQualifier("H");
+				} else {
+					optionalRole1 = roleRepository.findByQualifier("W");
+				}
+
+				Optional<Role> optionalRole2 = Optional.empty();
+				if (partnerIndividual.getGenderType().equals(GenderTypes.MALE.getGenderQualifier())) {
+					optionalRole2 = roleRepository.findByQualifier("H");
+				} else {
+					optionalRole2 = roleRepository.findByQualifier("W");
+				}
+
+				if (optionalRelationshipType.isPresent() && optionalRole1.isPresent() && optionalRole2.isPresent()) {
+					Relationship relationship = new Relationship(individual, partnerIndividual, optionalRole1.get(), optionalRole2.get(), optionalRelationshipType.get());
+					relationship = relationshipRepository.save(relationship);
+					logger.info("relationship=" + relationship.toString());
+				}
+
 			}
 		}
 
