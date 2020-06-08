@@ -95,6 +95,9 @@ public class ImportServiceImpl implements ImportService {
 			Long numberOfIndividualEntries = individualRepository.count();
 			logger.info("Individual entries=" + numberOfIndividualEntries.toString());
 
+			Long numberOfRelationshipEntries = relationshipRepository.count();
+			logger.info("Relationship entries=" + numberOfRelationshipEntries.toString());
+
 		} catch (Exception e) {
 			parseResult = Boolean.FALSE;
 			logger.error("Parse " + fileName + " failed: ", e.getLocalizedMessage());

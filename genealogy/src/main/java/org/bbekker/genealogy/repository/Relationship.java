@@ -10,12 +10,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
+@Table(name = "RELATIONSHIP")
 public class Relationship {
 
 	@Id
@@ -43,25 +45,25 @@ public class Relationship {
 	@JoinColumn(name = "RELATIONSHIP_TYPE_ID", nullable = false, unique = false)
 	private RelationshipType relationshipType;
 
-	@ManyToOne(optional = true, fetch = FetchType.LAZY)
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "FAMILY_ID", nullable = true, unique = false)
 	private Family family;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Temporal(TemporalType.DATE)
 	@Column(name = "START_DATE", nullable = true, unique = false)
 	private Date startDate;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Temporal(TemporalType.DATE)
 	@Column(name = "END_DATE", nullable = true, unique = false)
 	private Date endDate;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "PLACE", nullable = true, unique = false)
 	private String place;
 
-	@Basic(optional = true, fetch = FetchType.LAZY)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "NOTES", nullable = true, unique = false)
 	private String notes;
 
