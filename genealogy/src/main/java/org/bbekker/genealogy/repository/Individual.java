@@ -70,14 +70,14 @@ public class Individual {
 	private String deathCause;
 
 	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Column(name = "NOTES", nullable = true, unique = false)
-	private String notes;
-
+	@Column(name = "NOTE", nullable = true, unique = false)
+	private String note;
 
 	protected Individual() {
 	}
 
-	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName, String genderType) {
+	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName,
+			String genderType) {
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.middleName = middleName;
@@ -88,7 +88,10 @@ public class Individual {
 
 	@Override
 	public String toString() {
-		return String.format("Individual[id=%s lastName='%s' firstName='%s' middleName='%s' maidenName='%s' familiarName='%s' gender='%s' birthDate='%s' birthPlace='%s' deathDate='%s' deathPlace='%s' deathCause='%s' notes='%s']", id, lastName, firstName, middleName, maidenName, familiarName, genderType, birthDate, birthPlace, deathDate, deathPlace, deathCause, notes);
+		return String.format(
+				"Individual[id=%s lastName='%s' firstName='%s' middleName='%s' maidenName='%s' familiarName='%s' gender='%s' birthDate='%s' birthPlace='%s' deathDate='%s' deathPlace='%s' deathCause='%s' note='%s']",
+				id, lastName, firstName, middleName, maidenName, familiarName, genderType, birthDate, birthPlace,
+				deathDate, deathPlace, deathCause, note);
 	}
 
 	public void setId(String id) {
@@ -187,12 +190,12 @@ public class Individual {
 		return deathCause;
 	}
 
-	public void setNotes(String notes) {
-		this.notes = notes;
+	public void setNote(String note) {
+		this.note = note;
 	}
 
-	public String getNotes() {
-		return notes;
+	public String getNote() {
+		return note;
 	}
 
 }

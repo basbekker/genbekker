@@ -1,7 +1,9 @@
 package org.bbekker.genealogy.service;
 
+import java.util.Date;
 import java.util.List;
 
+import org.bbekker.genealogy.repository.Event;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class IndividualServiceImpl  implements IndividualService {
+public class IndividualServiceImpl implements IndividualService {
 
 	@Value("${spring.data.web.pageable.default-page-size}")
 	private int defaultPageSize;
@@ -24,6 +26,16 @@ public class IndividualServiceImpl  implements IndividualService {
 	private IndividualRepository individualRepository;
 
 	private PageHandlerUtil<Individual> pageHandler;
+
+	public void create(String lastName, String firstName, String middleName, String maidenName, String familiarName,
+			String genderType, Date birthDate, String birthPlace, Date deathDate, String deathPlace, String note) {
+
+		Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, genderType);
+
+		Event event = new Event("birth", birthDate);
+		event.setEventPlace(birthPlace);
+
+	}
 
 	@Override
 	public PageHandlerUtil<Individual> findAll() {

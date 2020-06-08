@@ -414,7 +414,7 @@ public class ImportServiceImpl implements ImportService {
 			individual.setDeathDate(deathDate);
 			individual.setDeathPlace(deathPlace);
 			individual.setDeathCause(deathCause);
-			individual.setNotes(notes);
+			individual.setNote(notes);
 			individual = individualRepository.save(individual);
 			logger.info("individual=" + individual.toString());
 
@@ -426,7 +426,7 @@ public class ImportServiceImpl implements ImportService {
 				partnerIndividual.setDeathDate(partnerDeathDate);
 				partnerIndividual.setDeathPlace(partnerDeathPlace);
 				partnerIndividual.setDeathCause(partnerDeathCause);
-				partnerIndividual.setNotes(partnerNotes);
+				partnerIndividual.setNote(partnerNotes);
 				partnerIndividual = individualRepository.save(partnerIndividual);
 				logger.info("partnerIndividual=" + partnerIndividual.toString());
 
