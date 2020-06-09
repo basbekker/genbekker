@@ -3,7 +3,11 @@ package org.bbekker.genealogy.service;
 import java.util.Date;
 import java.util.List;
 
+import org.bbekker.genealogy.common.AppConstants.EventTypes;
 import org.bbekker.genealogy.repository.Event;
+import org.bbekker.genealogy.repository.EventRepository;
+import org.bbekker.genealogy.repository.EventType;
+import org.bbekker.genealogy.repository.EventTypeRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,15 +29,29 @@ public class IndividualServiceImpl implements IndividualService {
 	@Autowired
 	private IndividualRepository individualRepository;
 
+	@Autowired
+	private EventRepository eventRepository;
+
+	@Autowired
+	private EventTypeRepository eventTypeRepository;
+
 	private PageHandlerUtil<Individual> pageHandler;
+
 
 	public void create(String lastName, String firstName, String middleName, String maidenName, String familiarName,
 			String genderType, Date birthDate, String birthPlace, Date deathDate, String deathPlace, String note) {
 
 		Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, genderType);
+		individual = individualRepository.save(individual);
 
-		Event event = new Event("birth", birthDate);
-		event.setEventPlace(birthPlace);
+		EventType eventType = eventTypeRepository.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+		Event birthEvent = new Event(individual, eventType, birthDate);
+		birthEvent.setEventPlace(birthPlace);
+		birthEvent = eventRepository.save(birthEvent);
+
+		EventType eventTypeD = eventTypeRepository.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+		Event deathEvent = new Event(individual, eventTypeD, deathDate);
+		deathEvent.setEventPlace(deathPlace);
 
 	}
 

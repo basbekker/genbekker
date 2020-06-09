@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -21,11 +23,16 @@ public class Event {
 	@Id
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@Column(name = "ID")
 	private String id;
 
-	@Basic(optional = false, fetch = FetchType.EAGER)
-	@Column(name = "EVENT_NAME", nullable = false, unique = false)
-	private String eventName;
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@JoinColumn(name = "INDIVIDUAL_ID", referencedColumnName = "ID", nullable = false)
+	private Individual individual;
+
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
+	@JoinColumn(name = "EVENT_TYPE_QUALIFIER", referencedColumnName = "QUALIFIER", nullable = false)
+	private EventType eventType;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Temporal(TemporalType.DATE)
@@ -40,17 +47,18 @@ public class Event {
 	@Column(name = "EVENT_NOTE", nullable = true, unique = false)
 	private String eventNote;
 
-
 	protected Event() {
 	}
 
-	public Event(String eventName, Date eventDate) {
-		this.eventName = eventName;
+	public Event(Individual individual, EventType eventType, Date eventDate) {
+		this.individual = individual;
+		this.eventType = eventType;
 		this.eventDate = eventDate;
 	}
 
-	public Event(String eventName, Date eventDate, String eventPlace, String eventNote) {
-		this.eventName = eventName;
+	public Event(Individual individual, EventType eventType, Date eventDate, String eventPlace, String eventNote) {
+		this.individual = individual;
+		this.eventType = eventType;
 		this.eventDate = eventDate;
 		this.eventPlace = eventPlace;
 		this.eventNote = eventNote;
@@ -58,7 +66,7 @@ public class Event {
 
 	@Override
 	public String toString() {
-		return String.format("Event[id=%s eventName='%s' eventDate='%s' eventPlace='%s' eventNotes='%s']", id, eventName, eventDate, eventPlace, eventNote);
+		return String.format("Event[id=%s individual='%s' eventType='%s' eventDate='%s' eventPlace='%s' eventNotes='%s']", id, individual, eventType, eventDate, eventPlace, eventNote);
 	}
 
 	public void setId(String id) {
@@ -69,12 +77,20 @@ public class Event {
 		return id;
 	}
 
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
+	public void setIndividual(Individual individual) {
+		this.individual = individual;
 	}
 
-	public String getEventName() {
-		return eventName;
+	public Individual getIndividual() {
+		return individual;
+	}
+
+	public void setEventType(EventType eventType) {
+		this.eventType = eventType;
+	}
+
+	public EventType getEventType() {
+		return eventType;
 	}
 
 	public void setEventDate(Date eventDate) {

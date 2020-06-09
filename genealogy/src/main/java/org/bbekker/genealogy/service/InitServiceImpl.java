@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.bbekker.genealogy.common.AppConstants;
+import org.bbekker.genealogy.common.AppConstants.EventTypes;
 import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.AppConstants.RelationshipTypes;
 import org.bbekker.genealogy.common.AppConstants.Roles;
@@ -17,6 +18,8 @@ import org.bbekker.genealogy.repository.BaseName;
 import org.bbekker.genealogy.repository.BaseNamePrefix;
 import org.bbekker.genealogy.repository.BaseNamePrefixRepository;
 import org.bbekker.genealogy.repository.BaseNameRepository;
+import org.bbekker.genealogy.repository.EventType;
+import org.bbekker.genealogy.repository.EventTypeRepository;
 import org.bbekker.genealogy.repository.Gender;
 import org.bbekker.genealogy.repository.GenderRepository;
 import org.bbekker.genealogy.repository.RelationshipType;
@@ -54,6 +57,9 @@ public class InitServiceImpl implements InitService {
 	@Autowired
 	private RelationshipTypeRepository relationshipTypeRepository;
 
+	@Autowired
+	private EventTypeRepository eventTypeRepository;
+
 	@Override
 	public Boolean loadInitialData(Locale locale) {
 
@@ -76,6 +82,10 @@ public class InitServiceImpl implements InitService {
 		}
 
 		if (!loadRoles()) {
+			result = Boolean.FALSE;
+		}
+
+		if (!loadEventTypes()) {
 			result = Boolean.FALSE;
 		}
 
@@ -318,5 +328,60 @@ public class InitServiceImpl implements InitService {
 
 		return result;
 	}
+
+	private Boolean loadEventTypes() {
+
+		Boolean result = Boolean.FALSE;
+
+
+		// First, load fixed set of relationship types from the enumeration.
+		if (EventTypes.values().length > 0) {
+
+			// Load the relationship types from the enumeration.
+			for (EventTypes acEventType : EventTypes.values()) {
+				EventType eventType = new EventType(
+						acEventType.getEventTypeQualifier(),
+						acEventType.getEventTypeCategory(),
+						acEventType.getEventTypeDescription());
+				eventType = eventTypeRepository.save(eventType);
+			}
+			result = Boolean.TRUE;
+		}
+
+		// Next, load additional relationship types from csv file.
+		try {
+
+			final Resource resource = new ClassPathResource(AppConstants.EVENT_TYPE_CSV_PATH);
+			final InputStream inputStream = resource.getInputStream();
+
+			final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+			String line = null;
+
+			while ((line = bufferedReader.readLine()) != null) {
+
+				// Skip empty entries
+				final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
+				if (
+						(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // qualifier
+						(lineList.get(1) != null && !lineList.get(1).isEmpty()) && // category
+						(lineList.get(2) != null && !lineList.get(2).isEmpty())) // description
+				{
+					EventType eventType = new EventType(lineList.get(0), lineList.get(1), lineList.get(2));
+					eventType = eventTypeRepository.save(eventType);
+				}
+			}
+
+			bufferedReader.close();
+			inputStream.close();
+
+			result = Boolean.TRUE;
+		} catch (IOException e) {
+			e.printStackTrace();
+			result = false;
+		}
+
+		return result;
+	}
+
 
 }

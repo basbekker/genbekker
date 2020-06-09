@@ -9,6 +9,7 @@ public class AppConstants {
 	public static final String GENDER_CSV_PATH = "data/Gender.csv";
 	public static final String ROLE_CSV_PATH = "data/Role.csv";
 	public static final String RELATIONSHIP_TYPE_CSV_PATH = "data/RelationshipType.csv";
+	public static final String EVENT_TYPE_CSV_PATH = "data/EventType.csv";
 
 	public static final String BEKKER_CSV_NAME = "BEKKER.csv";
 	public static final String BEKKER_TEST_CSV_NAME = "BEKKER.csv";
@@ -16,6 +17,8 @@ public class AppConstants {
 	private final static String GENDER_MESSAGE_PREFIX = "GenderId";
 	private final static String RELATIONSHIPTYPE_MESSAGE_PREFIX = "RelationshipTypeId";
 	private final static String ROLE_MESSAGE_PREFIX = "RoleId";
+	private final static String EVENTTYPE_MESSAGE_PREFIX = "EventTypeId";
+
 
 	/**
 	 * The gender type defines the biological sexuality of an individual.
@@ -155,6 +158,86 @@ public class AppConstants {
 			return Stream.of(Roles.values());
 		}
 	}
+
+	/**
+	 * The relationship types define the relationships that exists between two individuals.
+	 * Used fields:
+	 * - the qualifier that uniquely identifies the relationship,
+	 * - the textual description of the relationship in English.
+	 */
+	public enum EventTypeCategories {
+		INDIVIDUAL ("I", "events for individuals"),
+		RELATIONSHIP ("R", "events for relationships");
+
+		private final String category;
+		private final String description;
+
+		EventTypeCategories(String category, String description) {
+			this.category = category;
+			this.description = description;
+		}
+
+		public String getName() {
+			return this.getName();
+		}
+
+		public String getEventTypeCategory() {
+			return category;
+		}
+
+		public String getEventTypeDescription() {
+			return description;
+		}
+	}
+
+	/**
+	 * The relationship types define the relationships that exists between two individuals.
+	 * Used fields:
+	 * - the qualifier that uniquely identifies the relationship,
+	 * - the textual description of the relationship in English.
+	 */
+	public enum EventTypes {
+		BIRTH ("BIRTH", "I", "birth"),
+		DEATH ("DEATH", "I", "death"),
+		MARRIAGE ("MARRIAGE", "R", "marriage"),
+		DIVORCE ("DIVORCE", "R", "divorce"),
+		PARNTERS ("PARTNERS", "R", "parthership");
+
+		private final String qualifier;
+		private final String category;
+		private final String description;
+
+		EventTypes(String qualifier, String category, String description) {
+			this.qualifier = qualifier;
+			this.category = category;
+			this.description = description;
+		}
+
+		public String getName() {
+			return this.getName();
+		}
+
+		public String getEventTypeQualifier() {
+			return qualifier;
+		}
+
+		public String getEventTypeCategory() {
+			return category;
+		}
+
+		public String getEventTypeDescription() {
+			return description;
+		}
+
+		public String getMessageKey() {
+			return EVENTTYPE_MESSAGE_PREFIX + SystemConstants.DOT + qualifier;
+		}
+
+		public static Stream<RelationshipTypes> stream() {
+			return Stream.of(RelationshipTypes.values());
+		}
+	}
+
 
 
 	public static <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {

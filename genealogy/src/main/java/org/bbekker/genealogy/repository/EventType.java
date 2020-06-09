@@ -24,20 +24,25 @@ public class EventType {
 	private String qualifier;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
+	@Column(name = "CATEGORY", nullable = false, unique = false)
+	private String category;
+
+	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Column(name = "DESCRIPTION", nullable = false, unique = false)
 	private String description;
 
 	protected EventType() {
 	}
 
-	public EventType(String qualifier, String description) {
+	public EventType(String qualifier, String category, String description) {
 		this.qualifier = qualifier;
+		this.category = category;
 		this.description = description;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("EventType[id=%s qualifier='%s' description='%s']", id, qualifier, description);
+		return String.format("EventType[id=%s qualifier='%s' category='%s' description='%s']", id, qualifier, category, description);
 	}
 
 	public void setId(String id) {
@@ -54,6 +59,14 @@ public class EventType {
 
 	public String getQualifier() {
 		return qualifier;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getCategory() {
+		return category;
 	}
 
 	public void setdDscription(String description) {

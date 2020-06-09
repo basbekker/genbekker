@@ -1,26 +1,30 @@
 package org.bbekker.genealogy.repository;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
 
-@Entity
+@Entity(name = "Individual")
 @Table(name = "INDIVIDUAL")
 public class Individual {
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@Column(name = "ID")
 	private String id;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
@@ -46,6 +50,9 @@ public class Individual {
 	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Column(name = "GENDER_TYPE", nullable = false, unique = false)
 	private String genderType;
+
+	@OneToMany(mappedBy = "individual", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<Event> events;
 
 	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Temporal(TemporalType.DATE)
