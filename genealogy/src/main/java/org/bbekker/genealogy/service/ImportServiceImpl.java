@@ -44,6 +44,9 @@ public class ImportServiceImpl implements ImportService {
 	private IndividualRepository individualRepository;
 
 	@Autowired
+	private IndividualService individualService;
+
+	@Autowired
 	private RelationshipRepository relationshipRepository;
 
 	@Autowired
@@ -408,6 +411,9 @@ public class ImportServiceImpl implements ImportService {
 		}
 
 		if (parseOk) {
+
+			individualService.create(lastName, firstName, middleName, maidenName, familiarName, genderType, birthDate, birthPlace, deathDate, deathPlace, notes);
+
 			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, genderType);
 			individual.setBirthDate(birthDate);
 			individual.setBirthPlace(birthPlace);

@@ -38,20 +38,30 @@ public class IndividualServiceImpl implements IndividualService {
 	private PageHandlerUtil<Individual> pageHandler;
 
 
+	@Override
 	public void create(String lastName, String firstName, String middleName, String maidenName, String familiarName,
 			String genderType, Date birthDate, String birthPlace, Date deathDate, String deathPlace, String note) {
 
-		Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, genderType);
+		Individual individual = new Individual(lastName, firstName, emptyToNull(middleName), emptyToNull(maidenName), emptyToNull(familiarName), emptyToNull(genderType));
+		individual.setBirthDate(birthDate);
+		individual.setBirthPlace(emptyToNull(birthPlace));
+		individual.setDeathDate(deathDate);
+		individual.setDeathPlace(emptyToNull(deathPlace));
 		individual = individualRepository.save(individual);
 
-		EventType eventType = eventTypeRepository.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
-		Event birthEvent = new Event(individual, eventType, birthDate);
-		birthEvent.setEventPlace(birthPlace);
-		birthEvent = eventRepository.save(birthEvent);
+		if (birthDate != null) {
+			EventType birthEventType = eventTypeRepository.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+			Event birthEvent = new Event(individual, birthEventType, birthDate);
+			birthEvent.setEventPlace(birthPlace);
+			birthEvent = eventRepository.save(birthEvent);
+		}
 
-		EventType eventTypeD = eventTypeRepository.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
-		Event deathEvent = new Event(individual, eventTypeD, deathDate);
-		deathEvent.setEventPlace(deathPlace);
+		if (deathDate != null) {
+			EventType deathEventType = eventTypeRepository.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+			Event deathEvent = new Event(individual, deathEventType, deathDate);
+			deathEvent.setEventPlace(deathPlace);
+			deathEvent = eventRepository.save(deathEvent);
+		}
 
 	}
 
@@ -94,5 +104,13 @@ public class IndividualServiceImpl implements IndividualService {
 	public Integer getNumberOfElements() {
 		Long elementCount = individualRepository.count();
 		return elementCount.intValue();
+	}
+
+	private String emptyToNull(String input) {
+		if (input != null && !input.isEmpty()) {
+			return input;
+		} else {
+			return null;
+		}
 	}
 }

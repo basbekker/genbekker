@@ -28,10 +28,10 @@ public class AppConstants {
 	 * - the textual description the gender in English.
 	 */
 	public enum GenderTypes {
-		MALE ("M", "♂", "male"), // For male sexuality.
-		FEMALE ("F", "♀", "female"), // For female sexuality.
-		INTERSEXUAL ("I", "⚥", "intersexual"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
-		UNDEFINED ("U", "✗", "undefined"); // For use when sexuality is (still) unknown, or somehow doesn't fit in the previous 3.
+		MALE ("MALE", "♂", "male"), // For male sexuality.
+		FEMALE ("FEMALE", "♀", "female"), // For female sexuality.
+		INTERSEXUAL ("INTERSEXUAL", "⚥", "intersexual"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
+		UNDEFINED ("UNDEFINED", "✗", "undefined"); // For use when sexuality is (still) unknown, or somehow doesn't fit in the previous 3.
 
 		private final String qualifier;
 		private final String symbol;
@@ -75,11 +75,11 @@ public class AppConstants {
 	 * - the textual description of the relationship in English.
 	 */
 	public enum RelationshipTypes {
-		PARENT_CHILD ("PC", "parent child"),
-		MARRIED ("M", "marriage"),
-		PARTNERS ("P", "partners"),
-		COUSINS ("C", "cousins"),
-		FRIEND ("FR", "friends");
+		PARENT_CHILD ("PARENT_CHILD", "parent child"),
+		MARRIED ("MARRIAGE", "marriage"),
+		PARTNERS ("PARTNERSHIP", "partners"),
+		COUSINS ("COUSINS", "cousins"),
+		FRIEND ("FRIENDS", "friends");
 
 		private final String qualifier;
 		private final String description;
@@ -111,24 +111,24 @@ public class AppConstants {
 	}
 
 	public enum Roles {
-		FATHER ("F", "father"),
-		MOTHER ("M", "mother"),
-		SON ("S", "son"),
-		DAUGHTER ("D", "daughter"),
-		HUSBAND ("H", "husband"),
-		WIFE ("W", "wife"),
-		PARTNER ("P", "partner"),
-		COUSIN ("C", "cousin"),
-		NIECE ("N", "niece"),
-		UNCLE ("U", "uncle"),
-		AUNT ("A", "aunt"),
-		NEPHEW ("NW", "nephew"),
-		NIECE_UA ("NE", "niece (from uncle/aunt"),
-		PATERNAL_GRANDFATHER ("PG", "paternal grandfather"),
-		PATERNAL_GRANDMOTHER ("PM", "paternal grandmother"),
-		MATERNAL_GRANDFATHER ("MG", "maternal grandfather"),
-		MATERNAL_GRANDMOTHER ("MM", "maternal grandmother"),
-		FRIEND ("FR", "friend");
+		FATHER ("FATHER", "father"),
+		MOTHER ("MOTHER", "mother"),
+		SON ("SON", "son"),
+		DAUGHTER ("DAUGHTER", "daughter"),
+		HUSBAND ("HUSBAND", "husband"),
+		WIFE ("WIFE", "wife"),
+		PARTNER ("PARTNER", "partner"),
+		COUSIN ("COUSIN", "cousin"),
+		NIECE ("NIECE", "niece"),
+		UNCLE ("UNCLE", "uncle"),
+		AUNT ("AUNT", "aunt"),
+		NEPHEW ("NEPHEW", "nephew"),
+		NIECE_UA ("NIECE_UA", "niece (from uncle/aunt"),
+		PATERNAL_GRANDFATHER ("PATERNAL_GRANDFATHER", "paternal grandfather"),
+		PATERNAL_GRANDMOTHER ("PATERNAL_GRANDMOTHER", "paternal grandmother"),
+		MATERNAL_GRANDFATHER ("MATERNAL_GRANDFATHER", "maternal grandfather"),
+		MATERNAL_GRANDMOTHER ("MATERNAL_GRANDMOTHER", "maternal grandmother"),
+		FRIEND ("FRIEND", "friend");
 
 		private final String qualifier;
 		private final String description;
@@ -166,8 +166,8 @@ public class AppConstants {
 	 * - the textual description of the relationship in English.
 	 */
 	public enum EventTypeCategories {
-		INDIVIDUAL ("I", "events for individuals"),
-		RELATIONSHIP ("R", "events for relationships");
+		INDIVIDUAL ("INDIVIDUAL", "events for individuals"),
+		RELATIONSHIP ("RELATIONSHIP", "events for relationships");
 
 		private final String category;
 		private final String description;
@@ -197,11 +197,11 @@ public class AppConstants {
 	 * - the textual description of the relationship in English.
 	 */
 	public enum EventTypes {
-		BIRTH ("BIRTH", "I", "birth"),
-		DEATH ("DEATH", "I", "death"),
-		MARRIAGE ("MARRIAGE", "R", "marriage"),
-		DIVORCE ("DIVORCE", "R", "divorce"),
-		PARNTERS ("PARTNERS", "R", "parthership");
+		BIRTH ("BIRTH", "INDIVIDUAL", "birth"),
+		DEATH ("DEATH", "INDIVIDUAL", "death"),
+		MARRIAGE ("MARRIAGE", "RELATIONSHIP", "marriage"),
+		DIVORCE ("DIVORCE", "RELATIONSHIP", "divorce"),
+		PARNTERS ("PARTNERS", "RELATIONSHIP", "parthership");
 
 		private final String qualifier;
 		private final String category;
