@@ -1,5 +1,7 @@
 package org.bbekker.genealogy.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -7,8 +9,12 @@ import javax.validation.Valid;
 
 import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.SystemConstants;
+import org.bbekker.genealogy.repository.Event;
+import org.bbekker.genealogy.repository.EventRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
+import org.bbekker.genealogy.repository.Relationship;
+import org.bbekker.genealogy.repository.RelationshipRepository;
 import org.bbekker.genealogy.service.IndividualService;
 import org.bbekker.genealogy.service.PageHandlerUtil;
 import org.slf4j.Logger;
@@ -36,6 +42,12 @@ public class IndividualController {
 	IndividualRepository individualRepository;
 
 	@Autowired
+	EventRepository eventRepository;
+
+	@Autowired
+	RelationshipRepository relationshipRepository;
+
+	@Autowired
 	MessageSource messageSource;
 
 
@@ -57,6 +69,15 @@ public class IndividualController {
 			Individual individual = optionalIndividual.get();
 			model.addAttribute("individual", individual);
 			model.addAttribute("genderName", setGenderText(individual.getGenderType(), locale));
+
+			List<Event> events = eventRepository.findByIndividual(individual);
+			model.addAttribute("events", events);
+
+			List<Relationship> relationships1 = relationshipRepository.findByIndividual1(individual);
+			List<Relationship> relationships2 = relationshipRepository.findByIndividual2(individual);
+			List<Relationship> outputList = new ArrayList<Relationship>(relationships1);
+			outputList.addAll(relationships2);
+			model.addAttribute("relationships", outputList);
 		}
 		model.addAttribute("page", page);
 		model.addAttribute("searchArg", searchArg);

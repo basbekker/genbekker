@@ -1,5 +1,7 @@
 package org.bbekker.genealogy.repository;
 
+import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,8 +13,10 @@ import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "ROLE")
-public class Role {
+@Table(name = "ROLE_TYPE")
+public class RoleType implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
@@ -27,17 +31,17 @@ public class Role {
 	@Column(name = "DESCRIPTION", nullable = false, unique = false)
 	private String description;
 
-	protected Role() {
+	protected RoleType() {
 	}
 
-	public Role(String qualifier, String description) {
+	public RoleType(String qualifier, String description) {
 		this.qualifier = qualifier;
 		this.description = description;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Role[id=%s qualifier='%s' description='%s']", id, qualifier, description);
+		return String.format("RoleType[id=%s qualifier='%s' description='%s']", id, qualifier, description);
 	}
 
 	public void setId(String id) {

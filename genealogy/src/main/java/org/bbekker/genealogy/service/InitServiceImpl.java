@@ -24,8 +24,8 @@ import org.bbekker.genealogy.repository.Gender;
 import org.bbekker.genealogy.repository.GenderRepository;
 import org.bbekker.genealogy.repository.RelationshipType;
 import org.bbekker.genealogy.repository.RelationshipTypeRepository;
-import org.bbekker.genealogy.repository.Role;
-import org.bbekker.genealogy.repository.RoleRepository;
+import org.bbekker.genealogy.repository.RoleType;
+import org.bbekker.genealogy.repository.RoleTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ public class InitServiceImpl implements InitService {
 	private GenderRepository genderRepository;
 
 	@Autowired
-	private RoleRepository roleRepository;
+	private RoleTypeRepository roleTypeRepository;
 
 	@Autowired
 	private RelationshipTypeRepository relationshipTypeRepository;
@@ -238,8 +238,8 @@ public class InitServiceImpl implements InitService {
 
 			// Load the roles from the enumeration.
 			for (Roles acRrole : Roles.values()) {
-				Role role = new Role(acRrole.getRoleQualifier(), acRrole.getRoleDescription());
-				role = roleRepository.save(role);
+				RoleType roleType = new RoleType(acRrole.getRoleQualifier(), acRrole.getRoleDescription());
+				roleType = roleTypeRepository.save(roleType);
 			}
 			result = Boolean.TRUE;
 		}
@@ -261,8 +261,8 @@ public class InitServiceImpl implements InitService {
 						(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // qualifier
 						(lineList.get(1) != null && !lineList.get(1).isEmpty())) // description
 				{
-					Role role = new Role(lineList.get(0), lineList.get(1));
-					role = roleRepository.save(role);
+					RoleType roleType = new RoleType(lineList.get(0), lineList.get(1));
+					roleType = roleTypeRepository.save(roleType);
 				}
 			}
 

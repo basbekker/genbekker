@@ -15,16 +15,23 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.bbekker.genealogy.common.AppConstants;
+import org.bbekker.genealogy.common.AppConstants.EventTypes;
 import org.bbekker.genealogy.common.AppConstants.GenderTypes;
+import org.bbekker.genealogy.common.AppConstants.RelationshipTypes;
+import org.bbekker.genealogy.common.AppConstants.Roles;
 import org.bbekker.genealogy.common.SystemConstants;
+import org.bbekker.genealogy.repository.Event;
+import org.bbekker.genealogy.repository.EventRepository;
+import org.bbekker.genealogy.repository.EventType;
+import org.bbekker.genealogy.repository.EventTypeRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.repository.Relationship;
 import org.bbekker.genealogy.repository.RelationshipRepository;
 import org.bbekker.genealogy.repository.RelationshipType;
 import org.bbekker.genealogy.repository.RelationshipTypeRepository;
-import org.bbekker.genealogy.repository.Role;
-import org.bbekker.genealogy.repository.RoleRepository;
+import org.bbekker.genealogy.repository.RoleType;
+import org.bbekker.genealogy.repository.RoleTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +51,10 @@ public class ImportServiceImpl implements ImportService {
 	private IndividualRepository individualRepository;
 
 	@Autowired
-	private IndividualService individualService;
+	private EventRepository eventRepository;
+
+	@Autowired
+	private EventTypeRepository eventTypeRepository;
 
 	@Autowired
 	private RelationshipRepository relationshipRepository;
@@ -53,8 +63,7 @@ public class ImportServiceImpl implements ImportService {
 	private RelationshipTypeRepository relationshipTypeRepository;
 
 	@Autowired
-	private RoleRepository roleRepository;
-
+	private RoleTypeRepository roleTypeRepository;
 
 	@Value("${bekker.csv.blacklist}")
 	private String EigenCodeBlackList;
@@ -153,7 +162,6 @@ public class ImportServiceImpl implements ImportService {
 		String birthPlace = SystemConstants.EMPTY_STRING;
 		Date deathDate = null;
 		String deathPlace = SystemConstants.EMPTY_STRING;
-		String deathCause = SystemConstants.EMPTY_STRING;
 		String notes = SystemConstants.EMPTY_STRING;
 
 		// Partner individual.
@@ -167,7 +175,6 @@ public class ImportServiceImpl implements ImportService {
 		String partnerBirthPlace = SystemConstants.EMPTY_STRING;
 		Date partnerDeathDate = null;
 		String partnerDeathPlace = SystemConstants.EMPTY_STRING;
-		String partnerDeathCause = SystemConstants.EMPTY_STRING;
 		String partnerNotes = SystemConstants.EMPTY_STRING;
 
 		int position = 0;
@@ -213,8 +220,8 @@ public class ImportServiceImpl implements ImportService {
 				}
 
 				if (fieldName.equals(AppConstants.ANAAM_NL)) {
-					lastName = stripQuotes(field);
-					if (lastName.isEmpty()) {
+					lastName = emptyToNull(stripQuotes(field));
+					if (lastName == null || lastName.isEmpty()) {
 						parseOk = false;
 					}
 					logger.debug("lastName=" + lastName);
@@ -246,12 +253,14 @@ public class ImportServiceImpl implements ImportService {
 						birthDate = optionalBirthDate.get();
 					} else {
 						if (birthDateString != null && !birthDateString.isEmpty()) {
-							// The birth date field has data, only not in proper format, maybe it has just the year
+							// The birth date field has data, only not in proper format, maybe it has just
+							// the year
 							// or something alike, so do not loose that info and save it to the notes field.
 							if (notes.length() > 0) {
 								notes = notes + SystemConstants.SPACE;
 							}
-							notes = notes + AppConstants.GEBDATUM_NL + SystemConstants.EQUALS + birthDateString + SystemConstants.SEMICOLON;
+							notes = notes + AppConstants.GEBDATUM_NL + SystemConstants.EQUALS + birthDateString
+									+ SystemConstants.SEMICOLON;
 						}
 					}
 					logger.debug("birthDate=" + birthDate);
@@ -270,7 +279,8 @@ public class ImportServiceImpl implements ImportService {
 				if (fieldName.equals(AppConstants.GEBPLTS_NL)) {
 					if (field != null && !stripQuotes(field).isEmpty()) {
 						if (birthPlace != null && !birthPlace.isEmpty()) {
-							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
 						} else {
 							birthPlace = birthPlace + stripQuotes(field);
 						}
@@ -281,7 +291,8 @@ public class ImportServiceImpl implements ImportService {
 				if (fieldName.equals(AppConstants.GEBPROV_NL)) {
 					if (field != null && !stripQuotes(field).isEmpty()) {
 						if (birthPlace != null && !birthPlace.isEmpty()) {
-							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
 						} else {
 							birthPlace = birthPlace + stripQuotes(field);
 						}
@@ -292,7 +303,8 @@ public class ImportServiceImpl implements ImportService {
 				if (fieldName.equals(AppConstants.GEBLAND_NL)) {
 					if (field != null && !stripQuotes(field).isEmpty()) {
 						if (birthPlace != null && !birthPlace.isEmpty()) {
-							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+							birthPlace = birthPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
 						} else {
 							birthPlace = birthPlace + stripQuotes(field);
 						}
@@ -351,12 +363,14 @@ public class ImportServiceImpl implements ImportService {
 						partnerBirthDate = optionalPartnerBirthDate.get();
 					} else {
 						if (partnerBirthDateString != null && !partnerBirthDateString.isEmpty()) {
-							// The partner birth date field has data, only not in proper format, maybe it has just the year
+							// The partner birth date field has data, only not in proper format, maybe it
+							// has just the year
 							// or something alike, so do not loose that info and save it to the notes field.
 							if (partnerNotes.length() > 0) {
 								partnerNotes = partnerNotes + SystemConstants.SPACE;
 							}
-							partnerNotes = partnerNotes + AppConstants.PGEBDATUM_NL + SystemConstants.EQUALS + partnerBirthDateString + SystemConstants.SEMICOLON;
+							partnerNotes = partnerNotes + AppConstants.PGEBDATUM_NL + SystemConstants.EQUALS
+									+ partnerBirthDateString + SystemConstants.SEMICOLON;
 						}
 					}
 					logger.debug("partnerBirthDate=" + partnerBirthDate);
@@ -365,7 +379,8 @@ public class ImportServiceImpl implements ImportService {
 				if (fieldName.equals(AppConstants.PGEBPLTS_NL)) {
 					if (field != null && !stripQuotes(field).isEmpty()) {
 						if (partnerBirthPlace != null && !partnerBirthPlace.isEmpty()) {
-							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
 						} else {
 							partnerBirthPlace = partnerBirthPlace + stripQuotes(field);
 						}
@@ -376,7 +391,8 @@ public class ImportServiceImpl implements ImportService {
 				if (fieldName.equals(AppConstants.PGEBPROV_NL)) {
 					if (field != null && !stripQuotes(field).isEmpty()) {
 						if (partnerBirthPlace != null && !partnerBirthPlace.isEmpty()) {
-							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
 						} else {
 							partnerBirthPlace = partnerBirthPlace + stripQuotes(field);
 						}
@@ -387,7 +403,8 @@ public class ImportServiceImpl implements ImportService {
 				if (fieldName.equals(AppConstants.PGEBLAND_NL)) {
 					if (field != null && !stripQuotes(field).isEmpty()) {
 						if (partnerBirthPlace != null && !partnerBirthPlace.isEmpty()) {
-							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE + stripQuotes(field);
+							partnerBirthPlace = partnerBirthPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
 						} else {
 							partnerBirthPlace = partnerBirthPlace + stripQuotes(field);
 						}
@@ -412,48 +429,68 @@ public class ImportServiceImpl implements ImportService {
 
 		if (parseOk) {
 
-			individualService.create(lastName, firstName, middleName, maidenName, familiarName, genderType, birthDate, birthPlace, deathDate, deathPlace, notes);
-
-			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, genderType);
-			individual.setBirthDate(birthDate);
-			individual.setBirthPlace(birthPlace);
-			individual.setDeathDate(deathDate);
-			individual.setDeathPlace(deathPlace);
-			individual.setDeathCause(deathCause);
+			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName,
+					genderType);
 			individual.setNote(notes);
 			individual = individualRepository.save(individual);
 			logger.info("individual=" + individual.toString());
 
+			if (birthDate != null) {
+				EventType birthEventType = eventTypeRepository.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+				Event birthEvent = new Event(individual, birthEventType, birthDate);
+				birthEvent.setEventPlace(birthPlace);
+				birthEvent = eventRepository.save(birthEvent);
+			}
+
+			if (deathDate != null) {
+				EventType deathEventType = eventTypeRepository.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+				Event deathEvent = new Event(individual, deathEventType, deathDate);
+				deathEvent.setEventPlace(deathPlace);
+				deathEvent = eventRepository.save(deathEvent);
+			}
+
 			if (parsePartnerOk) {
+
 				Individual partnerIndividual = new Individual(partnerLastName, partnerFirstName, partnerMiddleName,
 						partnerMaidenName, partnerFamiliarName, partnerGenderType);
-				partnerIndividual.setBirthDate(partnerBirthDate);
-				partnerIndividual.setBirthPlace(partnerBirthPlace);
-				partnerIndividual.setDeathDate(partnerDeathDate);
-				partnerIndividual.setDeathPlace(partnerDeathPlace);
-				partnerIndividual.setDeathCause(partnerDeathCause);
 				partnerIndividual.setNote(partnerNotes);
 				partnerIndividual = individualRepository.save(partnerIndividual);
 				logger.info("partnerIndividual=" + partnerIndividual.toString());
 
-				Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository.findByQualifier("M");
+				if (partnerBirthDate != null) {
+					EventType birthEventType = eventTypeRepository.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+					Event birthEvent = new Event(partnerIndividual, birthEventType, partnerBirthDate);
+					birthEvent.setEventPlace(partnerBirthPlace);
+					birthEvent = eventRepository.save(birthEvent);
+				}
 
-				Optional<Role> optionalRole1 = Optional.empty();
+				if (partnerDeathDate != null) {
+					EventType deathEventType = eventTypeRepository.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+					Event deathEvent = new Event(partnerIndividual, deathEventType, partnerDeathDate);
+					deathEvent.setEventPlace(partnerDeathPlace);
+					deathEvent = eventRepository.save(deathEvent);
+				}
+
+
+				Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository.findByQualifier(RelationshipTypes.MARRIED.getRelationshipTypeQualifier());
+
+				Optional<RoleType> optionalRoleType1 = Optional.empty();
 				if (individual.getGenderType().equals(GenderTypes.MALE.getGenderQualifier())) {
-					optionalRole1 = roleRepository.findByQualifier("H");
+					optionalRoleType1 = roleTypeRepository.findByQualifier(Roles.HUSBAND.getRoleQualifier());
 				} else {
-					optionalRole1 = roleRepository.findByQualifier("W");
+					optionalRoleType1 = roleTypeRepository.findByQualifier(Roles.WIFE.getRoleQualifier());
 				}
 
-				Optional<Role> optionalRole2 = Optional.empty();
+				Optional<RoleType> optionalRoleType2 = Optional.empty();
 				if (partnerIndividual.getGenderType().equals(GenderTypes.MALE.getGenderQualifier())) {
-					optionalRole2 = roleRepository.findByQualifier("H");
+					optionalRoleType2 = roleTypeRepository.findByQualifier(Roles.HUSBAND.getRoleQualifier());
 				} else {
-					optionalRole2 = roleRepository.findByQualifier("W");
+					optionalRoleType2 = roleTypeRepository.findByQualifier(Roles.WIFE.getRoleQualifier());
 				}
 
-				if (optionalRelationshipType.isPresent() && optionalRole1.isPresent() && optionalRole2.isPresent()) {
-					Relationship relationship = new Relationship(individual, partnerIndividual, optionalRole1.get(), optionalRole2.get(), optionalRelationshipType.get());
+				if (optionalRelationshipType.isPresent() && optionalRoleType1.isPresent() && optionalRoleType2.isPresent()) {
+					Relationship relationship = new Relationship(individual, partnerIndividual, optionalRoleType1.get(),
+							optionalRoleType2.get(), optionalRelationshipType.get());
 					relationship = relationshipRepository.save(relationship);
 					logger.info("relationship=" + relationship.toString());
 				}
@@ -465,7 +502,8 @@ public class ImportServiceImpl implements ImportService {
 	}
 
 	/**
-	 * Determine the gender type using for using with the GENPTT Dutch gender identifiers.
+	 * Determine the gender type using for using with the GENPTT Dutch gender
+	 * identifiers.
 	 *
 	 * @param field imported string with Dutch gender indication, ie M, V
 	 * @return gender identifier
@@ -515,6 +553,14 @@ public class ImportServiceImpl implements ImportService {
 	public Boolean verifyUploadedFile(String fileName) {
 		// TODO Auto-generated method stub
 		return Boolean.TRUE;
+	}
+
+	private String emptyToNull(String input) {
+		if (input != null && !input.isEmpty()) {
+			return input;
+		} else {
+			return null;
+		}
 	}
 
 }

@@ -1,8 +1,9 @@
 package org.bbekker.genealogy.repository;
 
-import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,9 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -34,15 +34,15 @@ public class Relationship {
 	private Individual individual2;
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
-	@JoinColumn(name = "ROLE_1_ID", nullable = false, unique = false)
-	private Role role1;
+	@JoinColumn(name = "ROLE_TYPE_QUALIFIER_1", referencedColumnName = "QUALIFIER", nullable = false, unique = false)
+	private RoleType roleType1;
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
-	@JoinColumn(name = "ROLE_2_ID", nullable = false, unique = false)
-	private Role role2;
+	@JoinColumn(name = "ROLE_TYPE_QUALIFIER_2", referencedColumnName = "QUALIFIER", nullable = false, unique = false)
+	private RoleType roleType2;
 
 	@ManyToOne(optional = false, fetch = FetchType.EAGER)
-	@JoinColumn(name = "RELATIONSHIP_TYPE_ID", nullable = false, unique = false)
+	@JoinColumn(name = "RELATIONSHIP_TYPE_QUALIFIER", referencedColumnName = "QUALIFIER", nullable = false, unique = false)
 	private RelationshipType relationshipType;
 
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
@@ -50,38 +50,27 @@ public class Relationship {
 	private Family family;
 
 	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Temporal(TemporalType.DATE)
-	@Column(name = "START_DATE", nullable = true, unique = false)
-	private Date startDate;
+	@Column(name = "NOTE", nullable = true, unique = false)
+	private String note;
 
-	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Temporal(TemporalType.DATE)
-	@Column(name = "END_DATE", nullable = true, unique = false)
-	private Date endDate;
-
-	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Column(name = "PLACE", nullable = true, unique = false)
-	private String place;
-
-	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Column(name = "NOTES", nullable = true, unique = false)
-	private String notes;
+	@OneToMany(mappedBy = "individual", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<Event> events;
 
 
 	protected Relationship() {
 	}
 
-	public Relationship(Individual individual1, Individual individual2, Role role1, Role role2, RelationshipType relationshipType) {
+	public Relationship(Individual individual1, Individual individual2, RoleType roleType1, RoleType roleType2, RelationshipType relationshipType) {
 		this.individual1 = individual1;
 		this.individual2 = individual2;
-		this.role1 = role1;
-		this.role2 = role2;
+		this.roleType1 = roleType1;
+		this.roleType2 = roleType2;
 		this.relationshipType = relationshipType;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("Relationship[id=%s individual1='%s' individual2='%s' role1='%s' role2='%s' relationshipType='%s' family='%s' starthDate='%s' endDate='%s' place='%s' notes='%s']", id, individual1, individual2, role1, role2, relationshipType, family, startDate, endDate, place, notes);
+		return String.format("Relationship[id=%s individual1='%s' individual2='%s' roleType1='%s' roleType2='%s' relationshipType='%s' family='%s' note='%s']", id, individual1, individual2, roleType1, roleType2, relationshipType, family, note);
 	}
 
 	public void setId(String id) {
@@ -108,20 +97,20 @@ public class Relationship {
 		return individual2;
 	}
 
-	public void setRole1(Role role1) {
-		this.role1 = role1;
+	public void setRole1(RoleType roleType1) {
+		this.roleType1 = roleType1;
 	}
 
-	public Role getRole1() {
-		return role1;
+	public RoleType getRoleType1() {
+		return roleType1;
 	}
 
-	public void setRole2(Role role2) {
-		this.role2 = role2;
+	public void setRole2(RoleType roleType2) {
+		this.roleType2 = roleType2;
 	}
 
-	public Role getRole2() {
-		return role2;
+	public RoleType getRoleType2() {
+		return roleType2;
 	}
 
 	public void setRelationshipType(RelationshipType relationshipType) {
@@ -140,36 +129,20 @@ public class Relationship {
 		return family;
 	}
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
+	public void setNote(String note) {
+		this.note = note;
 	}
 
-	public Date getStartDate() {
-		return startDate;
+	public String getNote() {
+		return note;
 	}
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setEvents(List<Event> events) {
+		this.events = events;
 	}
 
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setPlace(String place) {
-		this.place = place;
-	}
-
-	public String getPlace() {
-		return place;
-	}
-
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
-
-	public String getNotes() {
-		return notes;
+	public List<Event> getEvents() {
+		return events;
 	}
 
 }

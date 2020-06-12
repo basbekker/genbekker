@@ -43,10 +43,6 @@ public class IndividualServiceImpl implements IndividualService {
 			String genderType, Date birthDate, String birthPlace, Date deathDate, String deathPlace, String note) {
 
 		Individual individual = new Individual(lastName, firstName, emptyToNull(middleName), emptyToNull(maidenName), emptyToNull(familiarName), emptyToNull(genderType));
-		individual.setBirthDate(birthDate);
-		individual.setBirthPlace(emptyToNull(birthPlace));
-		individual.setDeathDate(deathDate);
-		individual.setDeathPlace(emptyToNull(deathPlace));
 		individual = individualRepository.save(individual);
 
 		if (birthDate != null) {

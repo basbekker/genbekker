@@ -1,6 +1,5 @@
 package org.bbekker.genealogy.repository;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -12,8 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -51,34 +48,13 @@ public class Individual {
 	@Column(name = "GENDER_TYPE", nullable = false, unique = false)
 	private String genderType;
 
-	@OneToMany(mappedBy = "individual", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<Event> events;
-
-	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Temporal(TemporalType.DATE)
-	@Column(name = "BIRTH_DATE", nullable = true, unique = false)
-	private Date birthDate;
-
-	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Temporal(TemporalType.DATE)
-	@Column(name = "DEATH_DATE", nullable = true, unique = false)
-	private Date deathDate;
-
-	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Column(name = "BIRTH_PLACE", nullable = true, unique = false)
-	private String birthPlace;
-
-	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Column(name = "DEATH_PLACE", nullable = true, unique = false)
-	private String deathPlace;
-
-	@Basic(optional = true, fetch = FetchType.EAGER)
-	@Column(name = "DEATH_CAUSE", nullable = true, unique = false)
-	private String deathCause;
-
 	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "NOTE", nullable = true, unique = false)
 	private String note;
+
+	@OneToMany(mappedBy = "individual", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private List<Event> events;
+
 
 	protected Individual() {
 	}
@@ -96,9 +72,8 @@ public class Individual {
 	@Override
 	public String toString() {
 		return String.format(
-				"Individual[id=%s lastName='%s' firstName='%s' middleName='%s' maidenName='%s' familiarName='%s' gender='%s' birthDate='%s' birthPlace='%s' deathDate='%s' deathPlace='%s' deathCause='%s' note='%s']",
-				id, lastName, firstName, middleName, maidenName, familiarName, genderType, birthDate, birthPlace,
-				deathDate, deathPlace, deathCause, note);
+				"Individual[id=%s lastName='%s' firstName='%s' middleName='%s' maidenName='%s' familiarName='%s' gender='%s' note='%s']",
+				id, lastName, firstName, middleName, maidenName, familiarName, genderType, note);
 	}
 
 	public void setId(String id) {
@@ -157,52 +132,20 @@ public class Individual {
 		return genderType;
 	}
 
-	public void setBirthDate(Date birthDate) {
-		this.birthDate = birthDate;
-	}
-
-	public Date getBirthDate() {
-		return birthDate;
-	}
-
-	public void setDeathDate(Date deathDate) {
-		this.deathDate = deathDate;
-	}
-
-	public Date getDeathDate() {
-		return deathDate;
-	}
-
-	public void setBirthPlace(String birthPlace) {
-		this.birthPlace = birthPlace;
-	}
-
-	public String getBirthPlace() {
-		return birthPlace;
-	}
-
-	public void setDeathPlace(String deathPlace) {
-		this.deathPlace = deathPlace;
-	}
-
-	public String getDeathPlace() {
-		return deathPlace;
-	}
-
-	public void setDeathCause(String deathCause) {
-		this.deathCause = deathCause;
-	}
-
-	public String getDeathCause() {
-		return deathCause;
-	}
-
 	public void setNote(String note) {
 		this.note = note;
 	}
 
 	public String getNote() {
 		return note;
+	}
+
+	public void setEvents(List<Event> events) {
+		this.events = events;
+	}
+
+	public List<Event> getEvents() {
+		return events;
 	}
 
 }

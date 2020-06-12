@@ -1,5 +1,7 @@
 package org.bbekker.genealogy.repository;
 
+import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +14,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "RELATIONSHIP_TYPE")
-public class RelationshipType {
+public class RelationshipType implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
