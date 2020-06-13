@@ -1,6 +1,5 @@
 package org.bbekker.genealogy.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -13,10 +12,11 @@ import org.bbekker.genealogy.repository.Event;
 import org.bbekker.genealogy.repository.EventRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
-import org.bbekker.genealogy.repository.Relationship;
 import org.bbekker.genealogy.repository.RelationshipRepository;
 import org.bbekker.genealogy.service.IndividualService;
 import org.bbekker.genealogy.service.PageHandlerUtil;
+import org.bbekker.genealogy.util.IndividualFullView;
+import org.bbekker.genealogy.util.RelationshipWithOther;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,14 +70,13 @@ public class IndividualController {
 			model.addAttribute("individual", individual);
 			model.addAttribute("genderName", setGenderText(individual.getGenderType(), locale));
 
-			List<Event> events = eventRepository.findByIndividual(individual);
-			model.addAttribute("events", events);
+			IndividualFullView fullIndividual = new IndividualFullView(individualRepository, eventRepository, relationshipRepository);
+			fullIndividual.setIndividual(individual);
+			List<Event> events = fullIndividual.getEvents();
+			List<RelationshipWithOther> relationshipsWithOther = fullIndividual.getRelationshipsWithOther();
 
-			List<Relationship> relationships1 = relationshipRepository.findByIndividual1(individual);
-			List<Relationship> relationships2 = relationshipRepository.findByIndividual2(individual);
-			List<Relationship> outputList = new ArrayList<Relationship>(relationships1);
-			outputList.addAll(relationships2);
-			model.addAttribute("relationships", outputList);
+			model.addAttribute("events", events);
+			model.addAttribute("relationshipsWithOther", relationshipsWithOther);
 		}
 		model.addAttribute("page", page);
 		model.addAttribute("searchArg", searchArg);

@@ -63,20 +63,18 @@
 						<th>Type</th>
 						<th>Date</th>
 						<th>Place</th>
-						<th>Note</th>
+						<th>Notes</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr th:if="${events.empty}">
-						<td colspan="3">No events available</td>
+						<td colspan="3">No events found</td>
 					</tr>
 					<tr th:each="event : ${events}">
-
-						<td><span th:text="${event.eventType.qualifier}"> Type
-						</span></td>
-						<td><span th:text="${event.eventDate}"> Date </span></td>
-						<td><span th:text="${event.eventPlace}"> Place </span></td>
-						<td><span th:text="${event.eventNote}"> Note </span></td>
+						<td><span th:text="${event.eventType.qualifier}"></span></td>
+						<td><span th:text="${event.eventDate}"></span></td>
+						<td><span th:text="${event.eventPlace}"></span></td>
+						<td><span th:text="${event.eventNote}"></span></td>
 					</tr>
 				</tbody>
 			</table>
@@ -86,29 +84,39 @@
 			<table class="table">
 				<thead>
 					<tr>
-						<th>First Name</th>
-						<th>Last Name</th>
 						<th>Role</th>
 						<th>Relationship</th>
-						<th>First Name</th>
-						<th>Last Name</th>
-						<th>Role</th>
-						<th>Note</th>
+						<th>Other First Name</th>
+						<th>Other Middle Name</th>
+						<th>Other Last Name</th>
+						<th>Other Role</th>
+						<th>Notes</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr th:if="${relationships.empty}">
-						<td colspan="3">No relationships available</td>
+					<tr th:if="${relationshipsWithOther.empty}">
+						<td colspan="3">No relationships found</td>
 					</tr>
-					<tr th:each="relationship : ${relationships}">
-						<td><span th:text="${relationship.individual1.firstName}">Individual1 </span></td>
-						<td><span th:text="${relationship.individual1.lastName}">Individual1 </span></td>
-						<td><span th:text="${relationship.roleType1.qualifier}">Type1 </span></td>
-						<td><span th:text="${relationship.relationshipType.qualifier}"> Type </span></td>
-						<td><span th:text="${relationship.individual2.firstName}">Individual2 </span></td>
-						<td><span th:text="${relationship.individual2.lastName}">Individual2 </span></td>
-						<td><span th:text="${relationship.roleType2.qualifier}">Type2 </span></td>
-						<td><span th:text="${relationship.note}"> Note </span></td>
+					<tr th:each="relationshipWithOther : ${relationshipsWithOther}">
+						<td><span th:text="${relationshipWithOther.roleType.qualifier}"></span></td>
+						<td><span th:text="${relationshipWithOther.relationshipType.qualifier}"></span></td>
+						<td>
+							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg})}">
+								<span th:text="${relationshipWithOther.otherIndividual.firstName}"></span>
+							</a>
+						</td>
+						<td>
+							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg})}">
+								<span th:text="${relationshipWithOther.otherIndividual.middleName}"></span>
+							</a>
+						</td>
+						<td>
+							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg})}">
+								<span th:text="${relationshipWithOther.otherIndividual.lastName}"></span>
+							</a>							
+						</td>
+						<td><span th:text="${relationshipWithOther.otherRoleType.qualifier}"></span></td>
+						<td><span th:text="${relationshipWithOther.note}"></span></td>
 					</tr>
 				</tbody>
 			</table>
@@ -117,8 +125,8 @@
 		<div>
 			<p>
 				<a
-					th:href="@{/app/individual/paged(page=${page}, searchArg=${searchArg})}"><span
-					th:text="#{return.to.list}"></span></a>
+					th:href="@{/app/individual/paged(page=${page}, searchArg=${searchArg})}"><span th:text="#{return.to.list}"></span>
+				</a>
 			</p>
 		</div>
 

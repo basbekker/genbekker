@@ -52,7 +52,7 @@ public class Individual {
 	@Column(name = "NOTE", nullable = true, unique = false)
 	private String note;
 
-	@OneToMany(mappedBy = "individual", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "individual", cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
 	private List<Event> events;
 
 

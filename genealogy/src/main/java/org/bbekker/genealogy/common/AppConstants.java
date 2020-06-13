@@ -307,5 +307,23 @@ public class AppConstants {
 	public static final String POVLPROV_NL = "POVLPROV";
 	public static final String POVLLAND_NL = "POVLLAND";
 	//...
+	public static final String KIND1_NL = "KIND1";
+	public static final String KIND2_NL = "KIND2";
+	public static final String KIND3_NL = "KIND3";
+	public static final String KIND4_NL = "KIND4";
+	public static final String KIND5_NL = "KIND5";
+	public static final String KIND6_NL = "KIND6";
+	public static final String KIND7_NL = "KIND7";
+	public static final String KIND8_NL = "KIND8";
+	public static final String KIND9_NL = "KIND9";
+	public static final String KIND10_NL = "KIND10";
+	public static final String KIND11_NL = "KIND11";
+	public static final String KIND12_NL = "KIND12";
+	public static final String KIND13_NL = "KIND13";
+	public static final String KIND14_NL = "KIND14";
+	public static final String KIND15_NL = "KIND15";
+	public static final String KIND16_NL = "KIND16";
+	public static final String KIND17_NL = "KIND17";
+	public static final String KIND18_NL = "KIND18";
 
 }

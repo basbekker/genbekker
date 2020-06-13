@@ -1,13 +1,7 @@
 package org.bbekker.genealogy.service;
 
-import java.util.Date;
 import java.util.List;
 
-import org.bbekker.genealogy.common.AppConstants.EventTypes;
-import org.bbekker.genealogy.repository.Event;
-import org.bbekker.genealogy.repository.EventRepository;
-import org.bbekker.genealogy.repository.EventType;
-import org.bbekker.genealogy.repository.EventTypeRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,37 +23,8 @@ public class IndividualServiceImpl implements IndividualService {
 	@Autowired
 	private IndividualRepository individualRepository;
 
-	@Autowired
-	private EventRepository eventRepository;
-
-	@Autowired
-	private EventTypeRepository eventTypeRepository;
-
 	private PageHandlerUtil<Individual> pageHandler;
 
-
-	@Override
-	public void create(String lastName, String firstName, String middleName, String maidenName, String familiarName,
-			String genderType, Date birthDate, String birthPlace, Date deathDate, String deathPlace, String note) {
-
-		Individual individual = new Individual(lastName, firstName, emptyToNull(middleName), emptyToNull(maidenName), emptyToNull(familiarName), emptyToNull(genderType));
-		individual = individualRepository.save(individual);
-
-		if (birthDate != null) {
-			EventType birthEventType = eventTypeRepository.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
-			Event birthEvent = new Event(individual, birthEventType, birthDate);
-			birthEvent.setEventPlace(birthPlace);
-			birthEvent = eventRepository.save(birthEvent);
-		}
-
-		if (deathDate != null) {
-			EventType deathEventType = eventTypeRepository.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
-			Event deathEvent = new Event(individual, deathEventType, deathDate);
-			deathEvent.setEventPlace(deathPlace);
-			deathEvent = eventRepository.save(deathEvent);
-		}
-
-	}
 
 	@Override
 	public PageHandlerUtil<Individual> findAll() {
@@ -102,11 +67,4 @@ public class IndividualServiceImpl implements IndividualService {
 		return elementCount.intValue();
 	}
 
-	private String emptyToNull(String input) {
-		if (input != null && !input.isEmpty()) {
-			return input;
-		} else {
-			return null;
-		}
-	}
 }

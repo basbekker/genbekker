@@ -34,9 +34,9 @@ public class Event {
 	@JoinColumn(name = "EVENT_TYPE_QUALIFIER", referencedColumnName = "QUALIFIER", nullable = false)
 	private EventType eventType;
 
-	@Basic(optional = false, fetch = FetchType.EAGER)
+	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Temporal(TemporalType.DATE)
-	@Column(name = "EVENT_DATE", nullable = false, unique = false)
+	@Column(name = "EVENT_DATE", nullable = true, unique = false)
 	private Date eventDate;
 
 	@Basic(optional = true, fetch = FetchType.EAGER)
@@ -66,7 +66,7 @@ public class Event {
 
 	@Override
 	public String toString() {
-		return String.format("Event[id=%s individual='%s' eventType='%s' eventDate='%s' eventPlace='%s' eventNotes='%s']", id, individual, eventType, eventDate, eventPlace, eventNote);
+		return String.format("Event[id=%s individual='%s' eventType='%s' eventDate='%s' eventPlace='%s' eventNote='%s']", id, individual, eventType, eventDate, eventPlace, eventNote);
 	}
 
 	public void setId(String id) {
