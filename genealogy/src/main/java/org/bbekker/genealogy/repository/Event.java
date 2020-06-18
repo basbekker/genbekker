@@ -1,5 +1,6 @@
 package org.bbekker.genealogy.repository;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Basic;
@@ -18,11 +19,13 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "EVENT")
-public class Event {
+public class Event implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
 	@Column(name = "ID")
 	private String id;
 

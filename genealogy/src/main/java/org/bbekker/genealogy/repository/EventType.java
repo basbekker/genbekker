@@ -20,7 +20,7 @@ public class EventType implements Serializable {
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
 	private String id;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)

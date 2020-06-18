@@ -33,12 +33,12 @@
     </appender>
      
     <!-- LOG everything at INFO level -->
-    <root level="info">
+    <root level="warn">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </root>
     
-    <logger name="org.bbekker.genealogy.service.ImportServiceImpl" additivity="false"  level="info">
+    <logger name="org.bbekker.genealogy.service.ImportServiceImpl" additivity="false"  level="warn">
     	<appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>

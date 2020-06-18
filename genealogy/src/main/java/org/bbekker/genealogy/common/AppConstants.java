@@ -307,6 +307,10 @@ public class AppConstants {
 	public static final String POVLPROV_NL = "POVLPROV";
 	public static final String POVLLAND_NL = "POVLLAND";
 	//...
+	public static final String HUWDATUM_NL = "HUWDATUM";
+	//...
+	public static final String OPM1_NL = "OPM1";
+	public static final String OPM2_NL = "OPM2";
 	public static final String KIND1_NL = "KIND1";
 	public static final String KIND2_NL = "KIND2";
 	public static final String KIND3_NL = "KIND3";

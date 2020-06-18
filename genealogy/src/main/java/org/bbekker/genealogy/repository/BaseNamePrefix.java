@@ -1,5 +1,7 @@
 package org.bbekker.genealogy.repository;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -9,11 +11,13 @@ import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "BASE_NAME_PREFIX")
-public class BaseNamePrefix {
+public class BaseNamePrefix implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid")
+	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
 	private String id;
 
 	private String prefix;

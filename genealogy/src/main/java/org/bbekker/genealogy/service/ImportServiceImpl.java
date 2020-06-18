@@ -68,7 +68,6 @@ public class ImportServiceImpl implements ImportService {
 	@Value("${bekker.csv.blacklist}")
 	private String EigenCodeBlackList;
 
-
 	@Override
 	public Boolean parseBekkerCsvFile(String fileName) {
 
@@ -82,10 +81,14 @@ public class ImportServiceImpl implements ImportService {
 			final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			String line = null;
 
-
 			Map<Integer, String> headerMappings = null;
-			final Map<String, String> eigenCodeToIdMapping = new HashMap<String, String>();
-			final Map<String, String> parentToChildMapping = new HashMap<String, String>();
+			final Map<String, String> eigenCodeToIdMapping = new HashMap<String, String>(); // (Eigencode, Id)
+			final Map<String, String> parentToChildMapping = new HashMap<String, String>(); // (parent1Id:parent2Id,
+			// childEigencode) or
+			// (parent1Id,
+			// childEigencode)
+			final Map<String, String> childToParentMapping = new HashMap<String, String>(); // (childId,
+			// parent1Eigencode:parent2Eigencode)
 
 			final List<String> blackList = loadBlacklistedLines(EigenCodeBlackList);
 
@@ -98,7 +101,8 @@ public class ImportServiceImpl implements ImportService {
 					headerMappings = importCSVHeaderLine(line);
 				} else {
 					// Other lines are data lines.
-					parseResult = importCSVDataLine(line, headerMappings, blackList, eigenCodeToIdMapping, parentToChildMapping);
+					parseResult = importCSVDataLine(line, headerMappings, blackList, eigenCodeToIdMapping,
+							parentToChildMapping, childToParentMapping);
 				}
 
 				lineNum++;
@@ -111,7 +115,7 @@ public class ImportServiceImpl implements ImportService {
 			Long numberOfIndividualEntries = individualRepository.count();
 			logger.info("Individual entries=" + numberOfIndividualEntries.toString());
 
-			creatParentChildRelationships(eigenCodeToIdMapping, parentToChildMapping);
+			createParentChildRelationships(eigenCodeToIdMapping, parentToChildMapping, childToParentMapping);
 
 			Long numberOfRelationshipEntries = relationshipRepository.count();
 			logger.info("Relationship entries=" + numberOfRelationshipEntries.toString());
@@ -151,14 +155,15 @@ public class ImportServiceImpl implements ImportService {
 		return headerMappings;
 	}
 
-	private Boolean importCSVDataLine(String line, Map<Integer, String> headerMappings, List<String> blackListedLines, Map<String, String> eigenCodeToIdMapping, Map<String, String> parentToChildMapping) {
+	private Boolean importCSVDataLine(String line, Map<Integer, String> headerMappings, List<String> blackListedLines,
+			Map<String, String> eigenCodeToIdMapping, Map<String, String> parentToChildMapping,
+			Map<String, String> childToParentMapping) {
 
 		final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 
 		String eigenCode = SystemConstants.EMPTY_STRING;
 
 		String fatherEigenCode = SystemConstants.EMPTY_STRING;
-		String motherEigenCode = SystemConstants.EMPTY_STRING;
 		String ref1 = SystemConstants.EMPTY_STRING;
 		String ref2 = SystemConstants.EMPTY_STRING;
 
@@ -180,6 +185,9 @@ public class ImportServiceImpl implements ImportService {
 		String kind16 = SystemConstants.EMPTY_STRING;
 		String kind17 = SystemConstants.EMPTY_STRING;
 		String kind18 = SystemConstants.EMPTY_STRING;
+
+		String note1 = SystemConstants.EMPTY_STRING;
+		String note2 = SystemConstants.EMPTY_STRING;
 
 		// Principal individual.
 		String lastName = SystemConstants.EMPTY_STRING;
@@ -211,6 +219,11 @@ public class ImportServiceImpl implements ImportService {
 		String partnerDeathNote = SystemConstants.EMPTY_STRING;
 		String partnerNotes = SystemConstants.EMPTY_STRING;
 
+		// Partners event
+		Date partnersRelationDate = null;
+		String relationshipNote = SystemConstants.EMPTY_STRING;
+
+
 		int position = 0;
 		boolean parseOk = true;
 		boolean parsePartnerOk = true;
@@ -241,6 +254,17 @@ public class ImportServiceImpl implements ImportService {
 					motherEigenCode = emptyToNull(stripQuotes(field)) + "A";
 					logger.debug("fatherEigenCode=" + fatherEigenCode);
 				}
+
+				if (fieldName.equals(AppConstants.OPM1_NL)) {
+					note1 =  stripQuotes(field);
+					logger.debug("note1=" + note1);
+				}
+
+				if (fieldName.equals(AppConstants.OPM2_NL)) {
+					note2 =  stripQuotes(field);
+					logger.debug("note2=" + note2);
+				}
+
 
 				if (fieldName.equals(AppConstants.REF1_NL)) {
 					ref1 = emptyToNull(stripQuotes(field));
@@ -572,6 +596,27 @@ public class ImportServiceImpl implements ImportService {
 					logger.debug("partnerDeathDate=" + partnerDeathDate);
 				}
 
+				if (fieldName.equals(AppConstants.HUWDATUM_NL)) {
+					final String partnersRelationDateString = stripQuotes(field);
+					final Optional<Date> optionalpartnersRelationDate = setDate(partnersRelationDateString);
+					partnersRelationDate = null;
+					if (optionalpartnersRelationDate != null && optionalpartnersRelationDate.isPresent()) {
+						partnersRelationDate = optionalpartnersRelationDate.get();
+					} else {
+						if (partnersRelationDateString != null && !partnersRelationDateString.isEmpty()) {
+							// The partners relation (marriage?) date field has data, only not in proper format, maybe it
+							// has just the year
+							// or something alike, so do not loose that info and save it to the notes field.
+							if (relationshipNote.length() > 0) {
+								relationshipNote = relationshipNote + SystemConstants.SPACE;
+							}
+							relationshipNote = relationshipNote + AppConstants.HUWDATUM_NL + SystemConstants.EQUALS
+									+ partnersRelationDateString + SystemConstants.SEMICOLON;
+						}
+					}
+					logger.debug("partnersRelationDate=" + partnersRelationDate);
+				}
+
 			}
 
 			position++;
@@ -579,18 +624,40 @@ public class ImportServiceImpl implements ImportService {
 
 		if (parseOk) {
 
-			Individual individual = new Individual(lastName, firstName, middleName, maidenName, familiarName,
-					genderType);
-			individual.setNote(notes);
-			individual = individualRepository.save(individual);
+			// Check if the individual already exits.
+			Individual individual = null;
+			String individualId = eigenCodeToIdMapping.get(eigenCode);
+			if (individualId != null) {
+				Optional<Individual> optionalIndividual = individualRepository.findById(individualId);
+				if (optionalIndividual.isPresent()) {
+					individual = optionalIndividual.get();
+
+					// TODO we should do some name comparisons here between stored and csv entries,
+					// but for now only we append the note field.
+					String tmpNote = individual.getNote();
+					if (tmpNote != null && !tmpNote.isEmpty()) {
+						notes = tmpNote + "; " + notes;
+					}
+					individual.setNote(note1 + ";" + note2 + ";" + notes);
+					individual = individualRepository.save(individual);
+				}
+			} else {
+				individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, genderType);
+				individual.setNote(
+						(note1.isEmpty() ? SystemConstants.EMPTY_STRING : AppConstants.OPM1_NL + SystemConstants.EQUALS + note1 + SystemConstants.SEMICOLON + SystemConstants.SPACE) +
+						(note2.isEmpty() ? SystemConstants.EMPTY_STRING : AppConstants.OPM2_NL + SystemConstants.EQUALS + note2 + SystemConstants.SEMICOLON + SystemConstants.SPACE) +
+						notes);
+				individual = individualRepository.save(individual);
+
+				if (ref1 != null) {
+					eigenCodeToIdMapping.put(ref1, individual.getId());
+				}
+			}
 			logger.info("individual=" + individual.toString());
 
-			if (ref1 != null) {
-				eigenCodeToIdMapping.put(ref1, individual.getId());
-			}
-
-			if (birthDate != null  || (birthNote != null && !birthNote.isEmpty())) {
-				EventType birthEventType = eventTypeRepository.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+			if (birthDate != null || (birthNote != null && !birthNote.isEmpty())) {
+				EventType birthEventType = eventTypeRepository
+						.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
 				Event birthEvent = new Event(individual, birthEventType, birthDate);
 				birthEvent.setEventPlace(birthPlace);
 				birthEvent.setEventNote(birthNote);
@@ -598,15 +665,27 @@ public class ImportServiceImpl implements ImportService {
 			}
 
 			if (deathDate != null || (deathNote != null && !deathNote.isEmpty())) {
-				EventType deathEventType = eventTypeRepository.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+				EventType deathEventType = eventTypeRepository
+						.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
 				Event deathEvent = new Event(individual, deathEventType, deathDate);
 				deathEvent.setEventPlace(deathPlace);
 				deathEvent.setEventNote(deathNote);
 				deathEvent = eventRepository.save(deathEvent);
 			}
 
+			if (partnersRelationDate != null || (relationshipNote != null && !relationshipNote.isEmpty())) {
+				EventType partnerEventType = eventTypeRepository
+						.findByQualifier(EventTypes.MARRIAGE.getEventTypeQualifier());
+				Event partnerEvent = new Event(individual, partnerEventType, partnersRelationDate);
+				partnerEvent.setEventPlace("TODO"); // TODO
+				partnerEvent.setEventNote(relationshipNote);
+				partnerEvent = eventRepository.save(partnerEvent);
+			}
+
 			if (parsePartnerOk) {
 
+				// Not checking if the partner individual already exists, should not be the case,
+				// the partner should be of a second marriage.
 				Individual partnerIndividual = new Individual(partnerLastName, partnerFirstName, partnerMiddleName,
 						partnerMaidenName, partnerFamiliarName, partnerGenderType);
 				partnerIndividual.setNote(partnerNotes);
@@ -619,63 +698,81 @@ public class ImportServiceImpl implements ImportService {
 
 				// Add to mapping to later on add parent-child relationships.
 				if (kind1 != null) {
+					childToParentMapping.put(kind1, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind1);
 				}
 				if (kind2 != null) {
+					childToParentMapping.put(kind2, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind2);
 				}
 				if (kind3 != null) {
+					childToParentMapping.put(kind3, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind3);
 				}
 				if (kind4 != null) {
+					childToParentMapping.put(kind4, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind4);
 				}
 				if (kind5 != null) {
+					childToParentMapping.put(kind5, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind5);
 				}
 				if (kind6 != null) {
+					childToParentMapping.put(kind6, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind6);
 				}
 				if (kind7 != null) {
+					childToParentMapping.put(kind7, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind7);
 				}
 				if (kind8 != null) {
+					childToParentMapping.put(kind8, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind8);
 				}
 				if (kind9 != null) {
+					childToParentMapping.put(kind9, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind9);
 				}
 				if (kind10 != null) {
+					childToParentMapping.put(kind10, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind10);
 				}
 				if (kind11 != null) {
+					childToParentMapping.put(kind11, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind11);
 				}
 				if (kind12 != null) {
+					childToParentMapping.put(kind12, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind12);
 				}
 				if (kind13 != null) {
+					childToParentMapping.put(kind13, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind13);
 				}
 				if (kind14 != null) {
+					childToParentMapping.put(kind14, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind14);
 				}
 				if (kind15 != null) {
+					childToParentMapping.put(kind15, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind15);
 				}
 				if (kind16 != null) {
+					childToParentMapping.put(kind16, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind16);
 				}
 				if (kind17 != null) {
+					childToParentMapping.put(kind17, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind17);
 				}
 				if (kind18 != null) {
+					childToParentMapping.put(kind18, individual.getId() + ":" + partnerIndividual.getId());
 					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind18);
 				}
 
-
 				if (partnerBirthDate != null || (partnerBirthNote != null && !partnerBirthNote.isEmpty())) {
-					EventType birthEventType = eventTypeRepository.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+					EventType birthEventType = eventTypeRepository
+							.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
 					Event birthEvent = new Event(partnerIndividual, birthEventType, partnerBirthDate);
 					birthEvent.setEventPlace(partnerBirthPlace);
 					birthEvent.setEventNote(partnerBirthNote);
@@ -685,7 +782,8 @@ public class ImportServiceImpl implements ImportService {
 				}
 
 				if (partnerDeathDate != null || (partnerDeathNote != null && !partnerDeathNote.isEmpty())) {
-					EventType deathEventType = eventTypeRepository.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+					EventType deathEventType = eventTypeRepository
+							.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
 					Event deathEvent = new Event(partnerIndividual, deathEventType, partnerDeathDate);
 					deathEvent.setEventPlace(partnerDeathPlace);
 					deathEvent.setEventNote(partnerDeathNote);
@@ -694,117 +792,219 @@ public class ImportServiceImpl implements ImportService {
 					logger.info("deathEvent=" + deathEvent.toString());
 				}
 
+				if (partnersRelationDate != null || (relationshipNote != null && !relationshipNote.isEmpty())) {
+					EventType partnerEventType = eventTypeRepository
+							.findByQualifier(EventTypes.MARRIAGE.getEventTypeQualifier());
+					Event partnerEvent = new Event(partnerIndividual, partnerEventType, partnersRelationDate);
+					partnerEvent.setEventPlace("TODO"); // TODO
+					partnerEvent.setEventNote(relationshipNote);
+					partnerEvent = eventRepository.save(partnerEvent);
+				}
 
 				// The relationship is husband-wife.
-				RoleType partner1RoleType = getRoleType(individual, Roles.HUSBAND.getRoleQualifier(), Roles.WIFE.getRoleQualifier(), Roles.HUSBAND.getRoleQualifier());
-				RoleType partner2RoleType = getRoleType(partnerIndividual, Roles.HUSBAND.getRoleQualifier(), Roles.WIFE.getRoleQualifier(), Roles.HUSBAND.getRoleQualifier());
+				RoleType partner1RoleType = getRoleType(individual, Roles.HUSBAND.getRoleQualifier(),
+						Roles.WIFE.getRoleQualifier(), Roles.HUSBAND.getRoleQualifier());
+				RoleType partner2RoleType = getRoleType(partnerIndividual, Roles.HUSBAND.getRoleQualifier(),
+						Roles.WIFE.getRoleQualifier(), Roles.HUSBAND.getRoleQualifier());
+
 				RelationshipType relationshipType = null;
-				Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository.findByQualifier(RelationshipTypes.MARRIED.getRelationshipTypeQualifier());
+				Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository
+						.findByQualifier(RelationshipTypes.MARRIED.getRelationshipTypeQualifier());
 				if (optionalRelationshipType.isPresent()) {
 					relationshipType = optionalRelationshipType.get();
 				}
 
 				if (partner1RoleType != null && partner2RoleType != null && relationshipType != null) {
-					Relationship relationship = new Relationship(individual, partnerIndividual, partner1RoleType, partner2RoleType, relationshipType);
+					Relationship relationship = new Relationship(individual, partnerIndividual, partner1RoleType,
+							partner2RoleType, relationshipType);
+					relationship.setNote(relationshipNote);
 					relationship = relationshipRepository.save(relationship);
 					logger.info("relationship=" + relationship.toString());
 				}
 
-
+				/*
 				String parent1Id = null;
 				String parent2Id = null;
 				if (fatherEigenCode != null && motherEigenCode != null) {
 
 					// Get the role of the individual (son or daughter)
-					Optional<RoleType> optionalRoleType3 = Optional.empty();
-					if (individual.getGenderType().equals(GenderTypes.MALE.getGenderQualifier())) {
-						optionalRoleType3 = roleTypeRepository.findByQualifier(Roles.SON.getRoleQualifier());
-					} else {
-						if (individual.getGenderType().equals(GenderTypes.FEMALE.getGenderQualifier())) {
-							optionalRoleType3 = roleTypeRepository.findByQualifier(Roles.DAUGHTER.getRoleQualifier());
-						} else {
-							optionalRoleType3 = roleTypeRepository.findByQualifier(Roles.SON.getRoleQualifier()); // TODO should be something else than SON
-						}
-					}
+					RoleType roleTypeChild = getRoleType(individual, Roles.SON.getRoleQualifier(),
+							Roles.DAUGHTER.getRoleQualifier(), Roles.SON.getRoleQualifier());
 
 					// The relationship is parent-child.
-					Optional<RelationshipType> optionalRelationshipType2 = relationshipTypeRepository.findByQualifier(RelationshipTypes.PARENT_CHILD.getRelationshipTypeQualifier());
+					RelationshipType relationshipTypeParentChild = null;
+					Optional<RelationshipType> optionalRelationshipTypeParentChild = relationshipTypeRepository
+							.findByQualifier(RelationshipTypes.PARENT_CHILD.getRelationshipTypeQualifier());
+					if (optionalRelationshipTypeParentChild.isPresent()) {
+						relationshipTypeParentChild = optionalRelationshipTypeParentChild.get();
+					}
 
 					if ((parent1Id = eigenCodeToIdMapping.get(fatherEigenCode)) != null) {
 
-						// So we have an individual with a first parent (we name it father, but could be either.
+						// So we have an individual with a first parent.
+						Optional<Individual> optionalParent1 = individualRepository.findById(parent1Id);
+						if (optionalParent1.isPresent()) {
+							// Get the role of the first parent.
+							RoleType roleTypeParent1 = getRoleType(optionalParent1.get(),
+									Roles.FATHER.getRoleQualifier(), Roles.MOTHER.getRoleQualifier(),
+									Roles.FATHER.getRoleQualifier());
 
-						// Get the role of the first parent.
-						Optional<RoleType> optionalRoleType4 = Optional.empty();
-						Optional<Individual> optionalPerson = individualRepository.findById(parent1Id);
-						if (optionalPerson.isPresent()) {
-							if (optionalPerson.get().getGenderType().equals(GenderTypes.MALE.getGenderQualifier())) {
-								//father = optionalPerson.get();
-								optionalRoleType4 = roleTypeRepository.findByQualifier(Roles.FATHER.getRoleQualifier());
-							} else {
-								if (optionalPerson.get().getGenderType().equals(GenderTypes.FEMALE.getGenderQualifier())) {
-									//mother = optionalPerson.get();
-									optionalRoleType4 = roleTypeRepository.findByQualifier(Roles.MOTHER.getRoleQualifier());
-								} else  {
-									//father = optionalPerson.get(); // TODO should be something else than father
-									optionalRoleType4 = roleTypeRepository.findByQualifier(Roles.FATHER.getRoleQualifier());
-								}
+							// Save the relationship of the individual and its first parent.
+							if (roleTypeChild != null && roleTypeParent1 != null
+									&& relationshipTypeParentChild != null) {
+								Relationship relationship = new Relationship(individual, optionalParent1.get(),
+										roleTypeChild, roleTypeParent1, relationshipTypeParentChild);
+								relationship = relationshipRepository.save(relationship);
+								logger.info("relationship=" + relationship.toString());
 							}
 						}
-
-						// Save the relationship of the individual and its first parent.
-						if (optionalPerson.isPresent() && optionalRoleType3.isPresent() && optionalRoleType4.isPresent()) {
-							Relationship relationship = new Relationship(individual, optionalPerson.get(), optionalRoleType3.get(),
-									optionalRoleType4.get(), optionalRelationshipType2.get());
-							logger.info("relationship=" + relationship.toString());
-							relationship = relationshipRepository.save(relationship);
-							logger.info("relationship=" + relationship.toString());
-						}
-
 					}
 
 					if ((parent2Id = eigenCodeToIdMapping.get(motherEigenCode)) != null) {
 
 						// So the individual has a second parent as well.
+						Optional<Individual> optionalParent2 = individualRepository.findById(parent2Id);
+						if (optionalParent2.isPresent()) {
+							// Get the role of the second parent.
+							RoleType roleTypeParent2 = getRoleType(optionalParent2.get(),
+									Roles.FATHER.getRoleQualifier(), Roles.MOTHER.getRoleQualifier(),
+									Roles.FATHER.getRoleQualifier());
 
-						// Get the role of the second parent.
-						Optional<RoleType> optionalRoleType5 = Optional.empty();
-						Optional<Individual> optionalPerson = individualRepository.findById(parent2Id);
-						if (optionalPerson.isPresent()) {
-							if (optionalPerson.get().getGenderType().equals(GenderTypes.MALE.getGenderQualifier())) {
-								//father = optionalPerson.get();
-								optionalRoleType5 = roleTypeRepository.findByQualifier(Roles.FATHER.getRoleQualifier());
-							} else {
-								if (optionalPerson.get().getGenderType().equals(GenderTypes.FEMALE.getGenderQualifier())) {
-									//mother = optionalPerson.get();
-									optionalRoleType5 = roleTypeRepository.findByQualifier(Roles.MOTHER.getRoleQualifier());
-								} else  {
-									//father = optionalPerson.get(); // TODO should be something else than father
-									optionalRoleType5 = roleTypeRepository.findByQualifier(Roles.FATHER.getRoleQualifier());
-								}
+							// Save the relationship of the individual and its second parent.
+							if (roleTypeChild != null && roleTypeParent2 != null
+									&& relationshipTypeParentChild != null) {
+								Relationship relationship = new Relationship(individual, optionalParent2.get(),
+										roleTypeChild, roleTypeParent2, relationshipTypeParentChild);
+								relationship = relationshipRepository.save(relationship);
+								logger.info("relationship=" + relationship.toString());
 							}
-						}
-
-						// Save the relationship of the individual and its second parent.
-						if (optionalPerson.isPresent() && optionalRoleType3.isPresent() && optionalRoleType5.isPresent()) {
-							Relationship relationship = new Relationship(individual, optionalPerson.get(), optionalRoleType3.get(),
-									optionalRoleType5.get(), optionalRelationshipType2.get());
-							logger.info("relationship=" + relationship.toString());
-							relationship = relationshipRepository.save(relationship);
-							logger.info("relationship=" + relationship.toString());
 						}
 
 					}
 				}
+				 */
 			}
 		}
 
 		return Boolean.TRUE;
 	}
 
-	private void creatParentChildRelationships(Map<String, String> eigenCodeToIdMapping,
-			Map<String, String> parentToChildMapping) {
+	private void createParentChildRelationships(Map<String, String> eigenCodeToIdMapping,
+			Map<String, String> parentToChildMapping, Map<String, String> childToParentMapping) {
 
+		/*
+		for (Map.Entry<String, String> entry : childToParentMapping.entrySet()) {
+			String childId = entry.getKey();
+
+			String parentEigencodes = entry.getValue();
+			String parent1Id = null;
+			String parent2Id = null;
+			if (parentEigencodes != null && !parentEigencodes.isEmpty()) {
+				if (parentEigencodes.indexOf(":") > -1) {
+					// two parents
+					String parent1Eigencode = parentEigencodes.substring(0, parentEigencodes.indexOf(":"));
+					parent1Eigencode = padZeros(parent1Eigencode, 5);
+					parent1Id = eigenCodeToIdMapping.get(parent1Eigencode);
+
+					String parent2Eigencode = parentEigencodes.substring(parentEigencodes.indexOf(":") + 1,
+							parentEigencodes.length());
+					parent2Eigencode = padZeros(parent2Eigencode, 5);
+					parent2Id = eigenCodeToIdMapping.get(parent2Eigencode);
+				} else {
+					// just one parent.
+					String parent1Eigencode = parentEigencodes;
+					parent1Eigencode = padZeros(parent1Eigencode, 5);
+					parent1Id = eigenCodeToIdMapping.get(parent1Eigencode);
+				}
+			}
+
+		}
+		 */
+
+		for (Map.Entry<String, String> entry : childToParentMapping.entrySet()) {
+
+			// The eigenCode is a 5 digit string, which should be left-padded with zeros.
+			String childEigenCode = entry.getKey();
+			String childId = null;
+			if (childEigenCode != null && !childEigenCode.isEmpty()) {
+				childEigenCode = padZeros(childEigenCode, 5) + "Z";
+				childId = eigenCodeToIdMapping.get(childEigenCode);
+			}
+
+			String parentIds = entry.getValue();
+			String parent1Id = null;
+			String parent2Id = null;
+			if (parentIds != null && !parentIds.isEmpty()) {
+				if (parentIds.indexOf(":") > -1) {
+					// two parents
+					parent1Id = parentIds.substring(0, parentIds.indexOf(":"));
+					parent2Id = parentIds.substring(parentIds.indexOf(":") + 1, parentIds.length());
+				} else {
+					// just one parent.
+					parent1Id = parentIds;
+				}
+			}
+
+			Individual parent1 = null;
+			RoleType roleTypeParent1 = null;
+			Individual parent2 = null;
+			RoleType roleTypeParent2 = null;
+			Individual child = null;
+			RoleType roleTypeChild = null;
+			if (parent1Id != null && !parent1Id.isEmpty()) {
+				Optional<Individual> optionalParent1 = individualRepository.findById(parent1Id);
+				if (optionalParent1.isPresent()) {
+					parent1 = optionalParent1.get();
+					roleTypeParent1 = getRoleType(parent1, Roles.FATHER.getRoleQualifier(),
+							Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
+				}
+			}
+			if (parent2Id != null && !parent2Id.isEmpty()) {
+				Optional<Individual> optionalParent2 = individualRepository.findById(parent2Id);
+				if (optionalParent2.isPresent()) {
+					parent2 = optionalParent2.get();
+					roleTypeParent2 = getRoleType(parent2, Roles.FATHER.getRoleQualifier(),
+							Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
+				}
+			}
+			if (childId != null && !childId.isEmpty()) {
+				Optional<Individual> optionalChild = individualRepository.findById(childId);
+				if (optionalChild.isPresent()) {
+					child = optionalChild.get();
+					// Get the role of the child (son or daughter)
+					roleTypeChild = getRoleType(child, Roles.SON.getRoleQualifier(), Roles.DAUGHTER.getRoleQualifier(),
+							Roles.SON.getRoleQualifier());
+				}
+			}
+
+			// The relationship is parent-child.
+			RelationshipType relationshipType = null;
+			Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository
+					.findByQualifier(RelationshipTypes.PARENT_CHILD.getRelationshipTypeQualifier());
+			if (optionalRelationshipType.isPresent()) {
+				relationshipType = optionalRelationshipType.get();
+			}
+
+			// Finally save the relationship of the child and its first parent.
+			if (child != null && roleTypeChild != null && parent1 != null && roleTypeParent1 != null
+					&& relationshipType != null) {
+				Relationship relationship = new Relationship(child, parent1, roleTypeChild, roleTypeParent1,
+						relationshipType);
+				relationship = relationshipRepository.save(relationship);
+				logger.info("relationship=" + relationship.toString());
+			}
+
+			// And save the relationship for the same child and its second parent.
+			if (child != null && roleTypeChild != null && parent2 != null && roleTypeParent2 != null
+					&& relationshipType != null) {
+				Relationship relationship = new Relationship(child, parent2, roleTypeChild, roleTypeParent2,
+						relationshipType);
+				relationship = relationshipRepository.save(relationship);
+				logger.info("relationship=" + relationship.toString());
+			}
+		}
+
+		/*
 		for (Map.Entry<String, String> entry : parentToChildMapping.entrySet()) {
 
 			String parentIds = entry.getKey();
@@ -839,14 +1039,16 @@ public class ImportServiceImpl implements ImportService {
 				Optional<Individual> optionalParent1 = individualRepository.findById(parent1Id);
 				if (optionalParent1.isPresent()) {
 					parent1 = optionalParent1.get();
-					roleTypeParent1 = getRoleType(parent1, Roles.FATHER.getRoleQualifier(), Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
+					roleTypeParent1 = getRoleType(parent1, Roles.FATHER.getRoleQualifier(),
+							Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
 				}
 			}
 			if (parent2Id != null && !parent2Id.isEmpty()) {
 				Optional<Individual> optionalParent2 = individualRepository.findById(parent2Id);
 				if (optionalParent2.isPresent()) {
 					parent2 = optionalParent2.get();
-					roleTypeParent2 = getRoleType(parent2, Roles.FATHER.getRoleQualifier(), Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
+					roleTypeParent2 = getRoleType(parent2, Roles.FATHER.getRoleQualifier(),
+							Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
 				}
 			}
 			if (childId != null && !childId.isEmpty()) {
@@ -854,43 +1056,51 @@ public class ImportServiceImpl implements ImportService {
 				if (optionalChild.isPresent()) {
 					child = optionalChild.get();
 					// Get the role of the child (son or daughter)
-					roleTypeChild = getRoleType(child, Roles.SON.getRoleQualifier(), Roles.DAUGHTER.getRoleQualifier(), Roles.SON.getRoleQualifier());
+					roleTypeChild = getRoleType(child, Roles.SON.getRoleQualifier(), Roles.DAUGHTER.getRoleQualifier(),
+							Roles.SON.getRoleQualifier());
 				}
 			}
 
 			// The relationship is parent-child.
 			RelationshipType relationshipType = null;
-			Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository.findByQualifier(RelationshipTypes.PARENT_CHILD.getRelationshipTypeQualifier());
+			Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository
+					.findByQualifier(RelationshipTypes.PARENT_CHILD.getRelationshipTypeQualifier());
 			if (optionalRelationshipType.isPresent()) {
 				relationshipType = optionalRelationshipType.get();
 			}
 
 			// Finally save the relationship of the child and its first parent.
-			if (child != null && roleTypeChild != null && parent1 != null && roleTypeParent1 != null && relationshipType != null) {
-				Relationship relationship = new Relationship(child, parent1, roleTypeChild, roleTypeParent1, relationshipType);
+			if (child != null && roleTypeChild != null && parent1 != null && roleTypeParent1 != null
+					&& relationshipType != null) {
+				Relationship relationship = new Relationship(child, parent1, roleTypeChild, roleTypeParent1,
+						relationshipType);
 				relationship = relationshipRepository.save(relationship);
 				logger.info("relationship=" + relationship.toString());
 			}
 
 			// And save the relationship for the same child and its second parent.
-			if (child != null && roleTypeChild != null && parent2 != null && roleTypeParent2 != null && relationshipType != null) {
-				Relationship relationship = new Relationship(child, parent2, roleTypeChild, roleTypeParent2, relationshipType);
+			if (child != null && roleTypeChild != null && parent2 != null && roleTypeParent2 != null
+					&& relationshipType != null) {
+				Relationship relationship = new Relationship(child, parent2, roleTypeChild, roleTypeParent2,
+						relationshipType);
 				relationship = relationshipRepository.save(relationship);
 				logger.info("relationship=" + relationship.toString());
 			}
 		}
+		 */
 	}
 
 	/**
 	 * Determine role type on individual based on gender.
-	 * @param individual the individual
-	 * @param roleQualifierMale role qualifier if individual is male
+	 *
+	 * @param individual          the individual
+	 * @param roleQualifierMale   role qualifier if individual is male
 	 * @param roleQualifierFemale role qualifier if individual is female
-	 * @param roleQualifierOther role qualifier if individual is otherwise
+	 * @param roleQualifierOther  role qualifier if individual is otherwise
 	 * @return RoleType, null if no role was found for the role qualifier passed
 	 */
-	private RoleType getRoleType(Individual individual,
-			String roleQualifierMale, String roleQualifierFemale, String roleQualifierOther) {
+	private RoleType getRoleType(Individual individual, String roleQualifierMale, String roleQualifierFemale,
+			String roleQualifierOther) {
 
 		Optional<RoleType> optionalRoleType = Optional.empty();
 
@@ -910,8 +1120,6 @@ public class ImportServiceImpl implements ImportService {
 			return null;
 		}
 	}
-
-
 
 	private String padZeros(String input, int length) {
 		int inputLenght = input.length();
@@ -971,7 +1179,7 @@ public class ImportServiceImpl implements ImportService {
 
 		} catch (ParseException e) {
 			date = null;
-			logger.error(e.getLocalizedMessage());
+			logger.warn(e.getLocalizedMessage());
 		}
 		return date;
 	}
