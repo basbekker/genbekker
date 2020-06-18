@@ -164,6 +164,7 @@ public class ImportServiceImpl implements ImportService {
 		String eigenCode = SystemConstants.EMPTY_STRING;
 
 		String fatherEigenCode = SystemConstants.EMPTY_STRING;
+		String motherEigenCode = SystemConstants.EMPTY_STRING;
 		String ref1 = SystemConstants.EMPTY_STRING;
 		String ref2 = SystemConstants.EMPTY_STRING;
 
