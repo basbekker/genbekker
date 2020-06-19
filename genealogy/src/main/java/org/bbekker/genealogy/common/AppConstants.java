@@ -307,8 +307,18 @@ public class AppConstants {
 	public static final String POVLPROV_NL = "POVLPROV";
 	public static final String POVLLAND_NL = "POVLLAND";
 	//...
+	public static final String HUWTR_NL = "HUWTR";
 	public static final String HUWDATUM_NL = "HUWDATUM";
+	public static final String HUWPLTS_NL = "HUWPLTS";
+	public static final String HUWPROV_NL = "HUWPROV";
+	public static final String HUWLAND_NL = "HUWLAND";
 	//...
+	public static final String SCHRB_NL = "SCHRB";
+	public static final String SCHDATUM_NL = "SCHDATUM";
+	public static final String SCHPLTS_NL = "SCHPLTS";
+	public static final String SCHPROV_NL = "SCHPROV";
+	public static final String SCHLAND_NL = "SCHLAND";
+	//..
 	public static final String OPM1_NL = "OPM1";
 	public static final String OPM2_NL = "OPM2";
 	public static final String KIND1_NL = "KIND1";

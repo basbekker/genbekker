@@ -83,10 +83,6 @@ public class ImportServiceImpl implements ImportService {
 
 			Map<Integer, String> headerMappings = null;
 			final Map<String, String> eigenCodeToIdMapping = new HashMap<String, String>(); // (Eigencode, Id)
-			final Map<String, String> parentToChildMapping = new HashMap<String, String>(); // (parent1Id:parent2Id,
-			// childEigencode) or
-			// (parent1Id,
-			// childEigencode)
 			final Map<String, String> childToParentMapping = new HashMap<String, String>(); // (childId,
 			// parent1Eigencode:parent2Eigencode)
 
@@ -94,7 +90,7 @@ public class ImportServiceImpl implements ImportService {
 
 			while ((line = bufferedReader.readLine()) != null) {
 
-				logger.info("line=" + line);
+				logger.info("line=" + lineNum + SystemConstants.SEMICOLON + line);
 
 				if (lineNum == 1) {
 					// First line of the csv has the column names.
@@ -102,7 +98,7 @@ public class ImportServiceImpl implements ImportService {
 				} else {
 					// Other lines are data lines.
 					parseResult = importCSVDataLine(line, headerMappings, blackList, eigenCodeToIdMapping,
-							parentToChildMapping, childToParentMapping);
+							childToParentMapping);
 				}
 
 				lineNum++;
@@ -115,7 +111,7 @@ public class ImportServiceImpl implements ImportService {
 			Long numberOfIndividualEntries = individualRepository.count();
 			logger.info("Individual entries=" + numberOfIndividualEntries.toString());
 
-			createParentChildRelationships(eigenCodeToIdMapping, parentToChildMapping, childToParentMapping);
+			createParentChildRelationships(eigenCodeToIdMapping, childToParentMapping);
 
 			Long numberOfRelationshipEntries = relationshipRepository.count();
 			logger.info("Relationship entries=" + numberOfRelationshipEntries.toString());
@@ -156,8 +152,7 @@ public class ImportServiceImpl implements ImportService {
 	}
 
 	private Boolean importCSVDataLine(String line, Map<Integer, String> headerMappings, List<String> blackListedLines,
-			Map<String, String> eigenCodeToIdMapping, Map<String, String> parentToChildMapping,
-			Map<String, String> childToParentMapping) {
+			Map<String, String> eigenCodeToIdMapping, Map<String, String> childToParentMapping) {
 
 		final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 
@@ -222,7 +217,11 @@ public class ImportServiceImpl implements ImportService {
 
 		// Partners event
 		Date partnersRelationDate = null;
+		String partnersRelationPlace = SystemConstants.EMPTY_STRING;
 		String relationshipNote = SystemConstants.EMPTY_STRING;
+		Date partnersSeparationDate = null;
+		String partnersSeparationPlace = SystemConstants.EMPTY_STRING;
+		String separationNote = SystemConstants.EMPTY_STRING;
 
 
 		int position = 0;
@@ -233,7 +232,6 @@ public class ImportServiceImpl implements ImportService {
 		for (String field : lineList) {
 
 			String fieldName = headerMappings.get(position);
-
 			if (fieldName == null) {
 				fieldName = SystemConstants.EMPTY_STRING;
 			}
@@ -597,6 +595,7 @@ public class ImportServiceImpl implements ImportService {
 					logger.debug("partnerDeathDate=" + partnerDeathDate);
 				}
 
+				// Partner event: a relation
 				if (fieldName.equals(AppConstants.HUWDATUM_NL)) {
 					final String partnersRelationDateString = stripQuotes(field);
 					final Optional<Date> optionalpartnersRelationDate = setDate(partnersRelationDateString);
@@ -616,6 +615,100 @@ public class ImportServiceImpl implements ImportService {
 						}
 					}
 					logger.debug("partnersRelationDate=" + partnersRelationDate);
+				}
+
+				if (fieldName.equals(AppConstants.HUWPLTS_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnersRelationPlace != null && !partnersRelationPlace.isEmpty()) {
+							partnersRelationPlace = partnersRelationPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
+						} else {
+							partnersRelationPlace = partnersRelationPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnersRelationPlace=" + partnersRelationPlace);
+				}
+
+				if (fieldName.equals(AppConstants.HUWPROV_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnersRelationPlace != null && !partnersRelationPlace.isEmpty()) {
+							partnersRelationPlace = partnersRelationPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
+						} else {
+							partnersRelationPlace = partnersRelationPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnersRelationPlace=" + partnersRelationPlace);
+				}
+
+				if (fieldName.equals(AppConstants.HUWLAND_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnersRelationPlace != null && !partnersRelationPlace.isEmpty()) {
+							partnersRelationPlace = partnersRelationPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
+						} else {
+							partnersRelationPlace = partnersRelationPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnersRelationPlace=" + partnersRelationPlace);
+				}
+
+				// Partner event: a separacion
+				if (fieldName.equals(AppConstants.SCHDATUM_NL)) {
+					final String partnersSeparationDateString = stripQuotes(field);
+					final Optional<Date> optionalPartnersSeparationDate = setDate(partnersSeparationDateString);
+					partnersSeparationDate = null;
+					if (optionalPartnersSeparationDate != null && optionalPartnersSeparationDate.isPresent()) {
+						partnersSeparationDate = optionalPartnersSeparationDate.get();
+					} else {
+						if (partnersSeparationDateString != null && !partnersSeparationDateString.isEmpty()) {
+							// The partners relation (marriage?) date field has data, only not in proper format, maybe it
+							// has just the year
+							// or something alike, so do not loose that info and save it to the notes field.
+							if (separationNote.length() > 0) {
+								separationNote = separationNote + SystemConstants.SPACE;
+							}
+							separationNote = separationNote + AppConstants.SCHDATUM_NL + SystemConstants.EQUALS
+									+ partnersSeparationDateString + SystemConstants.SEMICOLON;
+						}
+					}
+					logger.debug("partnersSeparationDate=" + partnersSeparationDate);
+				}
+
+				if (fieldName.equals(AppConstants.SCHPLTS_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnersSeparationPlace != null && !partnersSeparationPlace.isEmpty()) {
+							partnersSeparationPlace = partnersSeparationPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
+						} else {
+							partnersSeparationPlace = partnersSeparationPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnersSeparationPlace=" + partnersSeparationPlace);
+				}
+
+				if (fieldName.equals(AppConstants.SCHPROV_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnersSeparationPlace != null && !partnersSeparationPlace.isEmpty()) {
+							partnersSeparationPlace = partnersSeparationPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
+						} else {
+							partnersSeparationPlace = partnersSeparationPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnersSeparationPlace=" + partnersSeparationPlace);
+				}
+
+				if (fieldName.equals(AppConstants.SCHLAND_NL)) {
+					if (field != null && !stripQuotes(field).isEmpty()) {
+						if (partnersSeparationPlace != null && !partnersSeparationPlace.isEmpty()) {
+							partnersSeparationPlace = partnersSeparationPlace + SystemConstants.COMMA + SystemConstants.SPACE
+									+ stripQuotes(field);
+						} else {
+							partnersSeparationPlace = partnersSeparationPlace + stripQuotes(field);
+						}
+					}
+					logger.debug("partnersSeparationPlace=" + partnersSeparationPlace);
 				}
 
 			}
@@ -678,8 +771,17 @@ public class ImportServiceImpl implements ImportService {
 				EventType partnerEventType = eventTypeRepository
 						.findByQualifier(EventTypes.MARRIAGE.getEventTypeQualifier());
 				Event partnerEvent = new Event(individual, partnerEventType, partnersRelationDate);
-				partnerEvent.setEventPlace("TODO"); // TODO
+				partnerEvent.setEventPlace(partnersRelationPlace); // TODO
 				partnerEvent.setEventNote(relationshipNote);
+				partnerEvent = eventRepository.save(partnerEvent);
+			}
+
+			if (partnersSeparationDate != null || (separationNote != null && !separationNote.isEmpty())) {
+				EventType partnerEventType = eventTypeRepository
+						.findByQualifier(EventTypes.DIVORCE.getEventTypeQualifier());
+				Event partnerEvent = new Event(individual, partnerEventType, partnersSeparationDate);
+				partnerEvent.setEventPlace(partnersSeparationPlace); // TODO
+				partnerEvent.setEventNote(separationNote);
 				partnerEvent = eventRepository.save(partnerEvent);
 			}
 
@@ -700,75 +802,57 @@ public class ImportServiceImpl implements ImportService {
 				// Add to mapping to later on add parent-child relationships.
 				if (kind1 != null) {
 					childToParentMapping.put(kind1, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind1);
 				}
 				if (kind2 != null) {
 					childToParentMapping.put(kind2, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind2);
 				}
 				if (kind3 != null) {
 					childToParentMapping.put(kind3, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind3);
 				}
 				if (kind4 != null) {
 					childToParentMapping.put(kind4, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind4);
 				}
 				if (kind5 != null) {
 					childToParentMapping.put(kind5, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind5);
 				}
 				if (kind6 != null) {
 					childToParentMapping.put(kind6, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind6);
 				}
 				if (kind7 != null) {
 					childToParentMapping.put(kind7, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind7);
 				}
 				if (kind8 != null) {
 					childToParentMapping.put(kind8, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind8);
 				}
 				if (kind9 != null) {
 					childToParentMapping.put(kind9, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind9);
 				}
 				if (kind10 != null) {
 					childToParentMapping.put(kind10, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind10);
 				}
 				if (kind11 != null) {
 					childToParentMapping.put(kind11, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind11);
 				}
 				if (kind12 != null) {
 					childToParentMapping.put(kind12, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind12);
 				}
 				if (kind13 != null) {
 					childToParentMapping.put(kind13, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind13);
 				}
 				if (kind14 != null) {
 					childToParentMapping.put(kind14, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind14);
 				}
 				if (kind15 != null) {
 					childToParentMapping.put(kind15, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind15);
 				}
 				if (kind16 != null) {
 					childToParentMapping.put(kind16, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind16);
 				}
 				if (kind17 != null) {
 					childToParentMapping.put(kind17, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind17);
 				}
 				if (kind18 != null) {
 					childToParentMapping.put(kind18, individual.getId() + ":" + partnerIndividual.getId());
-					parentToChildMapping.put(individual.getId() + ":" + partnerIndividual.getId(), kind18);
 				}
 
 				if (partnerBirthDate != null || (partnerBirthNote != null && !partnerBirthNote.isEmpty())) {
@@ -797,8 +881,17 @@ public class ImportServiceImpl implements ImportService {
 					EventType partnerEventType = eventTypeRepository
 							.findByQualifier(EventTypes.MARRIAGE.getEventTypeQualifier());
 					Event partnerEvent = new Event(partnerIndividual, partnerEventType, partnersRelationDate);
-					partnerEvent.setEventPlace("TODO"); // TODO
+					partnerEvent.setEventPlace(partnersRelationPlace);
 					partnerEvent.setEventNote(relationshipNote);
+					partnerEvent = eventRepository.save(partnerEvent);
+				}
+
+				if (partnersSeparationDate != null || (separationNote != null && !separationNote.isEmpty())) {
+					EventType partnerEventType = eventTypeRepository
+							.findByQualifier(EventTypes.DIVORCE.getEventTypeQualifier());
+					Event partnerEvent = new Event(partnerIndividual, partnerEventType, partnersSeparationDate);
+					partnerEvent.setEventPlace(partnersSeparationPlace);
+					partnerEvent.setEventNote(separationNote);
 					partnerEvent = eventRepository.save(partnerEvent);
 				}
 
@@ -891,36 +984,7 @@ public class ImportServiceImpl implements ImportService {
 	}
 
 	private void createParentChildRelationships(Map<String, String> eigenCodeToIdMapping,
-			Map<String, String> parentToChildMapping, Map<String, String> childToParentMapping) {
-
-		/*
-		for (Map.Entry<String, String> entry : childToParentMapping.entrySet()) {
-			String childId = entry.getKey();
-
-			String parentEigencodes = entry.getValue();
-			String parent1Id = null;
-			String parent2Id = null;
-			if (parentEigencodes != null && !parentEigencodes.isEmpty()) {
-				if (parentEigencodes.indexOf(":") > -1) {
-					// two parents
-					String parent1Eigencode = parentEigencodes.substring(0, parentEigencodes.indexOf(":"));
-					parent1Eigencode = padZeros(parent1Eigencode, 5);
-					parent1Id = eigenCodeToIdMapping.get(parent1Eigencode);
-
-					String parent2Eigencode = parentEigencodes.substring(parentEigencodes.indexOf(":") + 1,
-							parentEigencodes.length());
-					parent2Eigencode = padZeros(parent2Eigencode, 5);
-					parent2Id = eigenCodeToIdMapping.get(parent2Eigencode);
-				} else {
-					// just one parent.
-					String parent1Eigencode = parentEigencodes;
-					parent1Eigencode = padZeros(parent1Eigencode, 5);
-					parent1Id = eigenCodeToIdMapping.get(parent1Eigencode);
-				}
-			}
-
-		}
-		 */
+			Map<String, String> childToParentMapping) {
 
 		for (Map.Entry<String, String> entry : childToParentMapping.entrySet()) {
 
@@ -992,7 +1056,7 @@ public class ImportServiceImpl implements ImportService {
 				Relationship relationship = new Relationship(child, parent1, roleTypeChild, roleTypeParent1,
 						relationshipType);
 				relationship = relationshipRepository.save(relationship);
-				logger.info("relationship=" + relationship.toString());
+				logger.warn("relationship=" + relationship.toString());
 			}
 
 			// And save the relationship for the same child and its second parent.
@@ -1005,90 +1069,6 @@ public class ImportServiceImpl implements ImportService {
 			}
 		}
 
-		/*
-		for (Map.Entry<String, String> entry : parentToChildMapping.entrySet()) {
-
-			String parentIds = entry.getKey();
-			String parent1Id = null;
-			String parent2Id = null;
-			if (parentIds != null && !parentIds.isEmpty()) {
-				if (parentIds.indexOf(":") > -1) {
-					// two parents
-					parent1Id = parentIds.substring(0, parentIds.indexOf(":"));
-					parent2Id = parentIds.substring(parentIds.indexOf(":") + 1, parentIds.length());
-				} else {
-					// just one parent.
-					parent1Id = parentIds;
-				}
-			}
-
-			// The eigenCode is a 5 digit string, which should be left-padded with zeros.
-			String childEigenCode = entry.getValue();
-			String childId = null;
-			if (childEigenCode != null && !childEigenCode.isEmpty()) {
-				childEigenCode = padZeros(childEigenCode, 5) + "Z";
-				childId = eigenCodeToIdMapping.get(childEigenCode);
-			}
-
-			Individual parent1 = null;
-			RoleType roleTypeParent1 = null;
-			Individual parent2 = null;
-			RoleType roleTypeParent2 = null;
-			Individual child = null;
-			RoleType roleTypeChild = null;
-			if (parent1Id != null && !parent1Id.isEmpty()) {
-				Optional<Individual> optionalParent1 = individualRepository.findById(parent1Id);
-				if (optionalParent1.isPresent()) {
-					parent1 = optionalParent1.get();
-					roleTypeParent1 = getRoleType(parent1, Roles.FATHER.getRoleQualifier(),
-							Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
-				}
-			}
-			if (parent2Id != null && !parent2Id.isEmpty()) {
-				Optional<Individual> optionalParent2 = individualRepository.findById(parent2Id);
-				if (optionalParent2.isPresent()) {
-					parent2 = optionalParent2.get();
-					roleTypeParent2 = getRoleType(parent2, Roles.FATHER.getRoleQualifier(),
-							Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
-				}
-			}
-			if (childId != null && !childId.isEmpty()) {
-				Optional<Individual> optionalChild = individualRepository.findById(childId);
-				if (optionalChild.isPresent()) {
-					child = optionalChild.get();
-					// Get the role of the child (son or daughter)
-					roleTypeChild = getRoleType(child, Roles.SON.getRoleQualifier(), Roles.DAUGHTER.getRoleQualifier(),
-							Roles.SON.getRoleQualifier());
-				}
-			}
-
-			// The relationship is parent-child.
-			RelationshipType relationshipType = null;
-			Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository
-					.findByQualifier(RelationshipTypes.PARENT_CHILD.getRelationshipTypeQualifier());
-			if (optionalRelationshipType.isPresent()) {
-				relationshipType = optionalRelationshipType.get();
-			}
-
-			// Finally save the relationship of the child and its first parent.
-			if (child != null && roleTypeChild != null && parent1 != null && roleTypeParent1 != null
-					&& relationshipType != null) {
-				Relationship relationship = new Relationship(child, parent1, roleTypeChild, roleTypeParent1,
-						relationshipType);
-				relationship = relationshipRepository.save(relationship);
-				logger.info("relationship=" + relationship.toString());
-			}
-
-			// And save the relationship for the same child and its second parent.
-			if (child != null && roleTypeChild != null && parent2 != null && roleTypeParent2 != null
-					&& relationshipType != null) {
-				Relationship relationship = new Relationship(child, parent2, roleTypeChild, roleTypeParent2,
-						relationshipType);
-				relationship = relationshipRepository.save(relationship);
-				logger.info("relationship=" + relationship.toString());
-			}
-		}
-		 */
 	}
 
 	/**
