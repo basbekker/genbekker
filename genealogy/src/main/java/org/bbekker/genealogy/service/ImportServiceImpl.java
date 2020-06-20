@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.QuoteMode;
 import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.common.AppConstants.EventTypes;
 import org.bbekker.genealogy.common.AppConstants.GenderTypes;
@@ -153,6 +155,8 @@ public class ImportServiceImpl implements ImportService {
 
 	private Boolean importCSVDataLine(String line, Map<Integer, String> headerMappings, List<String> blackListedLines,
 			Map<String, String> eigenCodeToIdMapping, Map<String, String> childToParentMapping) {
+
+		String sanitizedLine = sanitize(line);
 
 		final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 
@@ -981,6 +985,19 @@ public class ImportServiceImpl implements ImportService {
 		}
 
 		return Boolean.TRUE;
+	}
+
+	/**
+	 * Check and sanitize line with comma separated fields.
+	 * I.e. if the field string has a comma in it, though, that breaks the parsing of the fields,
+	 * all fields are one off.
+	 *
+	 * @param line string with csv entries
+	 * @return cleaned up lines
+	 */
+	private String sanitize(String line) {
+		CSVFormat csvFormat = CSVFormat.DEFAULT.withQuoteMode(QuoteMode.MINIMAL);
+		return line;
 	}
 
 	private void createParentChildRelationships(Map<String, String> eigenCodeToIdMapping,
