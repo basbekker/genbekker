@@ -321,6 +321,7 @@ public class AppConstants {
 	//..
 	public static final String OPM1_NL = "OPM1";
 	public static final String OPM2_NL = "OPM2";
+	public static final String OPMH_NL = "OPMH";
 	public static final String KIND1_NL = "KIND1";
 	public static final String KIND2_NL = "KIND2";
 	public static final String KIND3_NL = "KIND3";

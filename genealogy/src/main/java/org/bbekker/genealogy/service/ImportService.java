@@ -7,5 +7,4 @@ public interface ImportService {
 
 	Boolean parseBekkerCsvFile(String fileName);
 
-	Boolean verifyUploadedFile(String fileName);
 }
