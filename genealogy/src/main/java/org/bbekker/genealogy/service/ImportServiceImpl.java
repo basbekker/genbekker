@@ -72,18 +72,20 @@ public class ImportServiceImpl implements ImportService {
 	@Value("${bekker.csv.blacklist}")
 	private String EigenCodeBlackList;
 
-
 	@Override
 	public Boolean parseBekkerCsvFile(String fileName) {
 
 		Boolean parseResult = Boolean.FALSE;
 		long lineNum = 2; // line 2 has data, line 1 has the headers.
 
+		File uploadedFile = null;
+		InputStream inputStream = null;
+		BufferedReader reader = null;
 		try {
-			File uploadedFile = new File(fileName);
-			InputStream inputStream = new FileInputStream(uploadedFile);
+			uploadedFile = new File(fileName);
+			inputStream = new FileInputStream(uploadedFile);
 
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			reader = new BufferedReader(new InputStreamReader(inputStream));
 
 			final Map<String, String> eigenCodeToIdMapping = new HashMap<String, String>(); // (Eigencode, Id)
 			final Map<String, String> childToParentMapping = new HashMap<String, String>(); // (childId,
@@ -119,6 +121,14 @@ public class ImportServiceImpl implements ImportService {
 			parseResult = Boolean.FALSE;
 			logger.error("Parse " + fileName + " failed on line " + lineNum + ": ", e.getLocalizedMessage());
 			e.printStackTrace();
+
+			try {
+				reader.close();
+			} catch (Exception re) { }
+			try {
+				inputStream.close();
+			} catch (Exception ie) { }
+
 		}
 
 		return parseResult;
@@ -141,30 +151,7 @@ public class ImportServiceImpl implements ImportService {
 		String ref1 = SystemConstants.EMPTY_STRING;
 		String ref2 = SystemConstants.EMPTY_STRING;
 
-		String kind1 = SystemConstants.EMPTY_STRING;
-		String kind2 = SystemConstants.EMPTY_STRING;
-		String kind3 = SystemConstants.EMPTY_STRING;
-		String kind4 = SystemConstants.EMPTY_STRING;
-		String kind5 = SystemConstants.EMPTY_STRING;
-		String kind6 = SystemConstants.EMPTY_STRING;
-		String kind7 = SystemConstants.EMPTY_STRING;
-		String kind8 = SystemConstants.EMPTY_STRING;
-		String kind9 = SystemConstants.EMPTY_STRING;
-		String kind10 = SystemConstants.EMPTY_STRING;
-		String kind11 = SystemConstants.EMPTY_STRING;
-		String kind12 = SystemConstants.EMPTY_STRING;
-		String kind13 = SystemConstants.EMPTY_STRING;
-		String kind14 = SystemConstants.EMPTY_STRING;
-		String kind15 = SystemConstants.EMPTY_STRING;
-		String kind16 = SystemConstants.EMPTY_STRING;
-		String kind17 = SystemConstants.EMPTY_STRING;
-		String kind18 = SystemConstants.EMPTY_STRING;
-
-		String note1 = SystemConstants.EMPTY_STRING;
-		String note2 = SystemConstants.EMPTY_STRING;
-		String noteH = SystemConstants.EMPTY_STRING;
-
-		// Principal individual.
+		// First individual.
 		String lastName = SystemConstants.EMPTY_STRING;
 		String firstName = SystemConstants.EMPTY_STRING;
 		String middleName = SystemConstants.EMPTY_STRING;
@@ -194,13 +181,38 @@ public class ImportServiceImpl implements ImportService {
 		String partnerDeathNote = SystemConstants.EMPTY_STRING;
 		String partnerNotes = SystemConstants.EMPTY_STRING;
 
-		// Partners event
+		// Partners events
 		Date partnersRelationDate = null;
 		String partnersRelationPlace = SystemConstants.EMPTY_STRING;
 		String relationshipNote = SystemConstants.EMPTY_STRING;
 		Date partnersSeparationDate = null;
 		String partnersSeparationPlace = SystemConstants.EMPTY_STRING;
 		String separationNote = SystemConstants.EMPTY_STRING;
+
+		// Kids between the two
+		String kind1 = SystemConstants.EMPTY_STRING;
+		String kind2 = SystemConstants.EMPTY_STRING;
+		String kind3 = SystemConstants.EMPTY_STRING;
+		String kind4 = SystemConstants.EMPTY_STRING;
+		String kind5 = SystemConstants.EMPTY_STRING;
+		String kind6 = SystemConstants.EMPTY_STRING;
+		String kind7 = SystemConstants.EMPTY_STRING;
+		String kind8 = SystemConstants.EMPTY_STRING;
+		String kind9 = SystemConstants.EMPTY_STRING;
+		String kind10 = SystemConstants.EMPTY_STRING;
+		String kind11 = SystemConstants.EMPTY_STRING;
+		String kind12 = SystemConstants.EMPTY_STRING;
+		String kind13 = SystemConstants.EMPTY_STRING;
+		String kind14 = SystemConstants.EMPTY_STRING;
+		String kind15 = SystemConstants.EMPTY_STRING;
+		String kind16 = SystemConstants.EMPTY_STRING;
+		String kind17 = SystemConstants.EMPTY_STRING;
+		String kind18 = SystemConstants.EMPTY_STRING;
+
+		// Notes
+		String note1 = SystemConstants.EMPTY_STRING;
+		String note2 = SystemConstants.EMPTY_STRING;
+		String noteH = SystemConstants.EMPTY_STRING;
 
 		boolean parseOk = true;
 		boolean parsePartnerOk = true;
@@ -291,7 +303,8 @@ public class ImportServiceImpl implements ImportService {
 				deathDate = optionalDeathDate.get();
 			} else {
 				if (deathDateString != null && !deathDateString.isEmpty()) {
-					// The birth date field has data, only not in proper format, maybe it has just the year
+					// The birth date field has data, only not in proper format, maybe it has just
+					// the year
 					// or something alike, so do not loose that info and save it to the notes field.
 					if (deathNote.length() > 0) {
 						deathNote = deathNote + SystemConstants.SPACE;
@@ -322,8 +335,10 @@ public class ImportServiceImpl implements ImportService {
 				partnerBirthDate = optionalPartnerBirthDate.get();
 			} else {
 				if (partnerBirthDateString != null && !partnerBirthDateString.isEmpty()) {
-					// The partner birth date field has data, only not in proper format, maybe it has just
-					// the year or something alike, so do not loose that info and save it to the notes field.
+					// The partner birth date field has data, only not in proper format, maybe it
+					// has just
+					// the year or something alike, so do not loose that info and save it to the
+					// notes field.
 					if (partnerBirthNote.length() > 0) {
 						partnerBirthNote = partnerBirthNote + SystemConstants.SPACE;
 					}
@@ -343,7 +358,8 @@ public class ImportServiceImpl implements ImportService {
 				partnerDeathDate = optionalPartnerDeathDate.get();
 			} else {
 				if (partnerDeathDateString != null && !partnerDeathDateString.isEmpty()) {
-					// The partner birth date field has data, only not in proper format, maybe it has just the year
+					// The partner birth date field has data, only not in proper format, maybe it
+					// has just the year
 					// or something alike, so do not loose that info and save it to the notes field.
 					if (partnerDeathNote.length() > 0) {
 						partnerDeathNote = partnerDeathNote + SystemConstants.SPACE;
@@ -380,7 +396,7 @@ public class ImportServiceImpl implements ImportService {
 			// Partner event: a separation
 			final String partnersSeparationDateString = nullToEmpty(csvRecord.get(AppConstants.SCHDATUM_NL));
 			final Optional<Date> optionalPartnersSeparationDate = setDate(partnersSeparationDateString);
-			partnersRelationDate = null;
+			partnersSeparationDate = null;
 			if (optionalPartnersSeparationDate != null && optionalPartnersSeparationDate.isPresent()) {
 				partnersSeparationDate = optionalPartnersSeparationDate.get();
 			} else {
@@ -435,35 +451,37 @@ public class ImportServiceImpl implements ImportService {
 						+ notes);
 				individual = individualRepository.save(individual);
 
+				// only if the individual did not exist already, add birth/death dates,
+				// otherwise there is the risk of duplicating those dates in the db.
+				if (birthDate != null || (birthNote != null && !birthNote.isEmpty())) {
+					EventType birthEventType = eventTypeRepository
+							.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+					Event birthEvent = new Event(individual, birthEventType, birthDate);
+					birthEvent.setEventPlace(birthPlace);
+					birthEvent.setEventNote(birthNote);
+					birthEvent = eventRepository.save(birthEvent);
+				}
+
+				if (deathDate != null || (deathNote != null && !deathNote.isEmpty())) {
+					EventType deathEventType = eventTypeRepository
+							.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+					Event deathEvent = new Event(individual, deathEventType, deathDate);
+					deathEvent.setEventPlace(deathPlace);
+					deathEvent.setEventNote(deathNote);
+					deathEvent = eventRepository.save(deathEvent);
+				}
+
 				if (ref1 != null) {
 					eigenCodeToIdMapping.put(ref1, individual.getId());
 				}
 			}
 			logger.info("individual=" + individual.toString());
 
-			if (birthDate != null || (birthNote != null && !birthNote.isEmpty())) {
-				EventType birthEventType = eventTypeRepository
-						.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
-				Event birthEvent = new Event(individual, birthEventType, birthDate);
-				birthEvent.setEventPlace(birthPlace);
-				birthEvent.setEventNote(birthNote);
-				birthEvent = eventRepository.save(birthEvent);
-			}
-
-			if (deathDate != null || (deathNote != null && !deathNote.isEmpty())) {
-				EventType deathEventType = eventTypeRepository
-						.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
-				Event deathEvent = new Event(individual, deathEventType, deathDate);
-				deathEvent.setEventPlace(deathPlace);
-				deathEvent.setEventNote(deathNote);
-				deathEvent = eventRepository.save(deathEvent);
-			}
-
 			if (partnersRelationDate != null || (relationshipNote != null && !relationshipNote.isEmpty())) {
 				EventType partnerEventType = eventTypeRepository
 						.findByQualifier(EventTypes.MARRIAGE.getEventTypeQualifier());
 				Event partnerEvent = new Event(individual, partnerEventType, partnersRelationDate);
-				partnerEvent.setEventPlace(partnersRelationPlace); // TODO
+				partnerEvent.setEventPlace(partnersRelationPlace);
 				partnerEvent.setEventNote(relationshipNote);
 				partnerEvent = eventRepository.save(partnerEvent);
 			}
@@ -472,7 +490,7 @@ public class ImportServiceImpl implements ImportService {
 				EventType partnerEventType = eventTypeRepository
 						.findByQualifier(EventTypes.DIVORCE.getEventTypeQualifier());
 				Event partnerEvent = new Event(individual, partnerEventType, partnersSeparationDate);
-				partnerEvent.setEventPlace(partnersSeparationPlace); // TODO
+				partnerEvent.setEventPlace(partnersSeparationPlace);
 				partnerEvent.setEventNote(separationNote);
 				partnerEvent = eventRepository.save(partnerEvent);
 			}
