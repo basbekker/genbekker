@@ -1,10 +1,12 @@
 package org.bbekker.genealogy.service;
 
+import java.util.concurrent.Future;
+
 import org.springframework.stereotype.Service;
 
 @Service
 public interface ImportService {
 
-	Boolean parseBekkerCsvFile(String fileName);
+	Future<Boolean> parseBekkerCsvFile(String fileName);
 
 }

@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.bbekker.genealogy.service.ImportService;
 import org.bbekker.genealogy.service.IndividualService;
@@ -62,8 +64,21 @@ public class UploadController {
 			Path path = Paths.get(UPLOAD_FOLDER + file.getOriginalFilename());
 			Files.write(path, bytes);
 
+			Future<Boolean> importTask;
 			if (processUpload) {
-				importService.parseBekkerCsvFile(path.toString());
+				importTask = importService.parseBekkerCsvFile(path.toString());
+
+				while(!importTask.isDone()) {
+					logger.info("Importing " + path.toString());
+					//Thread.sleep(30000); // 30 seconds
+					Thread.sleep(1000); // 1 second
+
+					String[] vars = new String[] { file.getOriginalFilename(),
+							individualService.getNumberOfElements().toString() };
+					String message = messageSource.getMessage("upload.ongoing", vars, locale);
+					logger.info(message);
+				}
+				Boolean result = importTask.get();
 			}
 
 			String[] vars = new String[] { file.getOriginalFilename(),
@@ -74,9 +89,13 @@ public class UploadController {
 
 			logger.info(message);
 
-		} catch (IOException e) {
-			logger.error(e.getLocalizedMessage());
-			e.printStackTrace();
+		} catch (IOException ioe) {
+			logger.error(ioe.getLocalizedMessage());
+			ioe.printStackTrace();
+		} catch (InterruptedException ie) {
+			ie.printStackTrace();
+		} catch (ExecutionException ee) {
+			ee.printStackTrace();
 		}
 
 		return "redirect:/app/upload/uploadStatus";

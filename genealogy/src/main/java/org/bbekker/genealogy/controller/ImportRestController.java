@@ -1,6 +1,8 @@
 package org.bbekker.genealogy.controller;
 
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.common.SystemConstants;
@@ -37,7 +39,13 @@ public class ImportRestController {
 		Boolean parseResult = Boolean.FALSE;
 		String return_msg = SystemConstants.EMPTY_STRING;
 
-		parseResult = importService.parseBekkerCsvFile(UPLOAD_FOLDER + AppConstants.BEKKER_CSV_NAME);
+		Future<Boolean> importTask = importService.parseBekkerCsvFile(UPLOAD_FOLDER + AppConstants.BEKKER_CSV_NAME);
+
+		try {
+			parseResult = importTask.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 
 		return_msg = messageSource.getMessage("import.finished " + parseResult, null, locale);
 		logger.info(return_msg);
@@ -55,7 +63,13 @@ public class ImportRestController {
 		Boolean parseResult = Boolean.FALSE;
 		String return_msg = SystemConstants.EMPTY_STRING;
 
-		parseResult = importService.parseBekkerCsvFile(UPLOAD_FOLDER + AppConstants.BEKKER_TEST_CSV_NAME);
+		Future<Boolean> importTask = importService.parseBekkerCsvFile(UPLOAD_FOLDER + AppConstants.BEKKER_TEST_CSV_NAME);
+
+		try {
+			parseResult = importTask.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 
 		return_msg = messageSource.getMessage("import.finished " + parseResult, null, locale);
 		logger.info(return_msg);

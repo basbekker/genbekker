@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Future;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -41,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -73,7 +76,8 @@ public class ImportServiceImpl implements ImportService {
 	private String EigenCodeBlackList;
 
 	@Override
-	public Boolean parseBekkerCsvFile(String fileName) {
+	@Async
+	public Future<Boolean> parseBekkerCsvFile(String fileName) {
 
 		Boolean parseResult = Boolean.FALSE;
 		long lineNum = 2; // line 2 has data, line 1 has the headers.
@@ -98,7 +102,7 @@ public class ImportServiceImpl implements ImportService {
 
 			for (CSVRecord csvRecord : csvParser) {
 
-				logger.info("line=" + csvRecord.toString());
+				logger.debug("line=" + csvRecord.toString());
 
 				parseResult = importCSVRecord(csvRecord, blackList, eigenCodeToIdMapping, childToParentMapping);
 
@@ -131,7 +135,7 @@ public class ImportServiceImpl implements ImportService {
 
 		}
 
-		return parseResult;
+		return new AsyncResult<Boolean>(parseResult);
 	}
 
 	private List<String> loadBlacklistedLines(String listOfCodes) {
@@ -475,7 +479,7 @@ public class ImportServiceImpl implements ImportService {
 					eigenCodeToIdMapping.put(ref1, individual.getId());
 				}
 			}
-			logger.info("individual=" + individual.toString());
+			logger.debug("individual=" + individual.toString());
 
 			if (partnersRelationDate != null || (relationshipNote != null && !relationshipNote.isEmpty())) {
 				EventType partnerEventType = eventTypeRepository
@@ -504,7 +508,7 @@ public class ImportServiceImpl implements ImportService {
 						partnerMaidenName, partnerFamiliarName, partnerGenderType);
 				partnerIndividual.setNote(partnerNotes);
 				partnerIndividual = individualRepository.save(partnerIndividual);
-				logger.info("partnerIndividual=" + partnerIndividual.toString());
+				logger.debug("partnerIndividual=" + partnerIndividual.toString());
 
 				if (ref2 != null) {
 					eigenCodeToIdMapping.put(ref2, partnerIndividual.getId());
@@ -573,7 +577,7 @@ public class ImportServiceImpl implements ImportService {
 					birthEvent.setEventPlace(partnerBirthPlace);
 					birthEvent.setEventNote(partnerBirthNote);
 					birthEvent = eventRepository.save(birthEvent);
-					logger.info("birthEvent=" + birthEvent.toString());
+					logger.debug("birthEvent=" + birthEvent.toString());
 				}
 
 				if (partnerDeathDate != null || (partnerDeathNote != null && !partnerDeathNote.isEmpty())) {
@@ -583,7 +587,7 @@ public class ImportServiceImpl implements ImportService {
 					deathEvent.setEventPlace(partnerDeathPlace);
 					deathEvent.setEventNote(partnerDeathNote);
 					deathEvent = eventRepository.save(deathEvent);
-					logger.info("deathEvent=" + deathEvent.toString());
+					logger.debug("deathEvent=" + deathEvent.toString());
 				}
 
 				if (partnersRelationDate != null || (relationshipNote != null && !relationshipNote.isEmpty())) {
@@ -593,6 +597,7 @@ public class ImportServiceImpl implements ImportService {
 					partnerEvent.setEventPlace(partnersRelationPlace);
 					partnerEvent.setEventNote(relationshipNote);
 					partnerEvent = eventRepository.save(partnerEvent);
+					logger.debug("partnerEvent=" + partnerEvent.toString());
 				}
 
 				if (partnersSeparationDate != null || (separationNote != null && !separationNote.isEmpty())) {
@@ -602,6 +607,7 @@ public class ImportServiceImpl implements ImportService {
 					partnerEvent.setEventPlace(partnersSeparationPlace);
 					partnerEvent.setEventNote(separationNote);
 					partnerEvent = eventRepository.save(partnerEvent);
+					logger.debug("partnerEvent=" + partnerEvent.toString());
 				}
 
 				// The relationship is husband-wife.
@@ -622,7 +628,7 @@ public class ImportServiceImpl implements ImportService {
 							partner2RoleType, relationshipType);
 					relationship.setNote(relationshipNote);
 					relationship = relationshipRepository.save(relationship);
-					logger.info("relationship=" + relationship.toString());
+					logger.debug("relationship=" + relationship.toString());
 				}
 			}
 		}
@@ -817,7 +823,7 @@ public class ImportServiceImpl implements ImportService {
 
 		} catch (ParseException e) {
 			date = null;
-			logger.warn(e.getLocalizedMessage());
+			logger.debug(e.getLocalizedMessage());
 		}
 		return date;
 	}

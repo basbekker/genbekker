@@ -1,4 +1,4 @@
-package org.bbekker.genealogy.imports;
+package org.bbekker.genealogy.common;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
