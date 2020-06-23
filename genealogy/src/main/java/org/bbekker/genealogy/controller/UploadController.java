@@ -70,7 +70,6 @@ public class UploadController {
 
 				while(!importTask.isDone()) {
 					logger.info("Importing " + path.toString());
-					//Thread.sleep(30000); // 30 seconds
 					Thread.sleep(1000); // 1 second
 
 					String[] vars = new String[] { file.getOriginalFilename(),

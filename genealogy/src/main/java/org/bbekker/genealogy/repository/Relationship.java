@@ -16,9 +16,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Table(name = "RELATIONSHIP")
+@Indexed
 public class Relationship implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -79,6 +79,12 @@ public class ImportServiceImpl implements ImportService {
 	@Async
 	public Future<Boolean> parseBekkerCsvFile(String fileName) {
 
+		Boolean parseResult = parseBekkerCsvFileLocal(fileName);
+		return new AsyncResult<Boolean>(parseResult);
+	}
+
+	public Boolean parseBekkerCsvFileLocal(String fileName) {
+
 		Boolean parseResult = Boolean.FALSE;
 		long lineNum = 2; // line 2 has data, line 1 has the headers.
 
@@ -135,7 +141,7 @@ public class ImportServiceImpl implements ImportService {
 
 		}
 
-		return new AsyncResult<Boolean>(parseResult);
+		return parseResult;
 	}
 
 	private List<String> loadBlacklistedLines(String listOfCodes) {

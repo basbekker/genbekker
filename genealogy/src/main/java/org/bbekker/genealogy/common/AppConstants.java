@@ -4,15 +4,15 @@ import java.util.stream.Stream;
 
 public class AppConstants {
 
-	public static final String BASE_NAME_CSV_PATH = "data/BaseName.csv";
-	public static final String BASE_NAME_PREFIX_CSV_PATH = "data/BaseNamePrefix.csv";
-	public static final String GENDER_CSV_PATH = "data/Gender.csv";
-	public static final String ROLE_CSV_PATH = "data/Role.csv";
-	public static final String RELATIONSHIP_TYPE_CSV_PATH = "data/RelationshipType.csv";
-	public static final String EVENT_TYPE_CSV_PATH = "data/EventType.csv";
+	public static final String BASE_NAME_CSV_PATH = "data/import/BaseName.csv";
+	public static final String BASE_NAME_PREFIX_CSV_PATH = "data/import/BaseNamePrefix.csv";
+	public static final String GENDER_CSV_PATH = "data/import/Gender.csv";
+	public static final String ROLE_CSV_PATH = "data/import/Role.csv";
+	public static final String RELATIONSHIP_TYPE_CSV_PATH = "data/import/RelationshipType.csv";
+	public static final String EVENT_TYPE_CSV_PATH = "data/import/EventType.csv";
 
 	public static final String BEKKER_CSV_NAME = "BEKKER.csv";
-	public static final String BEKKER_TEST_CSV_NAME = "BEKKER.csv";
+	public static final String BEKKER_TEST_CSV_NAME = "BEKKERTest.csv";
 
 	private final static String GENDER_MESSAGE_PREFIX = "GenderId";
 	private final static String RELATIONSHIPTYPE_MESSAGE_PREFIX = "RelationshipTypeId";

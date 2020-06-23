@@ -16,9 +16,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
 @Table(name = "EVENT")
+@Indexed
 public class Event implements Serializable {
 
 	private static final long serialVersionUID = 1L;

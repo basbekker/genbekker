@@ -8,12 +8,16 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.search.annotations.Indexed;
 
 @Entity
+@Table(name = "FAMILY")
+@Indexed
 public class Family {
 
 	@Id

@@ -15,6 +15,7 @@ import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.repository.RelationshipRepository;
 import org.bbekker.genealogy.service.IndividualService;
 import org.bbekker.genealogy.service.PageHandlerUtil;
+import org.bbekker.genealogy.service.SearchService;
 import org.bbekker.genealogy.util.IndividualFullView;
 import org.bbekker.genealogy.util.RelationshipWithOther;
 import org.slf4j.Logger;
@@ -39,6 +40,9 @@ public class IndividualController {
 	IndividualService individualService;
 
 	@Autowired
+	SearchService searchService;
+
+	@Autowired
 	IndividualRepository individualRepository;
 
 	@Autowired
@@ -58,10 +62,11 @@ public class IndividualController {
 
 	@RequestMapping(path = "/display/{id}", method = RequestMethod.GET)
 	public String displayIndividual(
-			@PathVariable("id") String id, Model model,
+			@PathVariable("id") String id,
 			@RequestParam(value = "page", required = false) String page,
 			@RequestParam(value = "searchArg", required = false) String searchArg,
-			Locale locale) {
+			Locale locale,
+			Model model) {
 
 		Optional<Individual> optionalIndividual = individualRepository.findById(id);
 
@@ -85,8 +90,23 @@ public class IndividualController {
 	}
 
 	@RequestMapping(path = "/all", method = RequestMethod.GET)
-	public String showAll(Model model) {
+	public String showAll(
+			Locale locale,
+			Model model) {
+
 		model.addAttribute("individuals", individualService.findAll());
+
+		return "allIndividuals";
+	}
+
+	@RequestMapping(path = "/search", method = RequestMethod.GET)
+	public String searchIndividuals(
+			@RequestParam(value = "searchArg", required = false) String searchArg,
+			Locale locale,
+			Model model) {
+
+		List<Individual> individuals = searchService.SearchByTerm(searchArg);
+		model.addAttribute("individuals", individuals);
 
 		return "allIndividuals";
 	}

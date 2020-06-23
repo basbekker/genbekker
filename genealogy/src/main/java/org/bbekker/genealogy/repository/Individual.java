@@ -14,9 +14,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 @Entity(name = "Individual")
 @Table(name = "INDIVIDUAL")
+@Indexed
 public class Individual implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -29,22 +32,27 @@ public class Individual implements Serializable {
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Column(name = "LAST_NAME", nullable = false, unique = false)
+	@Field
 	private String lastName;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Column(name = "FIRST_NAME", nullable = false, unique = false)
+	@Field
 	private String firstName;
 
 	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "MIDDLE_NAME", nullable = true, unique = false)
+	@Field
 	private String middleName;
 
 	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "MAIDEN_NAME", nullable = true, unique = false)
+	@Field
 	private String maidenName;
 
 	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "FAMILIAR_NAME", nullable = true, unique = false)
+	@Field
 	private String familiarName;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)

@@ -20,22 +20,22 @@
 						<tbody>
 							<tr>
 								<td>
-									<td>Current search:
+									<td>Current filter:
 									<span th:text="${searchArg}"></span>&nbsp;
 									<input type="hidden" name="searchArg" value="${searchArg}" />
 									<input type="hidden" name="page" value="${currentPage}" />
 								</td>
 								<td>
-									<input type="submit" name="action" value="clear">
+									<input type="submit" name="action" value="Reset">
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<td>New search:
+									<td>New filter:
 									<input type="text" id="nameSearch" name="nameSearch">&nbsp;
 								</td>
 								<td>				
-  									<input type="submit" name="action" value="search">
+  									<input type="submit" name="action" value="Filter">
 								</td>
 							</tr>
 						</tbody>
