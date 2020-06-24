@@ -37,7 +37,7 @@ public class SearchServiceImpl implements SearchService {
 				.buildQueryBuilder().forEntity(Individual.class).get();
 
 		// Generate a Lucene query using the builder
-		Query query = queryBuilder.keyword().onField("lastName").matching(term).createQuery();
+		Query query = queryBuilder.keyword().onFields("lastName", "firstName", "middleName", "maidenName", "familiarName").matching(term).createQuery();
 
 		FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery(query, Individual.class);
 

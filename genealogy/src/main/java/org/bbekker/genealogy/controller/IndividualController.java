@@ -1,5 +1,6 @@
 package org.bbekker.genealogy.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -101,14 +102,28 @@ public class IndividualController {
 
 	@RequestMapping(path = "/search", method = RequestMethod.GET)
 	public String searchIndividuals(
+			@RequestParam(value = "nameSearch", required = false) String nameSearch,
 			@RequestParam(value = "searchArg", required = false) String searchArg,
+			@RequestParam(value = "action", required = false) String action,
 			Locale locale,
 			Model model) {
 
-		List<Individual> individuals = searchService.SearchByTerm(searchArg);
-		model.addAttribute("individuals", individuals);
+		String searchString = null;
+		if (action != null && !action.isEmpty()) {
+			if (action.equals("Search")) {
+				searchString = nameSearch;
+			}
+		}
 
-		return "allIndividuals";
+		List<Individual> individuals = new ArrayList<Individual>();
+		if (searchString != null && !searchString.isEmpty()) {
+			individuals = searchService.SearchByTerm(searchString);
+			searchArg = searchString;
+		}
+		model.addAttribute("individuals", individuals);
+		model.addAttribute("searchArg", searchString);
+
+		return "searchIndividuals";
 	}
 
 	@RequestMapping(path = "/paged", method = RequestMethod.GET)

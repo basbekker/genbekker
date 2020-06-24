@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8" />
+	<link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+	<title>Browse individuals</title>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<h1>Search individuals</h1>
+			</div>
+		</div>
+		<div>
+		
+			<div>
+				<form action="/app/individual/search">
+					<table>
+						<tbody>
+							<tr>
+								<td>
+									<td>Current search:
+									<span th:text="${searchArg}"></span>&nbsp;
+									<input type="hidden" name="searchArg" value="${searchArg}" />
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<td>New search:
+									<input type="text" id="nameSearch" name="nameSearch">&nbsp;
+								</td>
+								<td>				
+  									<input type="submit" name="action" value="Search">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		
+			<div>
+				<table>
+					<thead>
+						<tr>
+							<th>First Name</th>
+							<th>Middle Name</th>
+							<th>Last Name</th>							
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:if="${individuals.empty}">
+							<td colspan="3">No individuals found</td>
+						</tr>
+						<tr th:each="individual : ${individuals}">	
+							<td>
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg})}">
+									<span th:text="${individual.firstName}"></span>
+								</a>
+							</td>
+							<td>
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg})}">
+									<span th:text="${individual.middleName}"></span>
+								</a>	
+							</td>
+							<td>
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg})}">
+									<span th:text="${individual.lastName}"></span>
+								</a>	
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		
+	</div>
+</body>
+
+</html>
