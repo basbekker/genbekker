@@ -72,17 +72,17 @@
 						</tr>
 						<tr th:each="individual : ${individuals}">	
 							<td>
-								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, page=${currentPage}, searchArg=${searchArg})}">
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, page=${currentPage}, searchArg=${searchArg}, returnUri=${returnUri})}">
 									<span th:text="${individual.firstName}"></span>
 								</a>
 							</td>
 							<td>
-								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, page=${currentPage}, searchArg=${searchArg})}">
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, page=${currentPage}, searchArg=${searchArg}, returnUri=${returnUri})}">
 									<span th:text="${individual.middleName}"></span>
 								</a>	
 							</td>
 							<td>
-								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, page=${currentPage}, searchArg=${searchArg})}">
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, page=${currentPage}, searchArg=${searchArg}, returnUri=${returnUri})}">
 									<span th:text="${individual.lastName}"></span>
 								</a>	
 							</td>

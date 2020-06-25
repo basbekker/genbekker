@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.bbekker.genealogy.common.AppConstants.GenderTypes;
@@ -66,6 +67,7 @@ public class IndividualController {
 			@PathVariable("id") String id,
 			@RequestParam(value = "page", required = false) String page,
 			@RequestParam(value = "searchArg", required = false) String searchArg,
+			@RequestParam(value = "returnUri", required = false) String returnUri,
 			Locale locale,
 			Model model) {
 
@@ -84,6 +86,7 @@ public class IndividualController {
 			model.addAttribute("events", events);
 			model.addAttribute("relationshipsWithOther", relationshipsWithOther);
 		}
+		model.addAttribute("returnUri", returnUri);
 		model.addAttribute("page", page);
 		model.addAttribute("searchArg", searchArg);
 
@@ -105,8 +108,11 @@ public class IndividualController {
 			@RequestParam(value = "nameSearch", required = false) String nameSearch,
 			@RequestParam(value = "searchArg", required = false) String searchArg,
 			@RequestParam(value = "action", required = false) String action,
+			HttpServletRequest request,
 			Locale locale,
 			Model model) {
+
+		String requestUri = request.getRequestURI();
 
 		String searchString = null;
 		if (action != null && !action.isEmpty()) {
@@ -122,6 +128,7 @@ public class IndividualController {
 		}
 		model.addAttribute("individuals", individuals);
 		model.addAttribute("searchArg", searchString);
+		model.addAttribute("returnUri", requestUri);
 
 		return "searchIndividuals";
 	}
@@ -132,7 +139,11 @@ public class IndividualController {
 			@RequestParam(value = "nameSearch", required = false) String nameSearch,
 			@RequestParam(value = "searchArg", required = false) String searchArg,
 			@RequestParam(value = "action", required = false) String action,
+			HttpServletRequest request,
+			Locale locale,
 			Model model) {
+
+		String requestUri = request.getRequestURI();
 
 		int currentPage = 1;
 		if (currentPageNumber != null && !currentPageNumber.isEmpty()) {
@@ -195,6 +206,7 @@ public class IndividualController {
 		model.addAttribute("prevPage", prevPage);
 		model.addAttribute("nextPage", nextPage);
 		model.addAttribute("lastPage", lastPage);
+		model.addAttribute("returnUri", requestUri);
 		model.addAttribute("searchArg", searchString);
 
 		return "pagedIndividuals";

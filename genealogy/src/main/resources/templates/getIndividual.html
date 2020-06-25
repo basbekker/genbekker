@@ -125,7 +125,7 @@
 		<div>
 			<p>
 				<a
-					th:href="@{/app/individual/paged(page=${page}, searchArg=${searchArg})}"><span th:text="#{return.to.list}"></span>
+					th:href="@{${returnUri}(page=${page}, searchArg=${searchArg})}"><span th:text="#{return.to.list}"></span>
 				</a>
 			</p>
 		</div>

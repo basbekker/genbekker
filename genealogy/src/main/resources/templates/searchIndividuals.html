@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<link rel="stylesheet" type="text/css" th:href="@{/style.css}">
-	<title>Browse individuals</title>
+	<title>Search individuals</title>
 </head>
 <body>
 	<div class="container">
@@ -54,17 +54,17 @@
 						</tr>
 						<tr th:each="individual : ${individuals}">	
 							<td>
-								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg})}">
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg}, returnUri=${returnUri})}">
 									<span th:text="${individual.firstName}"></span>
 								</a>
 							</td>
 							<td>
-								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg})}">
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg}, returnUri=${returnUri})}">
 									<span th:text="${individual.middleName}"></span>
 								</a>	
 							</td>
 							<td>
-								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg})}">
+								<a th:href="@{/app/individual/display/{id}(id=${individual.id}, searchArg=${searchArg}, returnUri=${returnUri})}">
 									<span th:text="${individual.lastName}"></span>
 								</a>	
 							</td>

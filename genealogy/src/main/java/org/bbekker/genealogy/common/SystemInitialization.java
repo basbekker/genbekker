@@ -40,7 +40,7 @@ public class SystemInitialization implements CommandLineRunner {
 
 	private void luceneInitialization() {
 
-		// If we drop and create the database on restart, reset the Lucene index files as well.
+		// If we drop/create the database on restart, reset the Lucene index files as well.
 		if (databaseDdlAuto != null && databaseDdlAuto.equals("create-drop")) {
 			luceneIndexServiceBean.resetIndex(luceneIndexPath);
 		}
