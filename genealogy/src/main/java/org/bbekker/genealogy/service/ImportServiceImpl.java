@@ -363,7 +363,7 @@ public class ImportServiceImpl implements ImportService {
 
 			final String partnerDeathDateString = nullToEmpty(csvRecord.get(AppConstants.POVLDATUM_NL));
 			final Optional<Date> optionalPartnerDeathDate = setDate(partnerDeathDateString);
-			partnerBirthDate = null;
+			partnerDeathDate = null;
 			if (optionalPartnerDeathDate != null && optionalPartnerDeathDate.isPresent()) {
 				partnerDeathDate = optionalPartnerDeathDate.get();
 			} else {

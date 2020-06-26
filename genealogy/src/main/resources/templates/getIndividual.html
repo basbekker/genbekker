@@ -101,17 +101,17 @@
 						<td><span th:text="${relationshipWithOther.roleType.qualifier}"></span></td>
 						<td><span th:text="${relationshipWithOther.relationshipType.qualifier}"></span></td>
 						<td>
-							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg})}">
+							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg}, returnUri=${returnUri}) }">
 								<span th:text="${relationshipWithOther.otherIndividual.firstName}"></span>
 							</a>
 						</td>
 						<td>
-							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg})}">
+							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg}, returnUri=${returnUri}) }">
 								<span th:text="${relationshipWithOther.otherIndividual.middleName}"></span>
 							</a>
 						</td>
 						<td>
-							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg})}">
+							<a th:href="@{/app/individual/display/{id}(id=${relationshipWithOther.otherIndividual.id}, page=${currentPage}, searchArg=${searchArg}, returnUri=${returnUri}) }">
 								<span th:text="${relationshipWithOther.otherIndividual.lastName}"></span>
 							</a>							
 						</td>
@@ -125,7 +125,7 @@
 		<div>
 			<p>
 				<a
-					th:href="@{${returnUri}(page=${page}, searchArg=${searchArg})}"><span th:text="#{return.to.list}"></span>
+					th:href="@{${returnUri}(page=${page}, searchArg=${searchArg}, ${returnUri})}"><span th:text="#{return.to.list}"></span>
 				</a>
 			</p>
 		</div>

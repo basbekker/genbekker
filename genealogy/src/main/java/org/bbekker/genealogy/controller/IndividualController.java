@@ -88,6 +88,7 @@ public class IndividualController {
 		}
 		model.addAttribute("returnUri", returnUri);
 		model.addAttribute("page", page);
+		model.addAttribute("currentPage", page);
 		model.addAttribute("searchArg", searchArg);
 
 		return "getIndividual";
@@ -106,6 +107,7 @@ public class IndividualController {
 	@RequestMapping(path = "/search", method = RequestMethod.GET)
 	public String searchIndividuals(
 			@RequestParam(value = "nameSearch", required = false) String nameSearch,
+			@RequestParam(value = "page", required = false) String page,
 			@RequestParam(value = "searchArg", required = false) String searchArg,
 			@RequestParam(value = "action", required = false) String action,
 			HttpServletRequest request,
@@ -128,6 +130,8 @@ public class IndividualController {
 		}
 		model.addAttribute("individuals", individuals);
 		model.addAttribute("searchArg", searchString);
+		model.addAttribute("page", page);
+		model.addAttribute("currentPage", page);
 		model.addAttribute("returnUri", requestUri);
 
 		return "searchIndividuals";
