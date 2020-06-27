@@ -30,7 +30,7 @@ public class ImportRestController {
 	@Autowired
 	ImportService importService;
 
-	@Value("${upload.folder}")
+	@Value("${org.bbekker.genealogy.upload.folder}")
 	String UPLOAD_FOLDER;
 
 	@RequestMapping(path = "/bekkercsv", method = RequestMethod.GET)

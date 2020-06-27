@@ -72,8 +72,8 @@ public class ImportServiceImpl implements ImportService {
 	@Autowired
 	private RoleTypeRepository roleTypeRepository;
 
-	@Value("${bekker.csv.blacklist}")
-	private String EigenCodeBlackList;
+	@Value("${org.bbekker.genealogy.bekker.csv.blacklist}")
+	private String EIGENCODE_BLACKLIST;
 
 	@Override
 	@Async
@@ -101,7 +101,7 @@ public class ImportServiceImpl implements ImportService {
 			final Map<String, String> childToParentMapping = new HashMap<String, String>(); // (childId,
 			// parent1Eigencode:parent2Eigencode)
 
-			final List<String> blackList = loadBlacklistedLines(EigenCodeBlackList);
+			final List<String> blackList = loadBlacklistedLines(EIGENCODE_BLACKLIST);
 
 			CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader()
 					.withQuoteMode(QuoteMode.MINIMAL).withIgnoreHeaderCase().withTrim());
@@ -146,7 +146,7 @@ public class ImportServiceImpl implements ImportService {
 
 	private List<String> loadBlacklistedLines(String listOfCodes) {
 		// Load lines to be skipped as they contain junk, or are not relevant.
-		final List<String> blacklist = Arrays.asList(EigenCodeBlackList.split(SystemConstants.COMMA));
+		final List<String> blacklist = Arrays.asList(listOfCodes.split(SystemConstants.COMMA));
 		return blacklist;
 	}
 
