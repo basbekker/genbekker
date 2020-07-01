@@ -37,7 +37,7 @@ public class UploadController {
 	@Autowired
 	IndividualService individualService;
 
-	@Value("${upload.folder}")
+	@Value("${org.bbekker.genealogy.upload.folder}")
 	String UPLOAD_FOLDER;
 
 	@RequestMapping(path = "/index", method = RequestMethod.GET)

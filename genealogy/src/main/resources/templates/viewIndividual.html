@@ -10,8 +10,22 @@
 	<div class="container">
 		<div class="row">
 			<div>
-				<h1>Individual</h1>
+				<h1>View Individual</h1>
 			</div>
+		</div>
+		
+		<div>
+			<form action="/app/individual/update/{id}(id=${individual.id})">
+				<table>
+					<tbody>
+						<tr>
+							<td>
+								<input type="submit" name="updat" value="Update">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
 		</div>
 
 		<div class="row">
@@ -20,7 +34,11 @@
 					<tbody th:if="${individual}">
 						<tr>
 							<td><span th:text="#{individual.id}"></span></td>
-							<td><span th:text="${individual.id}"></span></td>
+							<td>
+								<a th:href="@{/app/individual/update/{id}(id=${individual.id}) }">
+									<span th:text="${individual.id}"></span>
+								</a>
+							</td>
 						</tr>
 						<tr>
 							<td><span th:text="#{individual.firstName}"></span></td>

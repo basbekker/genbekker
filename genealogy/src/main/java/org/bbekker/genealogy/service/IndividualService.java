@@ -3,10 +3,17 @@ package org.bbekker.genealogy.service;
 import java.util.List;
 
 import org.bbekker.genealogy.repository.Individual;
+import org.bbekker.genealogy.util.IndividualFullView;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface IndividualService {
+
+	Individual get(String id);
+
+	IndividualFullView getFullView(String id);
+
+	IndividualFullView getFullView(Individual individual);
 
 	void saveAll(List<Individual> individuals);
 

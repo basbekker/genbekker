@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+	xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" th:href="@{/style.css}">
+<title>Individual</title>
+</head>
+
+<body>
+	<div class="container">
+		
+		<div class="row">
+			<div>
+				<h1>Individual</h1>
+			</div>
+		</div>
+
+		<div>
+			<form action="#" th:action="@{/app/individual/save}" th:object="${form}" method="post">
+			
+				<div>
+					<table class="table">
+						<tbody>
+							<tr>
+								<td><label for="ID">ID</label></td>
+								<td>
+									<span th:text="${#object.individual.id}"></span>
+								</td>
+							</tr>
+							<tr>
+								<td><span th:text="#{individual.firstName}"></span></td>
+								<td>
+									<input type="text" th:field="*{individual.firstName}">
+	    						</td>
+							</tr>
+							<tr>
+								<td><label for="middleName">Middle Name</label></td>
+								<td>
+	    							<input type="text" th:field="*{individual.middleName}">
+	    						</td>
+							</tr>
+							<tr>
+								<td><label for="lastName">Last Name</label></td>
+								<td>
+	    							<input type="text" th:field="*{individual.lastName}">
+	    						</td>
+							</tr>
+							<tr>
+								<td><label for="maidenName">Maiden Name</label></td>
+	    						<td>
+	    							<input type="text" th:field="*{individual.maidenName}">
+	    						</td>
+							</tr>
+							<tr>
+								<td><label for="familiarName">Familiar Name</label></td>
+	    						<td>
+	    							<input type="text" th:field="*{individual.familiarName}">
+	    						</td>							
+							</tr>
+							<tr>
+								<td>
+								<select th:field="*{individual.genderType}">
+  									<option th:each="type : ${allTypes}" 
+          									th:value="${type}" 
+          									th:text="#{${'individual.genderType.' + genderType}}">Wireframe</option>
+								</select>
+								</td>
+							</tr>
+							<tr>
+								<td><label for="note">Note</label></td>
+	    						<td>
+	    							<input type="text" th:field="*{individual.note}">
+	    						</td>	
+							</tr>
+						</tbody>
+					</table>
+					<input type="submit" name="action" value="Update">
+				</div>
+				
+			</form>
+		</div>
+		
+	</div>
+</body>
+
+</html>

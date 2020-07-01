@@ -3,18 +3,15 @@ package org.bbekker.genealogy.controller;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.SystemConstants;
+import org.bbekker.genealogy.dto.IndividualEditDTO;
 import org.bbekker.genealogy.repository.Event;
-import org.bbekker.genealogy.repository.EventRepository;
 import org.bbekker.genealogy.repository.Individual;
-import org.bbekker.genealogy.repository.IndividualRepository;
-import org.bbekker.genealogy.repository.RelationshipRepository;
 import org.bbekker.genealogy.service.IndividualService;
 import org.bbekker.genealogy.service.PageHandlerUtil;
 import org.bbekker.genealogy.service.SearchService;
@@ -27,6 +24,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,24 +43,50 @@ public class IndividualController {
 	SearchService searchService;
 
 	@Autowired
-	IndividualRepository individualRepository;
-
-	@Autowired
-	EventRepository eventRepository;
-
-	@Autowired
-	RelationshipRepository relationshipRepository;
-
-	@Autowired
 	MessageSource messageSource;
 
 
-	@RequestMapping(path = "/add", method = RequestMethod.POST)
+	@RequestMapping(path = "/create", method = RequestMethod.GET)
 	public String createIndividual(@Valid Individual individual, BindingResult result, Model model) {
-		return "addIndividual";
+		return "editIndividualForm";
 	}
 
-	@RequestMapping(path = "/display/{id}", method = RequestMethod.GET)
+	@RequestMapping(path = "/update/{id}", method = RequestMethod.GET)
+	public String updateIndividual(
+			@PathVariable("id") String id,
+			Locale locale,
+			Model model) {
+
+		IndividualEditDTO individualForm = new IndividualEditDTO();
+
+		Individual individual = individualService.get(id);
+		if (individual != null) {
+			individualForm.setIndividual(individual);
+		}
+
+		model.addAttribute("genderName", setGenderText(individual.getGenderType(), locale));
+		model.addAttribute("form", individualForm);
+
+		return "editIndividualForm";
+	}
+
+	@RequestMapping(path = "/delete/{id}", method = RequestMethod.GET)
+	public String deleteIndividual(
+			@PathVariable("id") String id,
+			Individual individual,
+			BindingResult result,
+			Model model) {
+		return "viewIndividual";
+	}
+
+	@RequestMapping(path = "/save}", method = RequestMethod.POST)
+	public String saveIndividual(
+			@ModelAttribute(value = "form") IndividualEditDTO individualForm,
+			Model model) {
+		return "viewIndividual";
+	}
+
+	@RequestMapping(path = "/view/{id}", method = RequestMethod.GET)
 	public String displayIndividual(
 			@PathVariable("id") String id,
 			@RequestParam(value = "page", required = false) String page,
@@ -71,15 +95,12 @@ public class IndividualController {
 			Locale locale,
 			Model model) {
 
-		Optional<Individual> optionalIndividual = individualRepository.findById(id);
-
-		if (optionalIndividual.isPresent()) {
-			Individual individual = optionalIndividual.get();
+		Individual individual = individualService.get(id);
+		if (individual != null) {
 			model.addAttribute("individual", individual);
 			model.addAttribute("genderName", setGenderText(individual.getGenderType(), locale));
 
-			IndividualFullView fullIndividual = new IndividualFullView(individualRepository, eventRepository, relationshipRepository);
-			fullIndividual.setIndividual(individual);
+			IndividualFullView fullIndividual = individualService.getFullView(individual);
 			List<Event> events = fullIndividual.getEvents();
 			List<RelationshipWithOther> relationshipsWithOther = fullIndividual.getRelationshipsWithOther();
 
@@ -91,7 +112,7 @@ public class IndividualController {
 		model.addAttribute("currentPage", page);
 		model.addAttribute("searchArg", searchArg);
 
-		return "getIndividual";
+		return "viewIndividual";
 	}
 
 	@RequestMapping(path = "/all", method = RequestMethod.GET)

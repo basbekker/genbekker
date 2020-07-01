@@ -1,9 +1,13 @@
 package org.bbekker.genealogy.service;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.bbekker.genealogy.repository.EventRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
+import org.bbekker.genealogy.repository.RelationshipRepository;
+import org.bbekker.genealogy.util.IndividualFullView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -22,6 +26,12 @@ public class IndividualServiceImpl implements IndividualService {
 
 	@Autowired
 	private IndividualRepository individualRepository;
+
+	@Autowired
+	private EventRepository eventRepository;
+
+	@Autowired
+	private RelationshipRepository relationshipRepository;
 
 	private PageHandlerUtil<Individual> pageHandler;
 
@@ -65,6 +75,29 @@ public class IndividualServiceImpl implements IndividualService {
 	public Integer getNumberOfElements() {
 		Long elementCount = individualRepository.count();
 		return elementCount.intValue();
+	}
+
+	@Override
+	public Individual get(String id) {
+		Optional<Individual> optionalIndividual = individualRepository.findById(id);
+		if (optionalIndividual.isPresent()) {
+			return optionalIndividual.get();
+		}
+		return null;
+	}
+
+	@Override
+	public IndividualFullView getFullView(String id) {
+		IndividualFullView fullIndividual = new IndividualFullView(individualRepository, eventRepository, relationshipRepository);
+		fullIndividual.setIndividual(id);
+		return fullIndividual;
+	}
+
+	@Override
+	public IndividualFullView getFullView(Individual individual) {
+		IndividualFullView fullIndividual = new IndividualFullView(individualRepository, eventRepository, relationshipRepository);
+		fullIndividual.setIndividual(individual);
+		return fullIndividual;
 	}
 
 }
