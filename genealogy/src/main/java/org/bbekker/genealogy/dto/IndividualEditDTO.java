@@ -8,6 +8,8 @@ public class IndividualEditDTO {
 
 	private Individual individual;
 
+	private String genderType;
+
 	private Event birth;
 
 	private Event death;
@@ -25,19 +27,27 @@ public class IndividualEditDTO {
 		this.individual = individual;
 	}
 
-	public IndividualEditDTO(Individual individual, Event birth) {
+	public IndividualEditDTO(Individual individual, String genderType) {
 		this.individual = individual;
+		this.genderType = genderType;
+	}
+
+	public IndividualEditDTO(Individual individual, String genderType, Event birth) {
+		this.individual = individual;
+		this.genderType = genderType;
 		this.birth = birth;
 	}
 
-	public IndividualEditDTO(Individual individual, Event birth, Event death) {
+	public IndividualEditDTO(Individual individual, String genderType, Event birth, Event death) {
 		this.individual = individual;
+		this.genderType = genderType;
 		this.birth = birth;
 		this.death = death;
 	}
 
-	public IndividualEditDTO(Individual individual, Event birth, Event death, Relationship partner) {
+	public IndividualEditDTO(Individual individual, String genderType, Event birth, Event death, Relationship partner) {
 		this.individual = individual;
+		this.genderType = genderType;
 		this.birth = birth;
 		this.death = death;
 		this.partner = partner;
@@ -49,6 +59,14 @@ public class IndividualEditDTO {
 
 	public void setIndividual(Individual individual) {
 		this.individual = individual;
+	}
+
+	public String getGenderType() {
+		return genderType;
+	}
+
+	public void setGenderType(String genderType) {
+		this.genderType = genderType;
 	}
 
 	public Event getBirth() {

@@ -60,6 +60,12 @@ public class IndividualServiceImpl implements IndividualService {
 	}
 
 	@Override
+	public Individual save(Individual individual) {
+
+		return individualRepository.save(individual);
+	}
+
+	@Override
 	public void saveAll(List<Individual> individuals) {
 
 		for (Individual individual : individuals) {
@@ -99,5 +105,7 @@ public class IndividualServiceImpl implements IndividualService {
 		fullIndividual.setIndividual(individual);
 		return fullIndividual;
 	}
+
+
 
 }

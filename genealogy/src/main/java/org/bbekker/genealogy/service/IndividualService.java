@@ -11,6 +11,8 @@ public interface IndividualService {
 
 	Individual get(String id);
 
+	Individual save(Individual individual);
+
 	IndividualFullView getFullView(String id);
 
 	IndividualFullView getFullView(Individual individual);

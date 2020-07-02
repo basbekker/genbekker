@@ -18,7 +18,7 @@
 		</div>
 
 		<div>
-			<form action="#" th:action="@{/app/individual/save}" th:object="${form}" method="post">
+			<form action="#" th:action="@{/app/individual/save/{id}(id=*{individual.id}) }"  th:object="${form}" method="post">
 			
 				<div>
 					<table class="table">
@@ -27,10 +27,11 @@
 								<td><label for="ID">ID</label></td>
 								<td>
 									<span th:text="${#object.individual.id}"></span>
+									<input type="hidden" th:field="*{individual.id}">
 								</td>
 							</tr>
 							<tr>
-								<td><span th:text="#{individual.firstName}"></span></td>
+								<td><label for="firstName">First Name</label></td>
 								<td>
 									<input type="text" th:field="*{individual.firstName}">
 	    						</td>
@@ -60,12 +61,14 @@
 	    						</td>							
 							</tr>
 							<tr>
+								<td><label for="genderType">Gender</label></td>
 								<td>
-								<select th:field="*{individual.genderType}">
-  									<option th:each="type : ${allTypes}" 
-          									th:value="${type}" 
-          									th:text="#{${'individual.genderType.' + genderType}}">Wireframe</option>
-								</select>
+									<select th:field="*{genderType}">
+  										<option th:each="type : ${allGenderTypes}" 
+          										th:value="${type}" 
+          										th:text="${type}">Gender Selection
+          								</option>
+									</select>
 								</td>
 							</tr>
 							<tr>
@@ -77,6 +80,7 @@
 						</tbody>
 					</table>
 					<input type="submit" name="action" value="Update">
+					<input type="submit" name="action" value="Cancel">
 				</div>
 				
 			</form>

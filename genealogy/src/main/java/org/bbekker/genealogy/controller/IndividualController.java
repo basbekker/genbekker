@@ -11,6 +11,8 @@ import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.dto.IndividualEditDTO;
 import org.bbekker.genealogy.repository.Event;
+import org.bbekker.genealogy.repository.Gender;
+import org.bbekker.genealogy.repository.GenderRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.service.IndividualService;
 import org.bbekker.genealogy.service.PageHandlerUtil;
@@ -43,6 +45,9 @@ public class IndividualController {
 	SearchService searchService;
 
 	@Autowired
+	GenderRepository genderRepository;
+
+	@Autowired
 	MessageSource messageSource;
 
 
@@ -62,10 +67,11 @@ public class IndividualController {
 		Individual individual = individualService.get(id);
 		if (individual != null) {
 			individualForm.setIndividual(individual);
+			individualForm.setGenderType(setGenderTypeText(individual.getGenderType(), locale));
 		}
 
-		model.addAttribute("genderName", setGenderText(individual.getGenderType(), locale));
 		model.addAttribute("form", individualForm);
+		model.addAttribute("allGenderTypes", getAllGenderTypes());
 
 		return "editIndividualForm";
 	}
@@ -79,10 +85,63 @@ public class IndividualController {
 		return "viewIndividual";
 	}
 
-	@RequestMapping(path = "/save}", method = RequestMethod.POST)
+	@RequestMapping(path = "/save/{id}", method = RequestMethod.POST)
 	public String saveIndividual(
+			@PathVariable("id") String id,
 			@ModelAttribute(value = "form") IndividualEditDTO individualForm,
+			@RequestParam(value = "action", required = false) String action,
+			Locale locale,
 			Model model) {
+
+		boolean save = false;
+		if (action != null && !action.isEmpty()) {
+			if (action.equals("Update")) {
+				save = true;
+			} else {
+				if (action.equals("Cancel")) {
+					save = false;
+				} else {
+					// no-op
+				}
+			}
+		} else {
+			// no submit, just a link, stick with page and search
+		}
+
+		String gt1 = individualForm.getGenderType();
+
+		// Get the (maybe updated) individual from the form.
+		Individual individual = individualForm.getIndividual();
+		String genderTypeQualifier = setGenderTypeQualifier(individualForm.getGenderType(), locale);
+		individual.setGender(genderTypeQualifier);
+
+		if (individual != null) {
+
+			if (save) {
+				String gt = individual.getGenderType();
+				// save the updated individual
+				individual = individualService.save(individual);
+			} else {
+				// Get the original one
+				individual = individualService.get(individual.getId());
+			}
+
+			IndividualFullView fullIndividual = individualService.getFullView(individual);
+			List<Event> events = fullIndividual.getEvents();
+			List<RelationshipWithOther> relationshipsWithOther = fullIndividual.getRelationshipsWithOther();
+
+			model.addAttribute("individual", individual);
+			model.addAttribute("genderName", setGenderTypeText(individual.getGenderType(), locale));
+			model.addAttribute("events", events);
+			model.addAttribute("relationshipsWithOther", relationshipsWithOther);
+		}
+
+		// TODO set proper values;
+		model.addAttribute("returnUri", "/app/individual/paged");
+		model.addAttribute("page", "1");
+		model.addAttribute("currentPage", "1");
+		model.addAttribute("searchArg", "");
+
 		return "viewIndividual";
 	}
 
@@ -97,16 +156,17 @@ public class IndividualController {
 
 		Individual individual = individualService.get(id);
 		if (individual != null) {
-			model.addAttribute("individual", individual);
-			model.addAttribute("genderName", setGenderText(individual.getGenderType(), locale));
 
 			IndividualFullView fullIndividual = individualService.getFullView(individual);
 			List<Event> events = fullIndividual.getEvents();
 			List<RelationshipWithOther> relationshipsWithOther = fullIndividual.getRelationshipsWithOther();
 
+			model.addAttribute("individual", individual);
+			model.addAttribute("genderName", setGenderTypeText(individual.getGenderType(), locale));
 			model.addAttribute("events", events);
 			model.addAttribute("relationshipsWithOther", relationshipsWithOther);
 		}
+
 		model.addAttribute("returnUri", returnUri);
 		model.addAttribute("page", page);
 		model.addAttribute("currentPage", page);
@@ -190,12 +250,12 @@ public class IndividualController {
 
 
 		if (action != null && !action.isEmpty()) {
-			if (action.equals("clear")) {
+			if (action.equals("Reset")) {
 				currentPage = 1;
 				searchString = SystemConstants.EMPTY_STRING;
 				noSearch = true;
 			} else {
-				if (action.equals("search")) {
+				if (action.equals("Filter")) {
 					currentPage = 1;
 					searchString = nameSearch;
 				} else {
@@ -237,7 +297,7 @@ public class IndividualController {
 		return "pagedIndividuals";
 	}
 
-	private String setGenderText(String genderType, Locale locale) {
+	private String setGenderTypeText(String genderType, Locale locale) {
 		String genderString = messageSource.getMessage("individual.genderType.undefined", null, locale);
 		if (genderType.equals(GenderTypes.MALE.getGenderQualifier())) {
 			genderString = messageSource.getMessage("individual.genderType.male", null, locale);
@@ -255,6 +315,21 @@ public class IndividualController {
 			}
 		}
 		return genderString;
+	}
+
+	private String setGenderTypeQualifier(String genderType, Locale locale) {
+		// TODO Search returned values from descriptions & locale combination.
+		String genderQualifier = GenderTypes.MALE.getGenderQualifier();
+		return genderQualifier;
+	}
+
+	private List<String> getAllGenderTypes() {
+		List<String> allGenderTypes = new ArrayList<String>();
+		Iterable<Gender> genders = genderRepository.findAll();
+		for (Gender gender : genders) {
+			allGenderTypes.add(gender.getDescription());
+		}
+		return allGenderTypes;
 	}
 
 }
