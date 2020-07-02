@@ -58,7 +58,7 @@ public class Relationship implements Serializable {
 	@Column(name = "NOTE", nullable = true, unique = false)
 	private String note;
 
-	@OneToMany(mappedBy = "individual", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "individual", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
 	private List<Event> events;
 
 

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
+import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.dto.IndividualEditDTO;
@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +51,22 @@ public class IndividualController {
 
 
 	@RequestMapping(path = "/create", method = RequestMethod.GET)
-	public String createIndividual(@Valid Individual individual, BindingResult result, Model model) {
+	public String createIndividual(
+			Locale locale,
+			Model model) {
+
+		IndividualEditDTO individualForm = new IndividualEditDTO();
+
+		Individual individual = new Individual(SystemConstants.EMPTY_STRING, SystemConstants.EMPTY_STRING);
+		individual.setId(AppConstants.ID_PLACEHOLDER);
+
+		// Create a new male individual
+		individualForm.setIndividual(individual);
+		individualForm.setGenderType(setGenderTypeText(GenderTypes.MALE.getGenderQualifier(), locale));
+
+		model.addAttribute("form", individualForm);
+		model.addAttribute("allGenderTypes", getAllGenderTypes());
+
 		return "editIndividualForm";
 	}
 
@@ -79,9 +93,24 @@ public class IndividualController {
 	@RequestMapping(path = "/delete/{id}", method = RequestMethod.GET)
 	public String deleteIndividual(
 			@PathVariable("id") String id,
-			Individual individual,
-			BindingResult result,
 			Model model) {
+
+		Individual individual = individualService.get(id);
+		if (individual != null) {
+			individual = individualService.delete(individual);
+
+			model.addAttribute("individual", individual);
+			model.addAttribute("genderName", SystemConstants.EMPTY_STRING);
+			model.addAttribute("events", new ArrayList<Event>());
+			model.addAttribute("relationshipsWithOther", new ArrayList<RelationshipWithOther>());
+		}
+
+		// TODO set proper values;
+		model.addAttribute("returnUri", "/app/individual/paged");
+		model.addAttribute("page", "1");
+		model.addAttribute("currentPage", "1");
+		model.addAttribute("searchArg", SystemConstants.EMPTY_STRING);
+
 		return "viewIndividual";
 	}
 
@@ -95,7 +124,7 @@ public class IndividualController {
 
 		boolean save = false;
 		if (action != null && !action.isEmpty()) {
-			if (action.equals("Update")) {
+			if (action.equals("Save")) {
 				save = true;
 			} else {
 				if (action.equals("Cancel")) {
@@ -108,8 +137,6 @@ public class IndividualController {
 			// no submit, just a link, stick with page and search
 		}
 
-		String gt1 = individualForm.getGenderType();
-
 		// Get the (maybe updated) individual from the form.
 		Individual individual = individualForm.getIndividual();
 		String genderTypeQualifier = setGenderTypeQualifier(individualForm.getGenderType(), locale);
@@ -117,8 +144,12 @@ public class IndividualController {
 
 		if (individual != null) {
 
+			// If creating a individual, reset the ID from placeholder tu null, so the UUID gets generated.
+			if (individual.getId().equals(AppConstants.ID_PLACEHOLDER)) {
+				individual.setId(null);
+			}
+
 			if (save) {
-				String gt = individual.getGenderType();
 				// save the updated individual
 				individual = individualService.save(individual);
 			} else {

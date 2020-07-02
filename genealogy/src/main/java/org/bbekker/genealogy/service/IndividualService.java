@@ -13,11 +13,16 @@ public interface IndividualService {
 
 	Individual save(Individual individual);
 
+	void saveAll(List<Individual> individuals);
+
+	Individual delete(String id);
+
+	Individual delete(Individual individual);
+
 	IndividualFullView getFullView(String id);
 
 	IndividualFullView getFullView(Individual individual);
 
-	void saveAll(List<Individual> individuals);
 
 	PageHandlerUtil<Individual> findAll();
 

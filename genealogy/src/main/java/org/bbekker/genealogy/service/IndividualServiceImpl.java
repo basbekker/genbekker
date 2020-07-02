@@ -3,6 +3,8 @@ package org.bbekker.genealogy.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.bbekker.genealogy.common.AppConstants;
+import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.EventRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
@@ -33,6 +35,9 @@ public class IndividualServiceImpl implements IndividualService {
 	@Autowired
 	private RelationshipRepository relationshipRepository;
 
+	@Autowired
+	private RelationshipService relationshipService;
+
 	private PageHandlerUtil<Individual> pageHandler;
 
 
@@ -60,6 +65,15 @@ public class IndividualServiceImpl implements IndividualService {
 	}
 
 	@Override
+	public Individual get(String id) {
+		Optional<Individual> optionalIndividual = individualRepository.findById(id);
+		if (optionalIndividual.isPresent()) {
+			return optionalIndividual.get();
+		}
+		return null;
+	}
+
+	@Override
 	public Individual save(Individual individual) {
 
 		return individualRepository.save(individual);
@@ -69,8 +83,32 @@ public class IndividualServiceImpl implements IndividualService {
 	public void saveAll(List<Individual> individuals) {
 
 		for (Individual individual : individuals) {
-			individualRepository.save(individual);
+			save(individual);
 		}
+	}
+
+	@Override
+	public Individual delete(String id) {
+
+		Optional<Individual> optionalIndividual = individualRepository.findById(id);
+		if (optionalIndividual.isPresent()) {
+			return delete(optionalIndividual.get());
+		}
+		return null;
+	}
+
+	@Override
+	public Individual delete(Individual individual) {
+
+		if (individual != null) {
+			relationshipService.deleteRelationshipsForIndividual(individual);
+			individualRepository.delete(individual);
+		}
+
+		individual = new Individual(SystemConstants.EMPTY_STRING, SystemConstants.EMPTY_STRING);
+		individual.setId(AppConstants.ID_DELETED);
+
+		return individual;
 	}
 
 	public Integer getPageSize() {
@@ -81,15 +119,6 @@ public class IndividualServiceImpl implements IndividualService {
 	public Integer getNumberOfElements() {
 		Long elementCount = individualRepository.count();
 		return elementCount.intValue();
-	}
-
-	@Override
-	public Individual get(String id) {
-		Optional<Individual> optionalIndividual = individualRepository.findById(id);
-		if (optionalIndividual.isPresent()) {
-			return optionalIndividual.get();
-		}
-		return null;
 	}
 
 	@Override
@@ -105,7 +134,5 @@ public class IndividualServiceImpl implements IndividualService {
 		fullIndividual.setIndividual(individual);
 		return fullIndividual;
 	}
-
-
 
 }

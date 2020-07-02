@@ -19,6 +19,8 @@ public class AppConstants {
 	private final static String ROLE_MESSAGE_PREFIX = "RoleId";
 	private final static String EVENTTYPE_MESSAGE_PREFIX = "EventTypeId";
 
+	public static final String ID_PLACEHOLDER = "ID Placeholder";
+	public static final String ID_DELETED = "ID Deleted";
 
 	/**
 	 * The gender type defines the biological sexuality of an individual.

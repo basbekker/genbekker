@@ -63,15 +63,19 @@ public class Individual implements Serializable {
 	@Column(name = "NOTE", nullable = true, unique = false)
 	private String note;
 
-	@OneToMany(mappedBy = "individual", cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "individual", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
 	private List<Event> events;
 
 
 	protected Individual() {
 	}
 
-	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName,
-			String genderType) {
+	public Individual(String lastName, String firstName) {
+		this.lastName = lastName;
+		this.firstName = firstName;
+	}
+
+	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName, String genderType) {
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.middleName = middleName;
