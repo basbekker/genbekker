@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.service.IndividualService;
+import org.bbekker.genealogy.service.PageHandlerUtil;
 import org.bbekker.genealogy.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -96,6 +97,15 @@ public class IndividualRestController {
 			@RequestParam("search") String term) {
 
 		List<Individual> individuals = searchService.SearchByTerm(term);
+
+		return ResponseEntity.ok(individuals);
+	}
+
+	@RequestMapping(path = "/all", method = RequestMethod.GET)
+	public ResponseEntity<Object> getAll() {
+
+		PageHandlerUtil<Individual> pageHandler = individualService.findAll();
+		List<Individual> individuals =  pageHandler.get();
 
 		return ResponseEntity.ok(individuals);
 	}
