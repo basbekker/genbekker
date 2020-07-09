@@ -22,6 +22,9 @@ public class AppConstants {
 	public static final String ID_PLACEHOLDER = "ID Placeholder";
 	public static final String ID_DELETED = "ID Deleted";
 
+	// Hardcoded user for authentication for now.
+	public static final String ADMIN_ID = "ADMIN";
+
 	/**
 	 * The gender type defines the biological sexuality of an individual.
 	 * Used fields:
