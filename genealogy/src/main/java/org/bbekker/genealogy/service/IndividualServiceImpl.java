@@ -1,15 +1,19 @@
 package org.bbekker.genealogy.service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import org.bbekker.genealogy.common.AppConstants;
+import org.bbekker.genealogy.common.AppConstants.Roles;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.EventRepository;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.repository.RelationshipRepository;
+import org.bbekker.genealogy.repository.RoleType;
 import org.bbekker.genealogy.util.IndividualFullView;
+import org.bbekker.genealogy.util.RelationshipWithOther;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -133,6 +137,46 @@ public class IndividualServiceImpl implements IndividualService {
 		IndividualFullView fullIndividual = new IndividualFullView(individualRepository, eventRepository, relationshipRepository);
 		fullIndividual.setIndividual(individual);
 		return fullIndividual;
+	}
+
+	@Override
+	public List<Individual> getKids(Individual individual) {
+
+		List<Individual> kids = new LinkedList<Individual>();
+
+		IndividualFullView fullIndividual = new IndividualFullView(individualRepository, eventRepository, relationshipRepository);
+		fullIndividual.setIndividual(individual);
+
+		List<RelationshipWithOther> relations = fullIndividual.getRelationshipsWithOther();
+		for (RelationshipWithOther relation : relations) {
+			RoleType roleType = relation.getOtherRoleType();
+			if ( roleType.getQualifier().equals(Roles.SON.getRoleQualifier()) || roleType.getQualifier().equals(Roles.DAUGHTER.getRoleQualifier()) ) {
+				kids.add(relation.getOtherIndividual());
+			}
+		}
+
+		return kids;
+	}
+
+	@Override
+	public Individual getPartner(Individual individual) {
+
+		Individual partner = null;
+
+		if (individual != null) {
+			IndividualFullView fullIndividual = new IndividualFullView(individualRepository, eventRepository, relationshipRepository);
+			fullIndividual.setIndividual(individual);
+
+			List<RelationshipWithOther> relations = fullIndividual.getRelationshipsWithOther();
+			for (RelationshipWithOther relation : relations) {
+				RoleType roleType = relation.getOtherRoleType();
+				if ( roleType.getQualifier().equals(Roles.HUSBAND.getRoleQualifier()) || roleType.getQualifier().equals(Roles.WIFE.getRoleQualifier()) ) {
+					partner = relation.getOtherIndividual();
+				}
+			}
+		}
+
+		return partner;
 	}
 
 }

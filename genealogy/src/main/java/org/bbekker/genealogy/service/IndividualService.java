@@ -32,4 +32,8 @@ public interface IndividualService {
 
 	Integer getNumberOfElements();
 
+	List<Individual> getKids(Individual individual);
+
+	Individual getPartner(Individual individual);
+
 }
