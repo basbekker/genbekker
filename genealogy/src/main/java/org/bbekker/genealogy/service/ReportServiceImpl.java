@@ -3,8 +3,8 @@ package org.bbekker.genealogy.service;
 import java.util.List;
 import java.util.Locale;
 
-import org.bbekker.genealogy.dto.ExtendedOffspringListDTO;
-import org.bbekker.genealogy.dto.OffSpringDTO;
+import org.bbekker.genealogy.dto.OffspringDTO;
+import org.bbekker.genealogy.dto.OffspringListDTO;
 import org.bbekker.genealogy.repository.Individual;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,25 +16,22 @@ public class ReportServiceImpl implements ReportService {
 	IndividualService individualService;
 
 	@Override
-	public ExtendedOffspringListDTO getExtendedReportOfOffspring(String individualId, Locale locale) {
+	public OffspringListDTO getOffspringReport(String id, Locale locale) {
 
 
-		Individual rootIndividual = individualService.get(individualId);
+		OffspringListDTO offspringList = new OffspringListDTO();
+
+		Individual rootIndividual = individualService.get(id);
 		if (rootIndividual != null) {
-
-			ExtendedOffspringListDTO offspringList = new ExtendedOffspringListDTO();
 			addOffspringToList(offspringList, rootIndividual, "1");
-
-			return offspringList;
-		} else {
-			return null;
 		}
 
+		return offspringList;
 	}
 
-	private void addOffspringToList(ExtendedOffspringListDTO offspringList, Individual individual, String level) {
+	private void addOffspringToList(OffspringListDTO offspringList, Individual individual, String level) {
 
-		OffSpringDTO offspringOne = new OffSpringDTO();
+		OffspringDTO offspringOne = new OffspringDTO();
 		offspringOne.buildFromIndividual(individual, level);
 		offspringOne.setPartnerName(individualService.getPartner(individual));
 		offspringList.addOffspring(offspringOne);

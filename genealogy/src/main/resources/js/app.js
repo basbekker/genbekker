@@ -11,36 +11,36 @@ class App extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {individuals: []};
+		this.state = {offspring: []};
 	}
 
 	componentDidMount() { 
-		client({method: 'GET', path: '/api/individual/all'}).done(response => {
-			this.setState({individuals: response.entity._embedded.individuals});
+		client({method: 'GET', path: '/api/report/offspringreport'}).done(response => {
+			this.setState({offspring: response.entity.offspring});
 		});
 	}
 
+
 	render() {
 		return (
-			<IndividualList individuals={this.state.individuals}/>
+			<OffspringList offspringList={this.state.individuals}/>
 		)
 	}
 }
 // end::app[]
 
 // tag::individual-list[]
-class IndividualList extends React.Component{
+class OffspringList extends React.Component{
 	render() {
 		const individuals = this.props.individuals.map(individual =>
-			<Individual key={individual._links.self.href} individual={individual}/>
+			<Individual key={individual.self_href} individual={individual}/>
 		);
 		return (
 			<table>
 				<tbody>
 					<tr>
-						<th>First Name</th>
-						<th>Last Name</th>
-						<th>Middle Name</th>
+						<th>Name</th>
+						<th>Partner Name</th>
 					</tr>
 					{individuals}
 				</tbody>
@@ -55,9 +55,8 @@ class Individual extends React.Component{
 	render() {
 		return (
 			<tr>
-				<td>{this.props.individual.firstName}</td>
-				<td>{this.props.individual.lastName}</td>
-				<td>{this.props.individual.middleName}</td>
+				<td>{this.props.individual.name}</td>
+				<td>{this.props.individual.partnerName}</td>
 			</tr>
 		)
 	}

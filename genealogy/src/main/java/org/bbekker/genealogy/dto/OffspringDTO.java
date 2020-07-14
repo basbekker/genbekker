@@ -5,7 +5,7 @@ import java.util.Date;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.Individual;
 
-public class OffSpringDTO {
+public class OffspringDTO {
 
 	private String level;
 	private String name;
@@ -14,9 +14,9 @@ public class OffSpringDTO {
 	private Date deathDate;
 	private String partnerName;
 
-	public OffSpringDTO() { }
+	public OffspringDTO() { }
 
-	public OffSpringDTO(String level, String name, String self_ref, Date birthDate, Date deathDate, String partnerName) {
+	public OffspringDTO(String level, String name, String self_ref, Date birthDate, Date deathDate, String partnerName) {
 		this.level = level;
 		this.name = name;
 		this.self_ref = self_ref;

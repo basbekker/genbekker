@@ -2,7 +2,7 @@ package org.bbekker.genealogy.controller;
 
 import java.util.Locale;
 
-import org.bbekker.genealogy.dto.ExtendedOffspringListDTO;
+import org.bbekker.genealogy.dto.OffspringListDTO;
 import org.bbekker.genealogy.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,13 +20,13 @@ public class ReportsController {
 	private ReportService reportService;
 
 	@RequestMapping(path = "/offspringreport", method = RequestMethod.GET)
-	public ResponseEntity<ExtendedOffspringListDTO>  getExtendedOffspringReport(
+	public ResponseEntity<OffspringListDTO>  getOffspringReport(
 			@RequestParam("id") String id,
 			Locale locale) {
 
-		ExtendedOffspringListDTO offspringList = reportService.getExtendedReportOfOffspring(id, locale);
+		OffspringListDTO offspringList = reportService.getOffspringReport(id, locale);
 
-		return new ResponseEntity<ExtendedOffspringListDTO>(offspringList, HttpStatus.OK);
+		return new ResponseEntity<OffspringListDTO>(offspringList, HttpStatus.OK);
 	}
 
 }
