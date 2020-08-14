@@ -34123,7 +34123,7 @@ var App = /*#__PURE__*/function (_React$Component) {
 
     _this = _super.call(this, props);
     _this.state = {
-      individuals: []
+      offspring: []
     };
     return _this;
   }
@@ -34135,18 +34135,18 @@ var App = /*#__PURE__*/function (_React$Component) {
 
       client({
         method: 'GET',
-        path: '/api/individual/all'
+        path: '/api/report/offspringreport'
       }).done(function (response) {
         _this2.setState({
-          individuals: response.entity._embedded.individuals
+          offspring: response.entity.offspring
         });
       });
     }
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/React.createElement(IndividualList, {
-        individuals: this.state.individuals
+      return /*#__PURE__*/React.createElement(OffspringList, {
+        offspringList: this.state.individuals
       });
     }
   }]);
@@ -34156,31 +34156,31 @@ var App = /*#__PURE__*/function (_React$Component) {
 // tag::individual-list[]
 
 
-var IndividualList = /*#__PURE__*/function (_React$Component2) {
-  _inherits(IndividualList, _React$Component2);
+var OffspringList = /*#__PURE__*/function (_React$Component2) {
+  _inherits(OffspringList, _React$Component2);
 
-  var _super2 = _createSuper(IndividualList);
+  var _super2 = _createSuper(OffspringList);
 
-  function IndividualList() {
-    _classCallCheck(this, IndividualList);
+  function OffspringList() {
+    _classCallCheck(this, OffspringList);
 
     return _super2.apply(this, arguments);
   }
 
-  _createClass(IndividualList, [{
+  _createClass(OffspringList, [{
     key: "render",
     value: function render() {
       var individuals = this.props.individuals.map(function (individual) {
         return /*#__PURE__*/React.createElement(Individual, {
-          key: individual._links.self.href,
+          key: individual.self_href,
           individual: individual
         });
       });
-      return /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "First Name"), /*#__PURE__*/React.createElement("th", null, "Last Name"), /*#__PURE__*/React.createElement("th", null, "Middle Name")), individuals));
+      return /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Name"), /*#__PURE__*/React.createElement("th", null, "Partner Name")), individuals));
     }
   }]);
 
-  return IndividualList;
+  return OffspringList;
 }(React.Component); // end::individual-list[]
 // tag::individual[]
 
@@ -34199,7 +34199,7 @@ var Individual = /*#__PURE__*/function (_React$Component3) {
   _createClass(Individual, [{
     key: "render",
     value: function render() {
-      return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, this.props.individual.firstName), /*#__PURE__*/React.createElement("td", null, this.props.individual.lastName), /*#__PURE__*/React.createElement("td", null, this.props.individual.middleName));
+      return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, this.props.individual.name), /*#__PURE__*/React.createElement("td", null, this.props.individual.partnerName));
     }
   }]);
 
