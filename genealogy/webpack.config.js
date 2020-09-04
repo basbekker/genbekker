@@ -1,8 +1,13 @@
 var path = require('path');
 
 module.exports = {
-    entry: './src/main/resources/js/app.js',
+    entry: {
+    	app: './src/main/resources/js/app.js',
+    	dice: './src/main/resources/js/static.js/game/dice.js',
+    	tictactoe: './src/main/resources/js/static.js/game/tictactoe.js'
+    },
     devtool: 'sourcemaps',
+    mode: 'development',
     cache: true,
     output: {
         path: __dirname,
