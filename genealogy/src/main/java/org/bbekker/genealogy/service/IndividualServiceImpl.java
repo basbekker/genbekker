@@ -20,6 +20,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
 public class IndividualServiceImpl implements IndividualService {
@@ -75,6 +76,12 @@ public class IndividualServiceImpl implements IndividualService {
 			return optionalIndividual.get();
 		}
 		return null;
+	}
+
+	@Override
+	public String getSelfUri(String id) {
+		String baseURI = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+		return baseURI + "/api/individual/" + id;
 	}
 
 	@Override

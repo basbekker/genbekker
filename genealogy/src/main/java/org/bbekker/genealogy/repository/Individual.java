@@ -10,6 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -55,9 +57,9 @@ public class Individual implements Serializable {
 	@Field
 	private String familiarName;
 
-	@Basic(optional = false, fetch = FetchType.EAGER)
-	@Column(name = "GENDER_TYPE", nullable = false, unique = false)
-	private String genderType;
+	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "GENDER", referencedColumnName = "QUALIFIER", nullable = true, unique = false)
+	private Gender gender;
 
 	@Basic(optional = true, fetch = FetchType.EAGER)
 	@Column(name = "NOTE", nullable = true, unique = false)
@@ -75,20 +77,20 @@ public class Individual implements Serializable {
 		this.firstName = firstName;
 	}
 
-	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName, String genderType) {
+	public Individual(String lastName, String firstName, String middleName, String maidenName, String familiarName, Gender gender) {
 		this.lastName = lastName;
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.maidenName = maidenName;
 		this.familiarName = familiarName;
-		this.genderType = genderType;
+		this.gender = gender;
 	}
 
 	@Override
 	public String toString() {
 		return String.format(
 				"Individual[id=%s lastName='%s' firstName='%s' middleName='%s' maidenName='%s' familiarName='%s' gender='%s' note='%s']",
-				id, lastName, firstName, middleName, maidenName, familiarName, genderType, note);
+				id, lastName, firstName, middleName, maidenName, familiarName, (gender != null ? gender.getQualifier() : null), note);
 	}
 
 	public void setId(String id) {
@@ -139,12 +141,12 @@ public class Individual implements Serializable {
 		return familiarName;
 	}
 
-	public void setGender(String genderType) {
-		this.genderType = genderType;
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
-	public String getGenderType() {
-		return genderType;
+	public Gender getGender() {
+		return gender;
 	}
 
 	public void setNote(String note) {

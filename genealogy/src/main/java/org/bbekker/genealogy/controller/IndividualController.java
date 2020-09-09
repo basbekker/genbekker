@@ -7,13 +7,12 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import org.bbekker.genealogy.common.AppConstants;
-import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.dto.IndividualEditDTO;
 import org.bbekker.genealogy.repository.Event;
 import org.bbekker.genealogy.repository.Gender;
-import org.bbekker.genealogy.repository.GenderRepository;
 import org.bbekker.genealogy.repository.Individual;
+import org.bbekker.genealogy.service.GenderService;
 import org.bbekker.genealogy.service.IndividualService;
 import org.bbekker.genealogy.service.PageHandlerUtil;
 import org.bbekker.genealogy.service.SearchService;
@@ -44,7 +43,7 @@ public class IndividualController {
 	SearchService searchService;
 
 	@Autowired
-	GenderRepository genderRepository;
+	GenderService genderService;
 
 	@Autowired
 	MessageSource messageSource;
@@ -62,7 +61,7 @@ public class IndividualController {
 
 		// Create a new male individual
 		individualForm.setIndividual(individual);
-		individualForm.setGenderType(setGenderTypeText(GenderTypes.MALE.getGenderQualifier(), locale));
+		individualForm.setGenderType(setGenderTypeText(individual.getGender(), locale));
 
 		model.addAttribute("form", individualForm);
 		model.addAttribute("allGenderTypes", getAllGenderTypes());
@@ -81,7 +80,7 @@ public class IndividualController {
 		Individual individual = individualService.get(id);
 		if (individual != null) {
 			individualForm.setIndividual(individual);
-			individualForm.setGenderType(setGenderTypeText(individual.getGenderType(), locale));
+			individualForm.setGenderType(setGenderTypeText(individual.getGender(), locale));
 		}
 
 		model.addAttribute("form", individualForm);
@@ -140,7 +139,10 @@ public class IndividualController {
 		// Get the (maybe updated) individual from the form.
 		Individual individual = individualForm.getIndividual();
 		String genderTypeQualifier = setGenderTypeQualifier(individualForm.getGenderType(), locale);
-		individual.setGender(genderTypeQualifier);
+		Gender gender = genderService.getGenderByQualifier(genderTypeQualifier);
+		if (gender != null) {
+			individual.setGender(gender);
+		}
 
 		if (individual != null) {
 
@@ -162,7 +164,7 @@ public class IndividualController {
 			List<RelationshipWithOther> relationshipsWithOther = fullIndividual.getRelationshipsWithOther();
 
 			model.addAttribute("individual", individual);
-			model.addAttribute("genderName", setGenderTypeText(individual.getGenderType(), locale));
+			model.addAttribute("genderName", setGenderTypeText(individual.getGender(), locale));
 			model.addAttribute("events", events);
 			model.addAttribute("relationshipsWithOther", relationshipsWithOther);
 		}
@@ -193,7 +195,7 @@ public class IndividualController {
 			List<RelationshipWithOther> relationshipsWithOther = fullIndividual.getRelationshipsWithOther();
 
 			model.addAttribute("individual", individual);
-			model.addAttribute("genderName", setGenderTypeText(individual.getGenderType(), locale));
+			model.addAttribute("genderName", setGenderTypeText(individual.getGender(), locale));
 			model.addAttribute("events", events);
 			model.addAttribute("relationshipsWithOther", relationshipsWithOther);
 		}
@@ -328,19 +330,21 @@ public class IndividualController {
 		return "pagedIndividuals";
 	}
 
-	private String setGenderTypeText(String genderType, Locale locale) {
+	private String setGenderTypeText(Gender gender, Locale locale) {
 		String genderString = messageSource.getMessage("individual.genderType.undefined", null, locale);
-		if (genderType.equals(GenderTypes.MALE.getGenderQualifier())) {
+		if (gender.getQualifier().equals("MALE")) {
 			genderString = messageSource.getMessage("individual.genderType.male", null, locale);
 		} else {
-			if (genderType.equals(GenderTypes.FEMALE.getGenderQualifier())) {
+			if (gender.getQualifier().equals("FEMALE")) {
 				genderString = messageSource.getMessage("individual.genderType.female", null, locale);
 			} else {
-				if (genderType.equals(GenderTypes.INTERSEXUAL.getGenderQualifier())) {
+				if (gender.getQualifier().equals("INTERSEXUAL")) {
 					genderString = messageSource.getMessage("individual.genderType.intersexual", null, locale);
 				} else {
-					if (genderType.equals(GenderTypes.UNDEFINED.getGenderQualifier())) {
+					if (gender.getQualifier().equals("UNDEFINED")) {
 						genderString = messageSource.getMessage("individual.genderType.undefined", null, locale);
+					} else {
+						genderString = messageSource.getMessage("individual.genderType.other", null, locale);
 					}
 				}
 			}
@@ -350,13 +354,13 @@ public class IndividualController {
 
 	private String setGenderTypeQualifier(String genderType, Locale locale) {
 		// TODO Search returned values from descriptions & locale combination.
-		String genderQualifier = GenderTypes.MALE.getGenderQualifier();
+		String genderQualifier = "MALE";
 		return genderQualifier;
 	}
 
 	private List<String> getAllGenderTypes() {
 		List<String> allGenderTypes = new ArrayList<String>();
-		Iterable<Gender> genders = genderRepository.findAll();
+		Iterable<Gender> genders = genderService.getAllGenders();
 		for (Gender gender : genders) {
 			allGenderTypes.add(gender.getDescription());
 		}

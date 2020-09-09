@@ -33,6 +33,7 @@ public class ReportServiceImpl implements ReportService {
 
 		OffspringDTO offspringOne = new OffspringDTO();
 		offspringOne.buildFromIndividual(individual, level);
+		offspringOne.setSelf_ref(individualService.getSelfUri(individual.getId()));
 		offspringOne.setPartnerName(individualService.getPartner(individual));
 		offspringList.addOffspring(offspringOne);
 

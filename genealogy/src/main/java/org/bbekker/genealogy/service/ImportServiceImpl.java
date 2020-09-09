@@ -21,7 +21,6 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.csv.QuoteMode;
 import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.common.AppConstants.EventTypes;
-import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.AppConstants.RelationshipTypes;
 import org.bbekker.genealogy.common.AppConstants.Roles;
 import org.bbekker.genealogy.common.SystemConstants;
@@ -29,6 +28,7 @@ import org.bbekker.genealogy.repository.Event;
 import org.bbekker.genealogy.repository.EventRepository;
 import org.bbekker.genealogy.repository.EventType;
 import org.bbekker.genealogy.repository.EventTypeRepository;
+import org.bbekker.genealogy.repository.Gender;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.repository.Relationship;
@@ -56,6 +56,9 @@ public class ImportServiceImpl implements ImportService {
 
 	@Autowired
 	private IndividualRepository individualRepository;
+
+	@Autowired
+	private GenderService genderService;
 
 	@Autowired
 	private EventRepository eventRepository;
@@ -167,7 +170,7 @@ public class ImportServiceImpl implements ImportService {
 		String middleName = SystemConstants.EMPTY_STRING;
 		String maidenName = SystemConstants.EMPTY_STRING;
 		String familiarName = SystemConstants.EMPTY_STRING;
-		String genderType = null;
+		Gender gender = null;
 		Date birthDate = null;
 		String birthPlace = SystemConstants.EMPTY_STRING;
 		String birthNote = SystemConstants.EMPTY_STRING;
@@ -182,7 +185,7 @@ public class ImportServiceImpl implements ImportService {
 		String partnerMiddleName = SystemConstants.EMPTY_STRING;
 		String partnerMaidenName = SystemConstants.EMPTY_STRING;
 		String partnerFamiliarName = SystemConstants.EMPTY_STRING;
-		String partnerGenderType = null;
+		Gender partnerGender = null;
 		Date partnerBirthDate = null;
 		String partnerBirthPlace = SystemConstants.EMPTY_STRING;
 		String partnerBirthNote = SystemConstants.EMPTY_STRING;
@@ -282,7 +285,7 @@ public class ImportServiceImpl implements ImportService {
 			familiarName = nullToEmpty(csvRecord.get(AppConstants.RNAAM_NL));
 			middleName = nullToEmpty(csvRecord.get(AppConstants.VVOEG_NL));
 			final String importGenderType = nullToEmpty(csvRecord.get(AppConstants.GESLACHT_NL));
-			genderType = setGender(importGenderType);
+			gender = setGender(importGenderType);
 
 			final String birthDateString = nullToEmpty(csvRecord.get(AppConstants.GEBDATUM_NL));
 			final Optional<Date> optionalBirthDate = setDate(birthDateString);
@@ -336,7 +339,7 @@ public class ImportServiceImpl implements ImportService {
 			partnerFamiliarName = nullToEmpty(csvRecord.get(AppConstants.PRNAAM_NL));
 			partnerMiddleName = nullToEmpty(csvRecord.get(AppConstants.PVVOEG_NL));
 			final String importPartnerGenderType = nullToEmpty(csvRecord.get(AppConstants.PGESLACHT_NL));
-			partnerGenderType = setGender(importPartnerGenderType);
+			partnerGender = setGender(importPartnerGenderType);
 
 			final String partnerBirthDateString = nullToEmpty(csvRecord.get(AppConstants.PGEBDATUM_NL));
 			final Optional<Date> optionalPartnerBirthDate = setDate(partnerBirthDateString);
@@ -447,7 +450,7 @@ public class ImportServiceImpl implements ImportService {
 					individual = individualRepository.save(individual);
 				}
 			} else {
-				individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, genderType);
+				individual = new Individual(lastName, firstName, middleName, maidenName, familiarName, gender);
 				individual
 				.setNote((note1.isEmpty() ? SystemConstants.EMPTY_STRING
 						: AppConstants.OPM1_NL + SystemConstants.EQUALS + note1 + SystemConstants.SEMICOLON
@@ -511,7 +514,7 @@ public class ImportServiceImpl implements ImportService {
 				// case,
 				// the partner should be of a second marriage.
 				Individual partnerIndividual = new Individual(partnerLastName, partnerFirstName, partnerMiddleName,
-						partnerMaidenName, partnerFamiliarName, partnerGenderType);
+						partnerMaidenName, partnerFamiliarName, partnerGender);
 				partnerIndividual.setNote(partnerNotes);
 				partnerIndividual = individualRepository.save(partnerIndividual);
 				logger.debug("partnerIndividual=" + partnerIndividual.toString());
@@ -754,11 +757,11 @@ public class ImportServiceImpl implements ImportService {
 
 		Optional<RoleType> optionalRoleType = Optional.empty();
 
-		String genderType = individual.getGenderType();
-		if (genderType.equals(GenderTypes.MALE.getGenderQualifier())) {
+		String genderType = individual.getGender().getQualifier();
+		if (genderType.equals(AppConstants.GenderTypes.MALE.getQualifier())) {
 			optionalRoleType = roleTypeRepository.findByQualifier(roleQualifierMale);
 		} else {
-			if (genderType.equals(GenderTypes.FEMALE.getGenderQualifier())) {
+			if (genderType.equals(AppConstants.GenderTypes.FEMALE.getQualifier())) {
 				optionalRoleType = roleTypeRepository.findByQualifier(roleQualifierFemale);
 			} else {
 				optionalRoleType = roleTypeRepository.findByQualifier(roleQualifierOther);
@@ -793,21 +796,21 @@ public class ImportServiceImpl implements ImportService {
 	 * @param field imported string with Dutch gender indication, ie M, V
 	 * @return gender identifier
 	 */
-	private String setGender(String field) {
+	private Gender setGender(String field) {
 
-		String genderIdentifier = null;
+		Gender gender = null;
 
 		if (field.equals(AppConstants.MALE_NL)) {
-			genderIdentifier = GenderTypes.MALE.getGenderQualifier();
+			gender = genderService.getGenderByQualifier(AppConstants.GenderTypes.MALE.getQualifier());
 		} else {
 			if (field.equals(AppConstants.FEMALE_NL)) {
-				genderIdentifier = GenderTypes.FEMALE.getGenderQualifier();
+				gender = genderService.getGenderByQualifier(AppConstants.GenderTypes.FEMALE.getQualifier());
 			} else {
-				genderIdentifier = GenderTypes.UNDEFINED.getGenderQualifier();
+				gender = genderService.getGenderByQualifier(AppConstants.GenderTypes.UNDEFINED.getQualifier());
 			}
 		}
 
-		return genderIdentifier;
+		return gender;
 	}
 
 	/**

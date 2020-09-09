@@ -23,11 +23,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    
 }
 
 body {
-    /* background-image: linear-gradient(rgba(62, 20, 20, 0.4), rgba(62, 20, 20, 0.4)), url(/image/game/back.jpg);
     background-size: cover;
     background-position: center; */
     font-family: Lato;

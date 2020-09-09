@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 public interface GenderRepository extends CrudRepository<Gender, String> {
 
 	@Query("SELECT g.description FROM Gender g WHERE g.id = :id")
-	Optional<String> findDescriptionById(@Param("id") String id);
+	public Optional<String> findDescriptionById(@Param("id") String id);
 
-	/*
-	@Query("SELECT g FROM Gender g WHERE g.gender = :gender AND g.languageCode = :languageCode")
-	List<Gender> findByTypeAndLanguage(@Param("gender") String gender, @Param("languageCode") String languageCode);
-	 */
+	@Query("SELECT g.description FROM Gender g WHERE g.qualifier = :qualifier")
+	public Optional<String> findDescriptionByQualifier(@Param("qualifier") String qualifier);
+
+	public Optional<Gender> findByQualifier(String qualifier);
 }

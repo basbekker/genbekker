@@ -27,49 +27,32 @@ public class AppConstants {
 
 	/**
 	 * The gender type defines the biological sexuality of an individual.
-	 * Used fields:
-	 * - the character qualifier used by the application,
-	 * - the Unicode symbol for the gender,
-	 * - the textual description the gender in English.
+	 * Used field:
+	 * - the character qualifier used by the application
 	 */
 	public enum GenderTypes {
-		MALE ("MALE", "♂", "male"), // For male sexuality.
-		FEMALE ("FEMALE", "♀", "female"), // For female sexuality.
-		INTERSEXUAL ("INTERSEXUAL", "⚥", "intersexual"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
-		UNDEFINED ("UNDEFINED", "✗", "undefined"); // For use when sexuality is (still) unknown, or somehow doesn't fit in the previous 3.
+		MALE ("MALE"), // For male sexuality.
+		FEMALE ("FEMALE"), // For female sexuality.
+		INTERSEXUAL ("INTERSEXUAL"), // For hermaphrodites, androgynous, transgendered sexualities (and probably others).
+		UNDEFINED ("UNDEFINED"), // For use when sexuality is (still) unknown.
+		OTHER ("OTHER"); // For if it somehow doesn't fit in the previous ones.
 
 		private final String qualifier;
-		private final String symbol;
-		private final String description;
 
-		GenderTypes(String qualifier, String symbol, String description) {
+		GenderTypes(String qualifier) {
 			this.qualifier = qualifier;
-			this.symbol = symbol;
-			this.description = description;
 		}
 
 		public String getName() {
 			return this.getName();
 		}
 
-		public String getGenderQualifier() {
+		public String getQualifier() {
 			return qualifier;
 		}
 
-		public String getGenderSymbol() {
-			return symbol;
-		}
-
-		public String getGenderDescription() {
-			return description;
-		}
-
-		public String getMessageKey() {
-			return GENDER_MESSAGE_PREFIX + SystemConstants.DOT + qualifier;
-		}
-
-		public static Stream<RelationshipTypes> stream() {
-			return Stream.of(RelationshipTypes.values());
+		public static Stream<GenderTypes> stream() {
+			return Stream.of(GenderTypes.values());
 		}
 	}
 

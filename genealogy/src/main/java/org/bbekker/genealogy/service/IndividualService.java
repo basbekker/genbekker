@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IndividualService {
 
+	String getSelfUri(String id);
+
 	Individual get(String id);
 
 	Individual save(Individual individual);

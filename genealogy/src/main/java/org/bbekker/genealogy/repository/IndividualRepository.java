@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 public interface IndividualRepository extends JpaRepository<Individual, String> {
 
 	@Query("SELECT i FROM Individual i WHERE i.lastName LIKE %:lastName%")
-	Page<Individual> findByLastNameLike(@Param("lastName") String lastName, Pageable pageable);
+	public Page<Individual> findByLastNameLike(@Param("lastName") String lastName, Pageable pageable);
 
 	@Query("SELECT count(i) FROM Individual i WHERE i.lastName LIKE %:lastName%")
-	Long count(@Param("lastName") String lastName);
+	public Long count(@Param("lastName") String lastName);
 
 }

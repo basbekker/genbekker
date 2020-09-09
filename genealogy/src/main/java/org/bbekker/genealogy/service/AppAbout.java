@@ -10,7 +10,7 @@ public class AppAbout {
 	}
 
 	public static String getVersion() {
-		return "v0.3 Alpha";
+		return "v0.5 Alpha";
 	}
 
 	public static String getAuthors() {

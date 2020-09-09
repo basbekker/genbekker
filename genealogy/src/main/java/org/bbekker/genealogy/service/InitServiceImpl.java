@@ -10,7 +10,6 @@ import java.util.Locale;
 
 import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.common.AppConstants.EventTypes;
-import org.bbekker.genealogy.common.AppConstants.GenderTypes;
 import org.bbekker.genealogy.common.AppConstants.RelationshipTypes;
 import org.bbekker.genealogy.common.AppConstants.Roles;
 import org.bbekker.genealogy.common.SystemConstants;
@@ -184,6 +183,7 @@ public class InitServiceImpl implements InitService {
 		Boolean result = Boolean.FALSE;
 
 		// First, load fixed set of gender types from the enumeration.
+		/*
 		if (GenderTypes.values().length > 0) {
 
 			// Load the roles from the enumeration.
@@ -194,6 +194,7 @@ public class InitServiceImpl implements InitService {
 			}
 			result = Boolean.TRUE;
 		}
+		 */
 
 		// Next, load additional gender types from csv file.
 		try {
@@ -208,11 +209,12 @@ public class InitServiceImpl implements InitService {
 
 				// Skip empty entries
 				final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
-				if ((lineList.get(0) != null && !lineList.get(0).isEmpty()) && // qualifier
-						(lineList.get(1) != null && !lineList.get(1).isEmpty()) && // symbol
-						(lineList.get(2) != null && !lineList.get(2).isEmpty())) // description
+				if (	(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // id
+						(lineList.get(1) != null && !lineList.get(1).isEmpty()) && // qualifier
+						(lineList.get(2) != null && !lineList.get(2).isEmpty()) && // description
+						(lineList.get(3) != null && !lineList.get(3).isEmpty())) // symbol
 				{
-					Gender gender = new Gender(lineList.get(0), lineList.get(1), lineList.get(2));
+					Gender gender = new Gender(lineList.get(0), lineList.get(1), lineList.get(2), lineList.get(3));
 					gender = genderRepository.save(gender);
 				}
 			}

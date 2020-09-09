@@ -84,6 +84,12 @@ public class IndividualRestController {
 		return ResponseEntity.ok().build();
 	}
 
+	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
+	public ResponseEntity<Individual> getSelfIndividual(
+			@PathVariable("id") String id) {
+		return getIndividual(id);
+	}
+
 	@RequestMapping(path = "/get/{id}", method = RequestMethod.GET)
 	public ResponseEntity<Individual> getIndividual(
 			@PathVariable("id") String id) {

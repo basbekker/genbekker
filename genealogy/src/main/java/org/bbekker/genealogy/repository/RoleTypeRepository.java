@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RoleTypeRepository extends CrudRepository<RoleType, String> {
 
-	public Optional<RoleType> findByQualifier(String qualifier);
+	Optional<RoleType> findByQualifier(String qualifier);
 }
