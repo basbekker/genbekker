@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.bbekker.genealogy.common.AppConstants;
-import org.bbekker.genealogy.common.AppConstants.EventTypes;
-import org.bbekker.genealogy.common.AppConstants.RelationshipTypes;
-import org.bbekker.genealogy.common.AppConstants.Roles;
 import org.bbekker.genealogy.common.SystemConstants;
 import org.bbekker.genealogy.repository.BaseName;
 import org.bbekker.genealogy.repository.BaseNamePrefix;
@@ -182,21 +179,7 @@ public class InitServiceImpl implements InitService {
 
 		Boolean result = Boolean.FALSE;
 
-		// First, load fixed set of gender types from the enumeration.
-		/*
-		if (GenderTypes.values().length > 0) {
-
-			// Load the roles from the enumeration.
-			for (GenderTypes acGenderType : GenderTypes.values()) {
-				Gender gender = new Gender(acGenderType.getGenderQualifier(), acGenderType.getGenderSymbol(),
-						acGenderType.getGenderDescription());
-				gender = genderRepository.save(gender);
-			}
-			result = Boolean.TRUE;
-		}
-		 */
-
-		// Next, load additional gender types from csv file.
+		// Load additional gender types from csv file.
 		try {
 
 			final Resource resource = new ClassPathResource(AppConstants.GENDER_CSV_PATH);
@@ -209,10 +192,12 @@ public class InitServiceImpl implements InitService {
 
 				// Skip empty entries
 				final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
-				if (	(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // id
+				if (
+						(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // id
 						(lineList.get(1) != null && !lineList.get(1).isEmpty()) && // qualifier
 						(lineList.get(2) != null && !lineList.get(2).isEmpty()) && // description
-						(lineList.get(3) != null && !lineList.get(3).isEmpty())) // symbol
+						(lineList.get(3) != null && !lineList.get(3).isEmpty()) // symbol
+						)
 				{
 					Gender gender = new Gender(lineList.get(0), lineList.get(1), lineList.get(2), lineList.get(3));
 					gender = genderRepository.save(gender);
@@ -235,18 +220,7 @@ public class InitServiceImpl implements InitService {
 
 		Boolean result = Boolean.FALSE;
 
-		// First, load fixed set of roles from the enumeration.
-		if (Roles.values().length > 0) {
-
-			// Load the roles from the enumeration.
-			for (Roles acRrole : Roles.values()) {
-				RoleType roleType = new RoleType(acRrole.getRoleQualifier(), acRrole.getRoleDescription());
-				roleType = roleTypeRepository.save(roleType);
-			}
-			result = Boolean.TRUE;
-		}
-
-		// Next, load additional roles types from csv file.
+		// Load additional roles types from csv file.
 		try {
 
 			final Resource resource = new ClassPathResource(AppConstants.ROLE_CSV_PATH);
@@ -284,20 +258,7 @@ public class InitServiceImpl implements InitService {
 
 		Boolean result = Boolean.FALSE;
 
-		// First, load fixed set of relationship types from the enumeration.
-		if (RelationshipTypes.values().length > 0) {
-
-			// Load the relationship types from the enumeration.
-			for (RelationshipTypes acRelationshipType : RelationshipTypes.values()) {
-				RelationshipType relationshipType = new RelationshipType(
-						acRelationshipType.getRelationshipTypeQualifier(),
-						acRelationshipType.getRelationshipTypeDescription());
-				relationshipType = relationshipTypeRepository.save(relationshipType);
-			}
-			result = Boolean.TRUE;
-		}
-
-		// Next, load additional relationship types from csv file.
+		// Load additional relationship types from csv file.
 		try {
 
 			final Resource resource = new ClassPathResource(AppConstants.RELATIONSHIP_TYPE_CSV_PATH);
@@ -311,10 +272,12 @@ public class InitServiceImpl implements InitService {
 				// Skip empty entries
 				final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 				if (
-						(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // qualifier
-						(lineList.get(1) != null && !lineList.get(1).isEmpty())) // description
+						(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // id
+						(lineList.get(1) != null && !lineList.get(1).isEmpty()) && // qualifier
+						(lineList.get(2) != null && !lineList.get(2).isEmpty()) // description
+						)
 				{
-					RelationshipType role = new RelationshipType(lineList.get(0), lineList.get(1));
+					RelationshipType role = new RelationshipType(lineList.get(0), lineList.get(1), lineList.get(2));
 					role = relationshipTypeRepository.save(role);
 				}
 			}
@@ -335,22 +298,7 @@ public class InitServiceImpl implements InitService {
 
 		Boolean result = Boolean.FALSE;
 
-
-		// First, load fixed set of relationship types from the enumeration.
-		if (EventTypes.values().length > 0) {
-
-			// Load the relationship types from the enumeration.
-			for (EventTypes acEventType : EventTypes.values()) {
-				EventType eventType = new EventType(
-						acEventType.getEventTypeQualifier(),
-						acEventType.getEventTypeCategory(),
-						acEventType.getEventTypeDescription());
-				eventType = eventTypeRepository.save(eventType);
-			}
-			result = Boolean.TRUE;
-		}
-
-		// Next, load additional relationship types from csv file.
+		// Load additional relationship types from csv file.
 		try {
 
 			final Resource resource = new ClassPathResource(AppConstants.EVENT_TYPE_CSV_PATH);
@@ -364,11 +312,14 @@ public class InitServiceImpl implements InitService {
 				// Skip empty entries
 				final List<String> lineList = Arrays.asList(line.split(SystemConstants.COMMA));
 				if (
-						(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // qualifier
+						(lineList.get(0) != null && !lineList.get(0).isEmpty()) && // id
 						(lineList.get(1) != null && !lineList.get(1).isEmpty()) && // category
-						(lineList.get(2) != null && !lineList.get(2).isEmpty())) // description
+						(lineList.get(2) != null && !lineList.get(2).isEmpty()) && // qualifier
+						(lineList.get(3) != null && !lineList.get(3).isEmpty()) // description
+						)
 				{
-					EventType eventType = new EventType(lineList.get(0), lineList.get(1), lineList.get(2));
+					EventType eventType = new EventType(lineList.get(0), lineList.get(1), lineList.get(2), lineList.get(3));
+					logger.info("EventType: " + eventType.toString());
 					eventType = eventTypeRepository.save(eventType);
 				}
 			}

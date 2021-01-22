@@ -6,8 +6,17 @@ import org.springframework.stereotype.Service;
 @Service
 public interface GenderService {
 
-	public Gender getGenderByQualifier(String qualifier);
+	public Gender getByQualifier(String qualifier);
 
 	public Iterable<Gender> getAllGenders();
 
+	public Gender getMale();
+
+	public Gender getFemale();
+
+	public Gender getIntersexual();
+
+	public Gender getUndefined();
+
+	public Gender getOther();
 }

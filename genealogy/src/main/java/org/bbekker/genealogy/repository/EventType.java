@@ -6,30 +6,30 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.GenericGenerator;
-
 @Entity
 @Table(name = "EVENT_TYPE")
+//@Table(name = "EVENT_TYPE", uniqueConstraints = @UniqueConstraint(columnNames = {"CATEGORY", "QUALIFIER"}))
 public class EventType implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	// The event type id is not generated; unique values need to be provided when these event type entries are loaded.
+	// This shouldn't be a problem, as the entries should be a fixed limited set.
 	@Id
-	@GeneratedValue(generator = "system-uuid")
-	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
-	private String id;
-
 	@Basic(optional = false, fetch = FetchType.EAGER)
-	@Column(name = "QUALIFIER", nullable = false, unique = true)
-	private String qualifier;
+	@Column(name = "ID", nullable = false, unique = true)
+	private String id;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Column(name = "CATEGORY", nullable = false, unique = false)
 	private String category;
+
+	@Basic(optional = false, fetch = FetchType.EAGER)
+	@Column(name = "QUALIFIER", nullable = false, unique = false)
+	private String qualifier;
 
 	@Basic(optional = false, fetch = FetchType.EAGER)
 	@Column(name = "DESCRIPTION", nullable = false, unique = false)
@@ -38,19 +38,16 @@ public class EventType implements Serializable {
 	protected EventType() {
 	}
 
-	public EventType(String qualifier, String category, String description) {
-		this.qualifier = qualifier;
+	public EventType(String id, String category, String qualifier,  String description) {
+		this.id = id;
 		this.category = category;
+		this.qualifier = qualifier;
 		this.description = description;
 	}
 
 	@Override
 	public String toString() {
 		return String.format("EventType[id=%s qualifier='%s' category='%s' description='%s']", id, qualifier, category, description);
-	}
-
-	public void setId(String id) {
-		this.id = id;
 	}
 
 	public String getId() {

@@ -34,7 +34,6 @@ import org.bbekker.genealogy.repository.IndividualRepository;
 import org.bbekker.genealogy.repository.Relationship;
 import org.bbekker.genealogy.repository.RelationshipRepository;
 import org.bbekker.genealogy.repository.RelationshipType;
-import org.bbekker.genealogy.repository.RelationshipTypeRepository;
 import org.bbekker.genealogy.repository.RoleType;
 import org.bbekker.genealogy.repository.RoleTypeRepository;
 import org.slf4j.Logger;
@@ -70,7 +69,7 @@ public class ImportServiceImpl implements ImportService {
 	private RelationshipRepository relationshipRepository;
 
 	@Autowired
-	private RelationshipTypeRepository relationshipTypeRepository;
+	private RelationshipTypeService relationshipTypeService;
 
 	@Autowired
 	private RoleTypeRepository roleTypeRepository;
@@ -468,7 +467,7 @@ public class ImportServiceImpl implements ImportService {
 				// otherwise there is the risk of duplicating those dates in the db.
 				if (birthDate != null || (birthNote != null && !birthNote.isEmpty())) {
 					EventType birthEventType = eventTypeRepository
-							.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+							.findByQualifier(EventTypes.BIRTH.getQualifier());
 					Event birthEvent = new Event(individual, birthEventType, birthDate);
 					birthEvent.setEventPlace(birthPlace);
 					birthEvent.setEventNote(birthNote);
@@ -477,7 +476,7 @@ public class ImportServiceImpl implements ImportService {
 
 				if (deathDate != null || (deathNote != null && !deathNote.isEmpty())) {
 					EventType deathEventType = eventTypeRepository
-							.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+							.findByQualifier(EventTypes.DEATH.getQualifier());
 					Event deathEvent = new Event(individual, deathEventType, deathDate);
 					deathEvent.setEventPlace(deathPlace);
 					deathEvent.setEventNote(deathNote);
@@ -492,7 +491,7 @@ public class ImportServiceImpl implements ImportService {
 
 			if (partnersRelationDate != null || (relationshipNote != null && !relationshipNote.isEmpty())) {
 				EventType partnerEventType = eventTypeRepository
-						.findByQualifier(EventTypes.MARRIAGE.getEventTypeQualifier());
+						.findByQualifier(EventTypes.MARRIAGE.getQualifier());
 				Event partnerEvent = new Event(individual, partnerEventType, partnersRelationDate);
 				partnerEvent.setEventPlace(partnersRelationPlace);
 				partnerEvent.setEventNote(relationshipNote);
@@ -501,7 +500,7 @@ public class ImportServiceImpl implements ImportService {
 
 			if (partnersSeparationDate != null || (separationNote != null && !separationNote.isEmpty())) {
 				EventType partnerEventType = eventTypeRepository
-						.findByQualifier(EventTypes.DIVORCE.getEventTypeQualifier());
+						.findByQualifier(EventTypes.DIVORCE.getQualifier());
 				Event partnerEvent = new Event(individual, partnerEventType, partnersSeparationDate);
 				partnerEvent.setEventPlace(partnersSeparationPlace);
 				partnerEvent.setEventNote(separationNote);
@@ -581,7 +580,7 @@ public class ImportServiceImpl implements ImportService {
 
 				if (partnerBirthDate != null || (partnerBirthNote != null && !partnerBirthNote.isEmpty())) {
 					EventType birthEventType = eventTypeRepository
-							.findByQualifier(EventTypes.BIRTH.getEventTypeQualifier());
+							.findByQualifier(EventTypes.BIRTH.getQualifier());
 					Event birthEvent = new Event(partnerIndividual, birthEventType, partnerBirthDate);
 					birthEvent.setEventPlace(partnerBirthPlace);
 					birthEvent.setEventNote(partnerBirthNote);
@@ -591,7 +590,7 @@ public class ImportServiceImpl implements ImportService {
 
 				if (partnerDeathDate != null || (partnerDeathNote != null && !partnerDeathNote.isEmpty())) {
 					EventType deathEventType = eventTypeRepository
-							.findByQualifier(EventTypes.DEATH.getEventTypeQualifier());
+							.findByQualifier(EventTypes.DEATH.getQualifier());
 					Event deathEvent = new Event(partnerIndividual, deathEventType, partnerDeathDate);
 					deathEvent.setEventPlace(partnerDeathPlace);
 					deathEvent.setEventNote(partnerDeathNote);
@@ -601,7 +600,7 @@ public class ImportServiceImpl implements ImportService {
 
 				if (partnersRelationDate != null || (relationshipNote != null && !relationshipNote.isEmpty())) {
 					EventType partnerEventType = eventTypeRepository
-							.findByQualifier(EventTypes.MARRIAGE.getEventTypeQualifier());
+							.findByQualifier(EventTypes.MARRIAGE.getQualifier());
 					Event partnerEvent = new Event(partnerIndividual, partnerEventType, partnersRelationDate);
 					partnerEvent.setEventPlace(partnersRelationPlace);
 					partnerEvent.setEventNote(relationshipNote);
@@ -611,7 +610,7 @@ public class ImportServiceImpl implements ImportService {
 
 				if (partnersSeparationDate != null || (separationNote != null && !separationNote.isEmpty())) {
 					EventType partnerEventType = eventTypeRepository
-							.findByQualifier(EventTypes.DIVORCE.getEventTypeQualifier());
+							.findByQualifier(EventTypes.DIVORCE.getQualifier());
 					Event partnerEvent = new Event(partnerIndividual, partnerEventType, partnersSeparationDate);
 					partnerEvent.setEventPlace(partnersSeparationPlace);
 					partnerEvent.setEventNote(separationNote);
@@ -620,17 +619,13 @@ public class ImportServiceImpl implements ImportService {
 				}
 
 				// The relationship is husband-wife.
-				RoleType partner1RoleType = getRoleType(individual, Roles.HUSBAND.getRoleQualifier(),
-						Roles.WIFE.getRoleQualifier(), Roles.HUSBAND.getRoleQualifier());
-				RoleType partner2RoleType = getRoleType(partnerIndividual, Roles.HUSBAND.getRoleQualifier(),
-						Roles.WIFE.getRoleQualifier(), Roles.HUSBAND.getRoleQualifier());
+				RoleType partner1RoleType = getRoleType(individual, Roles.HUSBAND.getQualifier(),
+						Roles.WIFE.getQualifier(), Roles.HUSBAND.getQualifier());
+				RoleType partner2RoleType = getRoleType(partnerIndividual, Roles.HUSBAND.getQualifier(),
+						Roles.WIFE.getQualifier(), Roles.HUSBAND.getQualifier());
 
-				RelationshipType relationshipType = null;
-				Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository
-						.findByQualifier(RelationshipTypes.MARRIED.getRelationshipTypeQualifier());
-				if (optionalRelationshipType.isPresent()) {
-					relationshipType = optionalRelationshipType.get();
-				}
+				RelationshipType relationshipType =
+						relationshipTypeService.getRelationshipTypeByQualifier(RelationshipTypes.MARRIED.getQualifier());
 
 				if (partner1RoleType != null && partner2RoleType != null && relationshipType != null) {
 					Relationship relationship = new Relationship(individual, partnerIndividual, partner1RoleType,
@@ -692,16 +687,16 @@ public class ImportServiceImpl implements ImportService {
 				Optional<Individual> optionalParent1 = individualRepository.findById(parent1Id);
 				if (optionalParent1.isPresent()) {
 					parent1 = optionalParent1.get();
-					roleTypeParent1 = getRoleType(parent1, Roles.FATHER.getRoleQualifier(),
-							Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
+					roleTypeParent1 = getRoleType(parent1, Roles.FATHER.getQualifier(),
+							Roles.MOTHER.getQualifier(), Roles.FATHER.getQualifier());
 				}
 			}
 			if (parent2Id != null && !parent2Id.isEmpty()) {
 				Optional<Individual> optionalParent2 = individualRepository.findById(parent2Id);
 				if (optionalParent2.isPresent()) {
 					parent2 = optionalParent2.get();
-					roleTypeParent2 = getRoleType(parent2, Roles.FATHER.getRoleQualifier(),
-							Roles.MOTHER.getRoleQualifier(), Roles.FATHER.getRoleQualifier());
+					roleTypeParent2 = getRoleType(parent2, Roles.FATHER.getQualifier(),
+							Roles.MOTHER.getQualifier(), Roles.FATHER.getQualifier());
 				}
 			}
 			if (childId != null && !childId.isEmpty()) {
@@ -709,18 +704,14 @@ public class ImportServiceImpl implements ImportService {
 				if (optionalChild.isPresent()) {
 					child = optionalChild.get();
 					// Get the role of the child (son or daughter)
-					roleTypeChild = getRoleType(child, Roles.SON.getRoleQualifier(), Roles.DAUGHTER.getRoleQualifier(),
-							Roles.SON.getRoleQualifier());
+					roleTypeChild = getRoleType(child, Roles.SON.getQualifier(), Roles.DAUGHTER.getQualifier(),
+							Roles.SON.getQualifier());
 				}
 			}
 
 			// The relationship is parent-child.
-			RelationshipType relationshipType = null;
-			Optional<RelationshipType> optionalRelationshipType = relationshipTypeRepository
-					.findByQualifier(RelationshipTypes.PARENT_CHILD.getRelationshipTypeQualifier());
-			if (optionalRelationshipType.isPresent()) {
-				relationshipType = optionalRelationshipType.get();
-			}
+			RelationshipType relationshipType =
+					relationshipTypeService.getRelationshipTypeByQualifier(RelationshipTypes.PARENT_CHILD.getQualifier());
 
 			// Finally save the relationship of the child and its first parent.
 			if (child != null && roleTypeChild != null && parent1 != null && roleTypeParent1 != null
@@ -801,12 +792,12 @@ public class ImportServiceImpl implements ImportService {
 		Gender gender = null;
 
 		if (field.equals(AppConstants.MALE_NL)) {
-			gender = genderService.getGenderByQualifier(AppConstants.GenderTypes.MALE.getQualifier());
+			gender = genderService.getMale();
 		} else {
 			if (field.equals(AppConstants.FEMALE_NL)) {
-				gender = genderService.getGenderByQualifier(AppConstants.GenderTypes.FEMALE.getQualifier());
+				gender = genderService.getFemale();
 			} else {
-				gender = genderService.getGenderByQualifier(AppConstants.GenderTypes.UNDEFINED.getQualifier());
+				gender = genderService.getUndefined();
 			}
 		}
 

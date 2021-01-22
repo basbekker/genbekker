@@ -139,7 +139,7 @@ public class IndividualController {
 		// Get the (maybe updated) individual from the form.
 		Individual individual = individualForm.getIndividual();
 		String genderTypeQualifier = setGenderTypeQualifier(individualForm.getGenderType(), locale);
-		Gender gender = genderService.getGenderByQualifier(genderTypeQualifier);
+		Gender gender = genderService.getByQualifier(genderTypeQualifier);
 		if (gender != null) {
 			individual.setGender(gender);
 		}

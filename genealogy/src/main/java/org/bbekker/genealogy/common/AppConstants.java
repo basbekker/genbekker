@@ -60,37 +60,26 @@ public class AppConstants {
 	 * The relationship types define the relationships that exists between two individuals.
 	 * Used fields:
 	 * - the qualifier that uniquely identifies the relationship,
-	 * - the textual description of the relationship in English.
 	 */
 	public enum RelationshipTypes {
-		PARENT_CHILD ("PARENT_CHILD", "parent child"),
-		MARRIED ("MARRIAGE", "marriage"),
-		PARTNERS ("PARTNERSHIP", "partners"),
-		COUSINS ("COUSINS", "cousins"),
-		FRIEND ("FRIENDS", "friends");
+		PARENT_CHILD ("PARENT_CHILD"),
+		MARRIED ("MARRIAGE"),
+		PARTNERS ("PARTNERSHIP"),
+		COUSINS ("COUSINS"),
+		FRIEND ("FRIENDS");
 
 		private final String qualifier;
-		private final String description;
 
-		RelationshipTypes(String qualifier, String description) {
+		RelationshipTypes(String qualifier) {
 			this.qualifier = qualifier;
-			this.description = description;
 		}
 
 		public String getName() {
 			return this.getName();
 		}
 
-		public String getRelationshipTypeQualifier() {
+		public String getQualifier() {
 			return qualifier;
-		}
-
-		public String getRelationshipTypeDescription() {
-			return description;
-		}
-
-		public String getMessageKey() {
-			return RELATIONSHIPTYPE_MESSAGE_PREFIX + SystemConstants.DOT + qualifier;
 		}
 
 		public static Stream<RelationshipTypes> stream() {
@@ -98,48 +87,39 @@ public class AppConstants {
 		}
 	}
 
+
 	public enum Roles {
-		FATHER ("FATHER", "father"),
-		MOTHER ("MOTHER", "mother"),
-		SON ("SON", "son"),
-		DAUGHTER ("DAUGHTER", "daughter"),
-		HUSBAND ("HUSBAND", "husband"),
-		WIFE ("WIFE", "wife"),
-		PARTNER ("PARTNER", "partner"),
-		COUSIN ("COUSIN", "cousin"),
-		NIECE ("NIECE", "niece"),
-		UNCLE ("UNCLE", "uncle"),
-		AUNT ("AUNT", "aunt"),
-		NEPHEW ("NEPHEW", "nephew"),
-		NIECE_UA ("NIECE_UA", "niece (from uncle/aunt"),
-		PATERNAL_GRANDFATHER ("PATERNAL_GRANDFATHER", "paternal grandfather"),
-		PATERNAL_GRANDMOTHER ("PATERNAL_GRANDMOTHER", "paternal grandmother"),
-		MATERNAL_GRANDFATHER ("MATERNAL_GRANDFATHER", "maternal grandfather"),
-		MATERNAL_GRANDMOTHER ("MATERNAL_GRANDMOTHER", "maternal grandmother"),
-		FRIEND ("FRIEND", "friend");
+		FATHER ("FATHER"),
+		MOTHER ("MOTHER"),
+		SON ("SON"),
+		DAUGHTER ("DAUGHTER"),
+		HUSBAND ("HUSBAND"),
+		WIFE ("WIFE"),
+		PARTNER ("PARTNER"),
+		COUSIN ("COUSIN"),
+		NIECE ("NIECE"),
+		UNCLE ("UNCLE"),
+		AUNT ("AUNT"),
+		NEPHEW ("NEPHEW"),
+		NIECE_UA ("NIECE_UA"),
+		PATERNAL_GRANDFATHER ("PATERNAL_GRANDFATHER"),
+		PATERNAL_GRANDMOTHER ("PATERNAL_GRANDMOTHER"),
+		MATERNAL_GRANDFATHER ("MATERNAL_GRANDFATHER"),
+		MATERNAL_GRANDMOTHER ("MATERNAL_GRANDMOTHER"),
+		FRIEND ("FRIEND");
 
 		private final String qualifier;
-		private final String description;
 
-		Roles(String qualifier, String description) {
+		Roles(String qualifier) {
 			this.qualifier = qualifier;
-			this.description = description;
 		}
 
 		public String getName() {
 			return this.getName();
 		}
 
-		public String getRoleQualifier() {
+		public String getQualifier() {
 			return qualifier;
-		}
-
-		public String getRoleDescription() {
-			return description;
-		}
-
-		public String getMessageKey() {
-			return ROLE_MESSAGE_PREFIX + SystemConstants.DOT + qualifier;
 		}
 
 		public static Stream<Roles> stream() {
@@ -151,31 +131,25 @@ public class AppConstants {
 	 * The relationship types define the relationships that exists between two individuals.
 	 * Used fields:
 	 * - the qualifier that uniquely identifies the relationship,
-	 * - the textual description of the relationship in English.
 	 */
 	public enum EventTypeCategories {
-		INDIVIDUAL ("INDIVIDUAL", "events for individuals"),
-		RELATIONSHIP ("RELATIONSHIP", "events for relationships");
+		INDIVIDUAL ("INDIVIDUAL"),
+		RELATIONSHIP ("RELATIONSHIP");
 
 		private final String category;
-		private final String description;
 
-		EventTypeCategories(String category, String description) {
+		EventTypeCategories(String category) {
 			this.category = category;
-			this.description = description;
 		}
 
 		public String getName() {
 			return this.getName();
 		}
 
-		public String getEventTypeCategory() {
+		public String getCategory() {
 			return category;
 		}
 
-		public String getEventTypeDescription() {
-			return description;
-		}
 	}
 
 	/**
@@ -185,48 +159,32 @@ public class AppConstants {
 	 * - the textual description of the relationship in English.
 	 */
 	public enum EventTypes {
-		BIRTH ("BIRTH", "INDIVIDUAL", "birth"),
-		DEATH ("DEATH", "INDIVIDUAL", "death"),
-		MARRIAGE ("MARRIAGE", "RELATIONSHIP", "marriage"),
-		DIVORCE ("DIVORCE", "RELATIONSHIP", "divorce"),
-		PARNTERS ("PARTNERS", "RELATIONSHIP", "parthership");
+		BIRTH ("BIRTH", "INDIVIDUAL"),
+		DEATH ("DEATH", "INDIVIDUAL"),
+		MARRIAGE ("MARRIAGE", "RELATIONSHIP"),
+		DIVORCE ("DIVORCE", "RELATIONSHIP"),
+		PARNTERS ("PARTNERS", "RELATIONSHIP");
 
 		private final String qualifier;
 		private final String category;
-		private final String description;
 
-		EventTypes(String qualifier, String category, String description) {
+		EventTypes(String qualifier, String category) {
 			this.qualifier = qualifier;
 			this.category = category;
-			this.description = description;
 		}
 
 		public String getName() {
 			return this.getName();
 		}
 
-		public String getEventTypeQualifier() {
+		public String getQualifier() {
 			return qualifier;
 		}
 
-		public String getEventTypeCategory() {
+		public String getCategory() {
 			return category;
 		}
-
-		public String getEventTypeDescription() {
-			return description;
-		}
-
-		public String getMessageKey() {
-			return EVENTTYPE_MESSAGE_PREFIX + SystemConstants.DOT + qualifier;
-		}
-
-		public static Stream<RelationshipTypes> stream() {
-			return Stream.of(RelationshipTypes.values());
-		}
 	}
-
-
 
 	public static <E extends Enum<E>> boolean isInEnum(String value, Class<E> enumClass) {
 		for (E e : enumClass.getEnumConstants()) {

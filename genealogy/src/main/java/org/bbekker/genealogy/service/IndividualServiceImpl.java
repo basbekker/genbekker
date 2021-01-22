@@ -157,7 +157,7 @@ public class IndividualServiceImpl implements IndividualService {
 		List<RelationshipWithOther> relations = fullIndividual.getRelationshipsWithOther();
 		for (RelationshipWithOther relation : relations) {
 			RoleType roleType = relation.getOtherRoleType();
-			if ( roleType.getQualifier().equals(Roles.SON.getRoleQualifier()) || roleType.getQualifier().equals(Roles.DAUGHTER.getRoleQualifier()) ) {
+			if ( roleType.getQualifier().equals(Roles.SON.getQualifier()) || roleType.getQualifier().equals(Roles.DAUGHTER.getQualifier()) ) {
 				kids.add(relation.getOtherIndividual());
 			}
 		}
@@ -177,7 +177,7 @@ public class IndividualServiceImpl implements IndividualService {
 			List<RelationshipWithOther> relations = fullIndividual.getRelationshipsWithOther();
 			for (RelationshipWithOther relation : relations) {
 				RoleType roleType = relation.getOtherRoleType();
-				if ( roleType.getQualifier().equals(Roles.HUSBAND.getRoleQualifier()) || roleType.getQualifier().equals(Roles.WIFE.getRoleQualifier()) ) {
+				if ( roleType.getQualifier().equals(Roles.HUSBAND.getQualifier()) || roleType.getQualifier().equals(Roles.WIFE.getQualifier()) ) {
 					partner = relation.getOtherIndividual();
 				}
 			}
