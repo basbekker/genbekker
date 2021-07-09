@@ -3,15 +3,16 @@ var path = require('path');
 module.exports = {
     entry: {
     	app: './src/main/resources/js/app.js',
-    	dice: './src/main/resources/js/static.js/game/dice.js',
-    	tictactoe: './src/main/resources/js/static.js/game/tictactoe.js'
+    	dice: './src/main/resources/public/js/game/dice.js',
+    	tictactoe: './src/main/resources/public/js/game/tictactoe.js'
     },
     devtool: 'sourcemaps',
     mode: 'development',
     cache: true,
     output: {
         path: __dirname,
-        filename: './src/main/resources/static/built/bundle.js'
+        filename: '[name].js',
+        chunkFilename: '[id].[chunkhash].js'
     },
     module: {
         rules: [
