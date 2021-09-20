@@ -41,7 +41,7 @@ public class IndividualRestController {
 	MessageSource messageSource;
 
 
-	@RequestMapping(path = "/create", method = RequestMethod.POST)
+	@RequestMapping(path = "/create", method = RequestMethod.POST, consumes = "application/json")
 	public ResponseEntity<Object> createIndividual(
 			@RequestBody Individual individual) {
 		Individual createdIndividual = individualRepository.save(individual);
@@ -84,7 +84,7 @@ public class IndividualRestController {
 		return ResponseEntity.ok().build();
 	}
 
-	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
+	@RequestMapping(path = "/{id}", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<Individual> getSelfIndividual(
 			@PathVariable("id") String id) {
 		return getIndividual(id);
@@ -98,7 +98,7 @@ public class IndividualRestController {
 		return ResponseEntity.of(optionalIndividual);
 	}
 
-	@RequestMapping(path = "/search", method = RequestMethod.GET)
+	@RequestMapping(path = "/search", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<Object> searchIndividual(
 			@RequestParam("search") String term) {
 
@@ -107,7 +107,7 @@ public class IndividualRestController {
 		return ResponseEntity.ok(individuals);
 	}
 
-	@RequestMapping(path = "/all", method = RequestMethod.GET)
+	@RequestMapping(path = "/all", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<Object> getAll() {
 
 		PageHandlerUtil<Individual> pageHandler = individualService.findAll();

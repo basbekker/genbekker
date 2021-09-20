@@ -1,10 +1,10 @@
-package org.bbekker.genealogy.dto;
+package org.bbekker.genealogy.api;
 
 import org.bbekker.genealogy.repository.Event;
 import org.bbekker.genealogy.repository.Individual;
 import org.bbekker.genealogy.repository.Relationship;
 
-public class IndividualEditDTO {
+public class IndividualDTO {
 
 	private Individual individual;
 
@@ -17,35 +17,35 @@ public class IndividualEditDTO {
 	private Relationship partner;
 
 
-	public IndividualEditDTO() {
+	public IndividualDTO() {
 		individual = null;
 		birth = null;
 		death = null;
 	}
 
-	public IndividualEditDTO(Individual individual) {
+	public IndividualDTO(Individual individual) {
 		this.individual = individual;
 	}
 
-	public IndividualEditDTO(Individual individual, String genderType) {
+	public IndividualDTO(Individual individual, String genderType) {
 		this.individual = individual;
 		this.genderType = genderType;
 	}
 
-	public IndividualEditDTO(Individual individual, String genderType, Event birth) {
+	public IndividualDTO(Individual individual, String genderType, Event birth) {
 		this.individual = individual;
 		this.genderType = genderType;
 		this.birth = birth;
 	}
 
-	public IndividualEditDTO(Individual individual, String genderType, Event birth, Event death) {
+	public IndividualDTO(Individual individual, String genderType, Event birth, Event death) {
 		this.individual = individual;
 		this.genderType = genderType;
 		this.birth = birth;
 		this.death = death;
 	}
 
-	public IndividualEditDTO(Individual individual, String genderType, Event birth, Event death, Relationship partner) {
+	public IndividualDTO(Individual individual, String genderType, Event birth, Event death, Relationship partner) {
 		this.individual = individual;
 		this.genderType = genderType;
 		this.birth = birth;

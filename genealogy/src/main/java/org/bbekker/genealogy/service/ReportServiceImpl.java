@@ -3,8 +3,8 @@ package org.bbekker.genealogy.service;
 import java.util.List;
 import java.util.Locale;
 
-import org.bbekker.genealogy.dto.OffspringDTO;
-import org.bbekker.genealogy.dto.OffspringListDTO;
+import org.bbekker.genealogy.api.OffspringDTO;
+import org.bbekker.genealogy.api.OffspringListDTO;
 import org.bbekker.genealogy.repository.Individual;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

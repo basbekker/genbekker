@@ -1,4 +1,4 @@
-package org.bbekker.genealogy.dto;
+package org.bbekker.genealogy.api;
 
 import java.util.Date;
 

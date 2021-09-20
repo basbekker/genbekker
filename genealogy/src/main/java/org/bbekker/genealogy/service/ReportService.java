@@ -2,7 +2,7 @@ package org.bbekker.genealogy.service;
 
 import java.util.Locale;
 
-import org.bbekker.genealogy.dto.OffspringListDTO;
+import org.bbekker.genealogy.api.OffspringListDTO;
 import org.springframework.stereotype.Service;
 
 @Service

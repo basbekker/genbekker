@@ -1,4 +1,4 @@
-package org.bbekker.genealogy.common;
+package org.bbekker.genealogy.configuration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;

@@ -1,6 +1,6 @@
 package org.bbekker.genealogy;
 
-import org.bbekker.genealogy.common.LuceneConfiguration;
+import org.bbekker.genealogy.configuration.LuceneConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

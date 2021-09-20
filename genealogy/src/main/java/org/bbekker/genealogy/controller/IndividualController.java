@@ -6,9 +6,9 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bbekker.genealogy.api.IndividualDTO;
 import org.bbekker.genealogy.common.AppConstants;
 import org.bbekker.genealogy.common.SystemConstants;
-import org.bbekker.genealogy.dto.IndividualEditDTO;
 import org.bbekker.genealogy.repository.Event;
 import org.bbekker.genealogy.repository.Gender;
 import org.bbekker.genealogy.repository.Individual;
@@ -54,7 +54,7 @@ public class IndividualController {
 			Locale locale,
 			Model model) {
 
-		IndividualEditDTO individualForm = new IndividualEditDTO();
+		IndividualDTO individualForm = new IndividualDTO();
 
 		Individual individual = new Individual(SystemConstants.EMPTY_STRING, SystemConstants.EMPTY_STRING);
 		individual.setId(AppConstants.ID_PLACEHOLDER);
@@ -75,7 +75,7 @@ public class IndividualController {
 			Locale locale,
 			Model model) {
 
-		IndividualEditDTO individualForm = new IndividualEditDTO();
+		IndividualDTO individualForm = new IndividualDTO();
 
 		Individual individual = individualService.get(id);
 		if (individual != null) {
@@ -116,7 +116,7 @@ public class IndividualController {
 	@RequestMapping(path = "/save/{id}", method = RequestMethod.POST)
 	public String saveIndividual(
 			@PathVariable("id") String id,
-			@ModelAttribute(value = "form") IndividualEditDTO individualForm,
+			@ModelAttribute(value = "form") IndividualDTO individualForm,
 			@RequestParam(value = "action", required = false) String action,
 			Locale locale,
 			Model model) {

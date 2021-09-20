@@ -33,7 +33,7 @@ public class ImportRestController {
 	@Value("${org.bbekker.genealogy.upload.folder}")
 	String UPLOAD_FOLDER;
 
-	@RequestMapping(path = "/bekkercsv", method = RequestMethod.GET)
+	@RequestMapping(path = "/bekkercsv", method = RequestMethod.GET, produces = "application/text")
 	public ResponseEntity<?> doBekkerCsvImport(Locale locale) {
 
 		Boolean parseResult = Boolean.FALSE;
@@ -57,7 +57,7 @@ public class ImportRestController {
 		}
 	}
 
-	@RequestMapping(path = "/bekkertestcsv", method = RequestMethod.GET)
+	@RequestMapping(path = "/bekkertestcsv", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<?> doBekkerTestCsvImport(Locale locale) {
 
 		Boolean parseResult = Boolean.FALSE;

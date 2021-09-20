@@ -1,7 +1,8 @@
-package org.bbekker.genealogy.common;
+package org.bbekker.genealogy.configuration;
 
 import java.util.Locale;
 
+import org.bbekker.genealogy.common.LuceneIndexServiceBean;
 import org.bbekker.genealogy.service.InitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +10,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-//@Order(1)
 public class SystemInitialization implements CommandLineRunner {
 
 	@Autowired

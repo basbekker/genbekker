@@ -1,9 +1,12 @@
-package org.bbekker.genealogy.common;
+package org.bbekker.genealogy.configuration;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.bbekker.genealogy.common.LuceneIndexServiceBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class LuceneConfiguration {
 
 	@Bean

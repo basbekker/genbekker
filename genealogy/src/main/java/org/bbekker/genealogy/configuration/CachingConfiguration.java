@@ -1,4 +1,4 @@
-package org.bbekker.genealogy.common;
+package org.bbekker.genealogy.configuration;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
