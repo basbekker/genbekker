@@ -61,7 +61,15 @@ public class UploadController {
 
 			// Get the file and save it in a separate upload storage
 			byte[] bytes = file.getBytes();
-			Path path = Paths.get(UPLOAD_FOLDER + file.getOriginalFilename());
+			String filename = file.getOriginalFilename();
+			if (filename.contains("..") || filename.contains("/") || filename.contains("\\")) {
+				throw new IllegalArgumentException("Invalid filename");
+			}
+			Path uploadDir = Paths.get(UPLOAD_FOLDER).normalize().toAbsolutePath();
+			Path path = uploadDir.resolve(filename).normalize().toAbsolutePath();
+			if (!path.startsWith(uploadDir)) {
+				throw new IllegalArgumentException("Invalid filename");
+			}
 			Files.write(path, bytes);
 
 			Future<Boolean> importTask;
